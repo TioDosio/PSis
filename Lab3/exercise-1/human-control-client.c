@@ -57,26 +57,30 @@ int main()
         {
         case KEY_LEFT:
             mvprintw(0, 0, "%d Left arrow is pressed", n);
+            m.direction = LEFT;
             break;
         case KEY_RIGHT:
             mvprintw(0, 0, "%d Right arrow is pressed", n);
+            m.direction = RIGHT;
             break;
         case KEY_DOWN:
             mvprintw(0, 0, "%d Down arrow is pressed", n);
+            m.direction = DOWN;
             break;
         case KEY_UP:
             mvprintw(0, 0, "%d :Up arrow is pressed", n);
+            m.direction = UP;
             break;
         default:
             ch = 'x';
             break;
         }
-        refresh(); /* Print it on to the real screen */
-                   // TODO_9
-                   //  prepare the movement message
+        refresh();
+        /* Print it on to the real screen */
+        // TODO_9
+        //  prepare the movement message
         if (ch != 'x')
         {
-            m.direction = ch;
             write(fd, &m, sizeof(m));
         }
         // TODO_10

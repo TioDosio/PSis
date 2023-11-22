@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-// #include <stdlib.h>
 #define WINDOW_SIZE 15
 
 direction_t random_direction()
