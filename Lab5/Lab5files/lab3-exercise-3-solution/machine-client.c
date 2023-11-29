@@ -7,23 +7,15 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <ctype.h>
+#include <zmq.h>
 
 int main()
 {	 
-
-    //TODO_4
-    // create and open the FIFO for writing
-
-    int fd;
-    while((fd = open(FIFO_NAME, O_WRONLY))== -1){
-	  if(mkfifo(FIFO_NAME, 0666)!=0){
-			printf("problem creating the fifo\n");
-			exit(-1);
-	  }else{
-		  printf("fifo created\n");
-	  }
-	}
-	printf("fifo just opened\n");
+    // creating request socket
+    printf ("Connecting to server…\n");
+    void *context = zmq_ctx_new ();
+    void *requester = zmq_socket (context, ZMQ_REQ);
+    zmq_connect (requester, ADDRESS_RC); 
 
     //TODO_5
     // read the character from the user
@@ -33,15 +25,13 @@ int main()
         ch = getchar();
         ch = tolower(ch);  
     }while(!isalpha(ch));
-
+ 
     // TODO_6
     // send connection message
     remote_char_t m;
     m.msg_type = 0;
     m.ch = ch;
-    write(fd, &m, sizeof(remote_char_t));
-    
-    
+    zmq_send (requester, &m, sizeof(m), 0);
 
     int sleep_delay;
     direction_t direction;
@@ -75,9 +65,12 @@ int main()
 
         //TODO_10
         //send the movement message
-        write(fd, &m, sizeof(m));
+        zmq_send (requester, &m, sizeof(m), 0);
+        zmq_recv (requester, &m, sizeof(m), 0);
     }
+    zmq_close (requester);
+    zmq_ctx_destroy (context);
 
- 
+
 	return 0;
 }

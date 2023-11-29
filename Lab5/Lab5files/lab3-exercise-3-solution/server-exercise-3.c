@@ -1,11 +1,11 @@
-
+#include <zmq.h>
 #include <ncurses.h>
 #include "remote-char.h"
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>  
 #include <stdlib.h>
+ #include <assert.h>
 
 #define WINDOW_SIZE 15 
 
@@ -66,19 +66,15 @@ int main()
     ch_info_t char_data[100];
     int n_chars = 0;
 
-
-    int fd;
     remote_char_t m;
-	while((fd = open(FIFO_NAME, O_RDONLY))== -1){
-	    if(mkfifo(FIFO_NAME, 0666)!=0){
-			printf("problem creating the fifo\n");
-			exit(-1);
-	    }else{
-		    printf("fifo created\n");
-	    }
-	}
-	printf("fifo just opened\n");
 
+    //  Socket to talk to clients
+    void *context = zmq_ctx_new ();
+    void *responder = zmq_socket (context, ZMQ_REP);
+    int rc = zmq_bind (responder, ADDRESS_RC);
+    assert(rc == 0);
+
+    // Initialize the screen
 	initscr();		    	
 	cbreak();				
     keypad(stdscr, TRUE);   
@@ -97,8 +93,7 @@ int main()
     direction_t  direction;
     while (1)
     {
-
-        read(fd, &m, sizeof(remote_char_t));
+        zmq_recv (responder, &m, sizeof(m), 0);
         if(m.msg_type == 0){
             ch = m.ch;
             pos_x = WINDOW_SIZE/2;
@@ -110,6 +105,8 @@ int main()
             char_data[n_chars].pos_y = pos_y;
             n_chars++;
         }
+        
+        zmq_send (responder, &m, sizeof(m), 0);
         if(m.msg_type == 1){
             //STEP 4
             int ch_pos = find_ch_info(char_data, n_chars, m.ch);

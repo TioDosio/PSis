@@ -9,4 +9,4 @@ typedef struct remote_char_t
     /* data */
 }remote_char_t;
 
-#define FIFO_NAME "/tmp/fifo_snail"
+#define ADDRESS_RC "ipc:///tmp/s1"

@@ -4,29 +4,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>  
- #include <ctype.h> 
- #include <stdlib.h>
+#include <ctype.h> 
+#include <stdlib.h>
+#include <zmq.h>
+
  
 
 int main()
 {
-
-
-
-
-    //TODO_4
-    // create and open the FIFO for writing
-    int fd;
-    while((fd = open(FIFO_NAME, O_WRONLY))== -1){
-	  if(mkfifo(FIFO_NAME, 0666)!=0){
-			printf("problem creating the fifo\n");
-			exit(-1);
-	  }else{
-		  printf("fifo created\n");
-	  }
-	}
-	printf("fifo just opened\n");
-
+    // creating request socket
+    printf ("Connecting to server…\n");
+    void *context = zmq_ctx_new ();
+    void *requester = zmq_socket (context, ZMQ_REQ);
+    zmq_connect (requester, ADDRESS_RC); 
 
     //TODO_5
     // read the character from the user
@@ -43,7 +33,7 @@ int main()
     remote_char_t m;
     m.msg_type = 0;
     m.ch = ch;
-    write(fd, &m, sizeof(remote_char_t));
+    zmq_send (requester, &m, sizeof(m), 0);
 
 
 	initscr();			/* Start curses mode 		*/
@@ -53,15 +43,17 @@ int main()
 
     int n = 0;
 
-    //TODO_9
-    // prepare the movement message
-    m.msg_type = 1;
-    m.ch = ch;
-    
     int key;
     do
     {
-    	key = getch();		
+        //TODO_9
+        // prepare the movement message
+        m.msg_type = 1;
+        m.ch = ch;
+        m.direction = 0;
+    
+    	key = getch();	
+        usleep(10000);	
         n++;
         switch (key)
         {
@@ -69,7 +61,7 @@ int main()
             mvprintw(0,0,"%d Left arrow is pressed", n);
             //TODO_9
             // prepare the movement message
-           m.direction = LEFT;
+            m.direction = LEFT;
             break;
         case KEY_RIGHT:
             mvprintw(0,0,"%d Right arrow is pressed", n);
@@ -81,7 +73,7 @@ int main()
             mvprintw(0,0,"%d Down arrow is pressed", n);
             //TODO_9
             // prepare the movement message
-           m.direction = DOWN;
+            m.direction = DOWN;
             break;
         case KEY_UP:
             mvprintw(0,0,"%d :Up arrow is pressed", n);
@@ -98,12 +90,16 @@ int main()
         //TODO_10
         //send the movement message
          if (key != 'x'){
-            write(fd, &m, sizeof(m));
+            zmq_send (requester, &m, sizeof(m), 0);
+            zmq_recv (requester, &m, sizeof(m), 0);
+            mvprintw(1,0,"Received %d", m.msg_type);
+
         }
         refresh();			/* Print it on to the real screen */
     }while(key != 27);
     
-    
+    zmq_close (requester);
+    zmq_ctx_destroy (context);
   	endwin();			/* End curses mode		  */
 
 	return 0;
