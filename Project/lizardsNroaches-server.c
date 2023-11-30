@@ -16,10 +16,6 @@ typedef struct ch_info_t
     int pos_x, pos_y;
 } ch_info_t;
 
-direction_t random_direction()
-{
-    return random() % 4;
-}
 void new_position(int *x, int *y, direction_t direction)
 {
     switch (direction)
