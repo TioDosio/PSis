@@ -1,6 +1,6 @@
 #include <zmq.h>
 #include <ncurses.h>
-#include "remote-char.h"
+#include "lizardsNroaches.h"
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -65,7 +65,7 @@ int main()
     ch_info_t char_data[100];
     int n_chars = 0;
 
-    remote_char_t m;
+    generic_msg m;
 
     //  Socket to talk to clients
     void *context = zmq_ctx_new();
@@ -94,7 +94,7 @@ int main()
         zmq_recv(responder, &m, sizeof(m), 0);
         if (m.msg_type == 0)
         {
-            ch = m.ch;
+            ch = m.ch_lizards;
             pos_x = WINDOW_SIZE / 2;
             pos_y = WINDOW_SIZE / 2;
 
@@ -109,7 +109,7 @@ int main()
         if (m.msg_type == 1)
         {
             // STEP 4
-            int ch_pos = find_ch_info(char_data, n_chars, m.ch);
+            int ch_pos = find_ch_info(char_data, n_chars, m.ch_lizards);
             if (ch_pos != -1)
             {
                 pos_x = char_data[ch_pos].pos_x;
