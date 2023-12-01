@@ -8,15 +8,22 @@
 #include <fcntl.h>
 #include <ctype.h>
 #include <zmq.h>
+#include <time.h>
 
 int main(int argc, char *argv[])
 {
+    int port, ip;
     // para colocar o ip e a porta como argumentos
-    /*if (argc != 3)
+    if (argc != 3)
     {
-        printf("You insert %s arguments, you need 3\n", argc);
-        return 1; // Return an error code
-    }*/
+        port = atoi(argv[2]);
+        ip = atoi(argv[1]);
+    }
+    else
+    {
+        printf("banana");
+    }
+    printf("MAX ROACHES: %d\n", MAX_ROACHES);
 
     // creating request socket
     printf("Connecting to server…\n");
@@ -24,16 +31,12 @@ int main(int argc, char *argv[])
     void *requester = zmq_socket(context, ZMQ_REQ);
     zmq_connect(requester, ADDRESS_RC);
 
-    // TODO_5
-    //  read the character from the user
     srand(time(NULL));
     int points_roach = rand() % 5 + 1;
 
-    // TODO_6
-    // send connection message
     generic_msg m;
     m.msg_type = 0;
-    m.points_roach = points_roach;
+    m.ch = points_roach;
     zmq_send(requester, &m, sizeof(m), 0);
 
     int sleep_delay;
@@ -61,13 +64,9 @@ int main(int argc, char *argv[])
             break;
         }
 
-        // TODO_9
-        //  prepare the movement message
         m.direction = direction;
         m.msg_type = 1;
 
-        // TODO_10
-        // send the movement message
         zmq_send(requester, &m, sizeof(m), 0);
         zmq_recv(requester, &m, sizeof(m), 0);
     }

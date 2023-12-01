@@ -7,9 +7,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#define WINDOW_SIZE 30
-
-// STEP 1
 typedef struct ch_info_t
 {
     int ch;
@@ -61,13 +58,11 @@ int find_ch_info(ch_info_t char_data[], int n_char, int ch)
 int main()
 {
 
-    // STEP 2
     ch_info_t char_data[100];
     int n_chars = 0;
 
     generic_msg m;
 
-    //  Socket to talk to clients
     void *context = zmq_ctx_new();
     void *responder = zmq_socket(context, ZMQ_REP);
     int rc = zmq_bind(responder, ADDRESS_RC);
@@ -94,11 +89,10 @@ int main()
         zmq_recv(responder, &m, sizeof(m), 0);
         if (m.msg_type == 0)
         {
-            ch = m.ch_lizards;
+            ch = m.ch;
             pos_x = WINDOW_SIZE / 2;
             pos_y = WINDOW_SIZE / 2;
 
-            // STEP 3
             char_data[n_chars].ch = ch;
             char_data[n_chars].pos_x = pos_x;
             char_data[n_chars].pos_y = pos_y;
@@ -109,7 +103,7 @@ int main()
         if (m.msg_type == 1)
         {
             // STEP 4
-            int ch_pos = find_ch_info(char_data, n_chars, m.ch_lizards);
+            int ch_pos = find_ch_info(char_data, n_chars, m.ch);
             if (ch_pos != -1)
             {
                 pos_x = char_data[ch_pos].pos_x;
@@ -133,7 +127,7 @@ int main()
         waddch(my_win, ch | A_BOLD);
         wrefresh(my_win);
     }
-    endwin(); /* End curses mode		  */
+    endwin(); /* End curses mode */
 
     return 0;
 }

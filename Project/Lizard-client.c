@@ -8,8 +8,14 @@
 #include <stdlib.h>
 #include <zmq.h>
 
-int main()
+int main(int argc, char *argv[])
 {
+    // para colocar o ip e a porta como argumentos
+    /*if (argc != 3)
+    {
+        printf("You insert %s arguments, you need 3\n", argc);
+        return 1; // Return an error code
+    }*/
     // creating request socket
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
@@ -30,7 +36,7 @@ int main()
     // send connection message
     generic_msg m;
     m.msg_type = 0;
-    m.ch_lizards = ch;
+    m.ch = ch;
     zmq_send(requester, &m, sizeof(m), 0);
 
     initscr();            /* Start curses mode 		*/
@@ -46,7 +52,7 @@ int main()
         // TODO_9
         //  prepare the movement message
         m.msg_type = 1;
-        m.ch_lizards = ch;
+        m.ch = ch;
         m.direction = 0;
 
         key = getch();
