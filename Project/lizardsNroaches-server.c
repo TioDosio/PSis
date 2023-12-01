@@ -141,7 +141,7 @@ int main()
             int ch_pos;
             switch (m.entity_type)
             {
-            case 0: // if lizard
+            case LIZARD:
                 ch_pos = find_entity_id(lizard_array, n_lizards, m.ch);
                 if (ch_pos != -1)
                 {
@@ -161,8 +161,8 @@ int main()
                     lizard_array[ch_pos].pos_y = pos_y;
                 }
                 break;
-            case 1: // if roach
-                ch_pos = find_entity_id(lizard_array, n_roaches, m.ch);
+            case ROACH: 
+                ch_pos = find_entity_id(roach_array, n_roaches, m.ch);
                 if (ch_pos != -1)
                 {
                     pos_x = roach_array[ch_pos].pos_x;

@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
 
         zmq_send(requester, &m, sizeof(m), 0);
         zmq_recv(requester, &r, sizeof(r), 0);
+        printf("Received %d\n", r.success);
     }
     zmq_close(requester);
     zmq_ctx_destroy(context);
