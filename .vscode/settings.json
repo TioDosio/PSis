@@ -2,5 +2,16 @@
     "files.associations": {
         "*.rmd": "markdown",
         "ncurses.h": "c"
-    }
+    },
+    "makefile.launchConfigurations": [
+        {
+           "cwd": "/home/guilherme/Psis/Group/PSis/Project",
+           "binaryPath": "/home/guilherme/Psis/Group/PSis/Project/lizardsNroaches-server",
+           "binaryArgs": [
+              "arg1",
+              "arg2"
+           ],
+           "stopAtEntry": true
+        }
+      ]
 }

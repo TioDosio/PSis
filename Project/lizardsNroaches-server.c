@@ -89,7 +89,7 @@ int main()
         if (m.msg_type == 0) // if connection request
         {
             r.success = 0;
-            ;
+            
             switch (m.entity_type)
             {
             case LIZARD:
@@ -116,7 +116,7 @@ int main()
                 {
                     roach_array[n_roaches].entity_type = m.entity_type;
                     roach_array[n_roaches].ch = m.ch;
-                    roach_array[n_roaches].points = atoi(m.ch);
+                    roach_array[n_roaches].points = m.ch - '0';
                     roach_array[n_roaches].pos_x = rand() % WINDOW_SIZE + 1;
                     roach_array[n_roaches].pos_y = rand() % WINDOW_SIZE + 1;
                     n_roaches++;
@@ -142,7 +142,7 @@ int main()
             switch (m.entity_type)
             {
             case 0: // if lizard
-                int ch_pos = find_entity_id(lizard_array, n_lizards, m.ch);
+                ch_pos = find_entity_id(lizard_array, n_lizards, m.ch);
                 if (ch_pos != -1)
                 {
                     pos_x = lizard_array[ch_pos].pos_x;
