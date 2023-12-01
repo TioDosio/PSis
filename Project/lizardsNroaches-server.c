@@ -6,12 +6,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <assert.h>
-
-typedef struct ch_info_t
-{
-    int ch;
-    int pos_x, pos_y;
-} ch_info_t;
+#include <time.h>
 
 void new_position(int *x, int *y, direction_t direction)
 {
@@ -42,9 +37,9 @@ void new_position(int *x, int *y, direction_t direction)
     }
 }
 
-int find_ch_info(ch_info_t char_data[], int n_char, int ch)
+// returns the position of the entity in the array
+int find_entity_id(entity_t char_data[], int n_char, int ch)
 {
-
     for (int i = 0; i < n_char; i++)
     {
         if (ch == char_data[i].ch)
@@ -57,11 +52,15 @@ int find_ch_info(ch_info_t char_data[], int n_char, int ch)
 
 int main()
 {
-
-    ch_info_t char_data[100];
-    int n_chars = 0;
+    // Define lizards and roaches
+    entity_t lizard_array[MAX_LIZARDS];
+    entity_t roach_array[MAX_ROACHES];
+    int n_roaches = 0;
+    int n_lizards = 0;
+    srand(time(NULL));
 
     generic_msg m;
+    response_msg r;
 
     void *context = zmq_ctx_new();
     void *responder = zmq_socket(context, ZMQ_REP);
@@ -87,39 +86,103 @@ int main()
     while (1)
     {
         zmq_recv(responder, &m, sizeof(m), 0);
-        if (m.msg_type == 0)
+        if (m.msg_type == 0) // if connection request
         {
-            ch = m.ch;
-            pos_x = WINDOW_SIZE / 2;
-            pos_y = WINDOW_SIZE / 2;
-
-            char_data[n_chars].ch = ch;
-            char_data[n_chars].pos_x = pos_x;
-            char_data[n_chars].pos_y = pos_y;
-            n_chars++;
-        }
-
-        zmq_send(responder, &m, sizeof(m), 0);
-        if (m.msg_type == 1)
-        {
-            // STEP 4
-            int ch_pos = find_ch_info(char_data, n_chars, m.ch);
-            if (ch_pos != -1)
+            r.success = 0;
+            ;
+            switch (m.entity_type)
             {
-                pos_x = char_data[ch_pos].pos_x;
-                pos_y = char_data[ch_pos].pos_y;
-                ch = char_data[ch_pos].ch;
-                /*deletes old place */
-                wmove(my_win, pos_x, pos_y);
-                waddch(my_win, ' ');
+            case LIZARD:
+                if (n_lizards <= MAX_LIZARDS)
+                {
+                    lizard_array[n_lizards].entity_type = m.entity_type;
+                    lizard_array[n_lizards].ch = m.ch;
+                    lizard_array[n_lizards].points = 0;
+                    lizard_array[n_lizards].pos_x = rand() % (WINDOW_SIZE - 1) + 1;
+                    lizard_array[n_lizards].pos_y = rand() % (WINDOW_SIZE - 1) + 1;
+                    n_lizards++;
+                    r.success = 1;
+                }
+                else
+                {
+                    // mandar response a dizer que nao pode
+                    printf("Too many lizards\n");
+                    r.success = 0;
+                }
+                break;
 
-                /* claculates new direction */
-                direction = m.direction;
+            case ROACH:
+                if (n_roaches <= MAX_ROACHES)
+                {
+                    roach_array[n_roaches].entity_type = m.entity_type;
+                    roach_array[n_roaches].ch = m.ch;
+                    roach_array[n_roaches].points = atoi(m.ch);
+                    roach_array[n_roaches].pos_x = rand() % WINDOW_SIZE + 1;
+                    roach_array[n_roaches].pos_y = rand() % WINDOW_SIZE + 1;
+                    n_roaches++;
+                    r.success = 1;
+                }
+                else
+                {
+                    // mandar response a dizer que nao pode
+                    printf("Too many roaches\n");
+                    r.success = 0;
+                }
+                break;
 
-                /* claculates new mark position */
-                new_position(&pos_x, &pos_y, direction);
-                char_data[ch_pos].pos_x = pos_x;
-                char_data[ch_pos].pos_y = pos_y;
+            default:
+                break;
+            }
+        }
+        zmq_send(responder, &r, sizeof(r), 0);
+
+        if (m.msg_type == 1) // if movement request
+        {
+            int ch_pos;
+            switch (m.entity_type)
+            {
+            case 0: // if lizard
+                int ch_pos = find_entity_id(lizard_array, n_lizards, m.ch);
+                if (ch_pos != -1)
+                {
+                    pos_x = lizard_array[ch_pos].pos_x;
+                    pos_y = lizard_array[ch_pos].pos_y;
+                    ch = lizard_array[ch_pos].ch;
+                    /*deletes old place */
+                    wmove(my_win, pos_x, pos_y);
+                    waddch(my_win, ' ');
+
+                    /* calculates new direction */
+                    direction = m.direction;
+
+                    /* claculates new mark position */
+                    new_position(&pos_x, &pos_y, direction);
+                    lizard_array[ch_pos].pos_x = pos_x;
+                    lizard_array[ch_pos].pos_y = pos_y;
+                }
+                break;
+            case 1: // if roach
+                ch_pos = find_entity_id(lizard_array, n_roaches, m.ch);
+                if (ch_pos != -1)
+                {
+                    pos_x = roach_array[ch_pos].pos_x;
+                    pos_y = roach_array[ch_pos].pos_y;
+                    ch = roach_array[ch_pos].ch;
+                    /*deletes old place */
+                    wmove(my_win, pos_x, pos_y);
+                    waddch(my_win, ' ');
+
+                    /* claculates new direction */
+                    direction = m.direction;
+
+                    /* claculates new mark position */
+                    new_position(&pos_x, &pos_y, direction);
+                    roach_array[ch_pos].pos_x = pos_x;
+                    roach_array[ch_pos].pos_y = pos_y;
+                }
+                break;
+            default:
+                break;
             }
         }
         /* draw mark on new position */

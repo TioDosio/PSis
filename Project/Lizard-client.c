@@ -16,13 +16,13 @@ int main(int argc, char *argv[])
         printf("You insert %s arguments, you need 3\n", argc);
         return 1; // Return an error code
     }*/
+
     // creating request socket
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
     void *requester = zmq_socket(context, ZMQ_REQ);
     zmq_connect(requester, ADDRESS_RC);
-
-    // TODO_5
+    response_msg r;
     //  read the character from the user
     char ch;
     do
@@ -32,10 +32,10 @@ int main(int argc, char *argv[])
         ch = tolower(ch);
     } while (!isalpha(ch));
 
-    // TODO_6
     // send connection message
     generic_msg m;
-    m.msg_type = 0;
+    m.msg_type = 0; // connection msg
+    m.entity_type = 0;
     m.ch = ch;
     zmq_send(requester, &m, sizeof(m), 0);
 
@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
     int key;
     do
     {
-        // TODO_9
         //  prepare the movement message
         m.msg_type = 1;
         m.ch = ch;
@@ -62,25 +61,21 @@ int main(int argc, char *argv[])
         {
         case KEY_LEFT:
             mvprintw(0, 0, "%d Left arrow is pressed", n);
-            // TODO_9
             //  prepare the movement message
             m.direction = LEFT;
             break;
         case KEY_RIGHT:
             mvprintw(0, 0, "%d Right arrow is pressed", n);
-            // TODO_9
             //  prepare the movement message
             m.direction = RIGHT;
             break;
         case KEY_DOWN:
             mvprintw(0, 0, "%d Down arrow is pressed", n);
-            // TODO_9
             //  prepare the movement message
             m.direction = DOWN;
             break;
         case KEY_UP:
             mvprintw(0, 0, "%d :Up arrow is pressed", n);
-            // TODO_9
             //  prepare the movement message
             m.direction = UP;
             break;
@@ -97,13 +92,12 @@ int main(int argc, char *argv[])
             break;
         }
 
-        // TODO_10
         // send the movement message
         if (key != 'x')
         {
             zmq_send(requester, &m, sizeof(m), 0);
-            zmq_recv(requester, &m, sizeof(m), 0);
-            mvprintw(1, 0, "Received %d", m.msg_type);
+            zmq_recv(requester, &r, sizeof(r), 0);
+            mvprintw(1, 0, "Received %d", r.success);
         }
         refresh(); /* Print it on to the real screen */
     } while (key != 27);

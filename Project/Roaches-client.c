@@ -14,31 +14,32 @@ int main(int argc, char *argv[])
 {
     int port, ip;
     // para colocar o ip e a porta como argumentos
-    if (argc != 3)
+    if (argc == 3)
     {
         port = atoi(argv[2]);
         ip = atoi(argv[1]);
     }
     else
     {
-        printf("banana");
+        port = 5555; // mudar para o ip e porta do servidor
+        ip = "";
     }
-    printf("MAX ROACHES: %d\n", MAX_ROACHES);
 
     // creating request socket
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
     void *requester = zmq_socket(context, ZMQ_REQ);
     zmq_connect(requester, ADDRESS_RC);
-
+    response_msg r;
     srand(time(NULL));
-    int points_roach = rand() % 5 + 1;
+    int points_roach = rand() % 4 + 1;
 
     generic_msg m;
     m.msg_type = 0;
-    m.ch = points_roach;
+    m.entity_type = ROACH;
+    m.ch = points_roach + '0';
     zmq_send(requester, &m, sizeof(m), 0);
-
+    zmq_recv(requester, &r, sizeof(r), 0);
     int sleep_delay;
     direction_t direction;
     int n = 0;
@@ -68,7 +69,7 @@ int main(int argc, char *argv[])
         m.msg_type = 1;
 
         zmq_send(requester, &m, sizeof(m), 0);
-        zmq_recv(requester, &m, sizeof(m), 0);
+        zmq_recv(requester, &r, sizeof(r), 0);
     }
     zmq_close(requester);
     zmq_ctx_destroy(context);

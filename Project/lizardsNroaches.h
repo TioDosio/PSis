@@ -1,19 +1,21 @@
 #define ADDRESS_RC "ipc:///tmp/s1"
 #define WINDOW_SIZE 30
 #define MAX_ROACHES (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
+#define MAX_LIZARDS 26
 
-typedef struct lizard_t
+typedef enum entity_type_t
 {
-    char name;
-    int points;
-    unsigned short int pos[2];
-} lizard_t;
+    LIZARD,
+    ROACH
+} entity_type_t;
 
-typedef struct roach_t
+typedef struct entity_t
 {
-    unsigned short int value;
-    unsigned short int pos[2];
-} roach_t;
+    entity_type_t entity_type;
+    char ch;
+    unsigned int points;
+    unsigned short int pos_x, pos_y;
+} entity_t;
 
 typedef enum direction_t
 {
@@ -25,21 +27,18 @@ typedef enum direction_t
 
 typedef struct generic_msg // connect or movement or disconnect
 {
-    unsigned short int entity_type; /* 0 - lizard, 1 - roach */
-    unsigned short int msg_type;    /* 0 - connect   1 - move   2 - disconnect*/
-    char ch;                        /* value to send (points of roaches or char of lizard) */
-    direction_t direction;          /* direction of movement */
-
+    entity_type_t entity_type;
+    unsigned short int msg_type; /* 0 - connect   1 - move   2 - disconnect*/
+    char ch;                     /* value to send (points of roaches or char of lizard) */
+    direction_t direction;       /* direction of movement */
 } generic_msg;
 
-typedef struct update_msg
+typedef struct display_msg
 {
-    lizard_t array_lizards[26];
-    roach_t array_roaches[MAX_ROACHES];
-} update_msg;
+    entity_t array_entities[MAX_LIZARDS + MAX_ROACHES];
+} display_msg;
 
-typedef struct response
+typedef struct response_msg
 {
-    unsigned short int name_check;
-
-} response;
+    unsigned short int success; /* 0 - fail, 1 - success */
+} response_msg;

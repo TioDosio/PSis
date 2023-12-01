@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra 
+CFLAGS = -Wall -Wextra -g
 LIBS = -lncurses -lzmq
 
 all: Display-app Lizard-client lizardsNroaches-server Roaches-client
