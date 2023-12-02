@@ -50,6 +50,81 @@ int find_entity_id(entity_t char_data[], int n_char, int ch)
     return -1;
 }
 
+void draw_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
+{
+    switch (direction)
+    {
+    case UP:
+        mvwprintw(win, pos_x + 1, pos_y, "*");
+        mvwprintw(win, pos_x + 2, pos_y, "*");
+        mvwprintw(win, pos_x + 3, pos_y, "*");
+        mvwprintw(win, pos_x + 4, pos_y, "*");
+        mvwprintw(win, pos_x + 5, pos_y, "*");
+
+        break;
+    case DOWN:
+        mvwprintw(win, pos_x - 1, pos_y, "*");
+        mvwprintw(win, pos_x - 2, pos_y, "*");
+        mvwprintw(win, pos_x - 3, pos_y, "*");
+        mvwprintw(win, pos_x - 4, pos_y, "*");
+        mvwprintw(win, pos_x - 5, pos_y, "*");
+        break;
+    case LEFT:
+        mvwprintw(win, pos_x, pos_y + 1, "*");
+        mvwprintw(win, pos_x, pos_y + 2, "*");
+        mvwprintw(win, pos_x, pos_y + 3, "*");
+        mvwprintw(win, pos_x, pos_y + 4, "*");
+        mvwprintw(win, pos_x, pos_y + 5, "*");
+        break;
+    case RIGHT:
+        mvwprintw(win, pos_x, pos_y - 1, "*");
+        mvwprintw(win, pos_x, pos_y - 2, "*");
+        mvwprintw(win, pos_x, pos_y - 3, "*");
+        mvwprintw(win, pos_x, pos_y - 4, "*");
+        mvwprintw(win, pos_x, pos_y - 5, "*");
+        break;
+    default:
+        break;
+    }
+}
+
+void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
+{
+    switch (direction)
+    {
+    case UP:
+        mvwprintw(win, pos_x + 1, pos_y, " ");
+        mvwprintw(win, pos_x + 2, pos_y, " ");
+        mvwprintw(win, pos_x + 3, pos_y, " ");
+        mvwprintw(win, pos_x + 4, pos_y, " ");
+        mvwprintw(win, pos_x + 5, pos_y, " ");
+        break;
+    case DOWN:
+        mvwprintw(win, pos_x - 1, pos_y, " ");
+        mvwprintw(win, pos_x - 2, pos_y, " ");
+        mvwprintw(win, pos_x - 3, pos_y, " ");
+        mvwprintw(win, pos_x - 4, pos_y, " ");
+        mvwprintw(win, pos_x - 5, pos_y, " ");
+        break;
+    case LEFT:
+        mvwprintw(win, pos_x, pos_y + 1, " ");
+        mvwprintw(win, pos_x, pos_y + 2, " ");
+        mvwprintw(win, pos_x, pos_y + 3, " ");
+        mvwprintw(win, pos_x, pos_y + 4, " ");
+        mvwprintw(win, pos_x, pos_y + 5, " ");
+        break;
+    case RIGHT:
+        mvwprintw(win, pos_x, pos_y - 1, " ");
+        mvwprintw(win, pos_x, pos_y - 2, " ");
+        mvwprintw(win, pos_x, pos_y - 3, " ");
+        mvwprintw(win, pos_x, pos_y - 4, " ");
+        mvwprintw(win, pos_x, pos_y - 5, " ");
+        break;
+    default:
+        break;
+    }
+}
+
 int main()
 {
     // Define lizards and roaches
@@ -89,7 +164,7 @@ int main()
         if (m.msg_type == 0) // if connection request
         {
             r.success = 0;
-            
+
             switch (m.entity_type)
             {
             case LIZARD:
@@ -151,6 +226,7 @@ int main()
                     /*deletes old place */
                     wmove(my_win, pos_x, pos_y);
                     waddch(my_win, ' ');
+                    clear_body(my_win, pos_x, pos_y, direction);
 
                     /* calculates new direction */
                     direction = m.direction;
@@ -159,9 +235,10 @@ int main()
                     new_position(&pos_x, &pos_y, direction);
                     lizard_array[ch_pos].pos_x = pos_x;
                     lizard_array[ch_pos].pos_y = pos_y;
+                    draw_body(my_win, pos_x, pos_y, direction);
                 }
                 break;
-            case ROACH: 
+            case ROACH:
                 ch_pos = find_entity_id(roach_array, n_roaches, m.ch);
                 if (ch_pos != -1)
                 {
@@ -184,11 +261,11 @@ int main()
             default:
                 break;
             }
+            wmove(my_win, pos_x, pos_y);
+            waddch(my_win, ch | A_BOLD);
+            wrefresh(my_win);
         }
         /* draw mark on new position */
-        wmove(my_win, pos_x, pos_y);
-        waddch(my_win, ch | A_BOLD);
-        wrefresh(my_win);
     }
     endwin(); /* End curses mode */
 
