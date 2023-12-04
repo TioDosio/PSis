@@ -51,7 +51,6 @@ int find_entity_id(entity_t entity[], int n_entities, int ch)
     return -1;
 }
 
-
 int main()
 {
     // Define lizards and roaches
@@ -100,9 +99,9 @@ int main()
                     lizard_array[n_lizards].points = 0;
                     lizard_array[n_lizards].pos_x = rand() % (WINDOW_SIZE - 1) + 1;
                     lizard_array[n_lizards].pos_y = rand() % (WINDOW_SIZE - 1) + 1;
-                    
+
                     disp_draw_entity(my_win, lizard_array[n_lizards]);
-                    
+
                     n_lizards++;
                     r.success = 1;
                 }
@@ -139,7 +138,8 @@ int main()
             default:
                 break;
             }
-        } else if (m.msg_type == 1) // if movement request
+        }
+        else if (m.msg_type == 1) // if movement request
         {
             int entity_id;
             entity_t old_entity;
@@ -150,11 +150,11 @@ int main()
                 entity_id = find_entity_id(lizard_array, n_lizards, m.ch);
                 if (entity_id != -1)
                 {
-                    old_entity = lizard_array[entity_id]; //save old values
+                    old_entity = lizard_array[entity_id]; // save old values
                 }
                 break;
             case ROACH:
-                    old_entity = roach_array[entity_id]; //save old values
+                old_entity = roach_array[entity_id]; // save old values
                 break;
             default:
                 r.success = 0;
@@ -163,25 +163,25 @@ int main()
             }
 
             // Common procedure for both Roaches and Lizards
-            if(entity_id != -1)
+            if (entity_id != -1)
             {
                 pos_x = old_entity.pos_x;
                 pos_y = old_entity.pos_y;
 
-                //Copy old values to new entity
+                // Copy old values to new entity
                 new_entity = old_entity;
-                
-                //update new direction rom message
+
+                // update new direction rom message
                 new_entity.direction = m.direction;
-                new_position(&pos_x, &pos_y, m.direction); 
-                new_entity.pos_x =  pos_x;  
+                new_position(&pos_x, &pos_y, m.direction);
+                new_entity.pos_x = pos_x;
                 new_entity.pos_y = pos_y;
 
-                //Delete old entity and draw new one
+                // Delete old entity and draw new one
                 disp_clear_entity(my_win, old_entity);
                 disp_draw_entity(my_win, new_entity);
 
-                //Save values in array
+                // Save values in array
                 switch (m.entity_type)
                 {
                 case LIZARD:
@@ -193,8 +193,19 @@ int main()
                 default:
                     break;
                 }
+                int i = 0;
+                for (; i < n_lizards; i++)
+                {
+                    disp_clear_entity(my_win, lizard_array[i]);
+                    disp_draw_entity(my_win, lizard_array[i]);
+                }
+                i = 0;
+                for (; i < n_roaches; i++)
+                {
+                    disp_clear_entity(my_win, roach_array[i]);
+                    disp_draw_entity(my_win, roach_array[i]);
+                }
             }
-            
         }
         wrefresh(my_win);
         zmq_send(responder, &r, sizeof(r), 0);
