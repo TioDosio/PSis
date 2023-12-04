@@ -38,9 +38,11 @@ int main(int argc, char *argv[])
     m.entity_type = 0;
     m.ch = ch;
     zmq_send(requester, &m, sizeof(m), 0);
+    zmq_recv(requester, &r, sizeof(r), 0);
 
     initscr();            /* Start curses mode 		*/
     cbreak();             /* Line buffering disabled	*/
+    mvprintw(0, 0, "Received reply: %d", r.success);
     keypad(stdscr, TRUE); /* We get F1, F2 etc..		*/
     noecho();             /* Don't echo() while we do getch */
 

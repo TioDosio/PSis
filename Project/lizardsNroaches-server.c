@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
+#include "display-funcs.h"
 
 void new_position(int *x, int *y, direction_t direction)
 {
@@ -37,12 +38,12 @@ void new_position(int *x, int *y, direction_t direction)
     }
 }
 
-// returns the position of the entity in the array
-int find_entity_id(entity_t char_data[], int n_char, int ch)
+// returns correct position of the entity from the array
+int find_entity_id(entity_t entity[], int n_entities, int ch)
 {
-    for (int i = 0; i < n_char; i++)
+    for (int i = 0; i < n_entities; i++)
     {
-        if (ch == char_data[i].ch)
+        if (ch == entity[i].ch)
         {
             return i;
         }
@@ -50,183 +51,6 @@ int find_entity_id(entity_t char_data[], int n_char, int ch)
     return -1;
 }
 
-void draw_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
-{
-    switch (direction)
-    {
-    case UP:
-        mvwprintw(win, pos_x + 1, pos_y, "*");
-        if (pos_x + 2 != WINDOW_SIZE - 1)
-        {
-            mvwprintw(win, pos_x + 2, pos_y, "*");
-            if (pos_x + 3 != WINDOW_SIZE - 1)
-            {
-                mvwprintw(win, pos_x + 3, pos_y, "*");
-                if (pos_x + 4 != WINDOW_SIZE - 1)
-                {
-                    mvwprintw(win, pos_x + 4, pos_y, "*");
-                    if (pos_x + 5 != WINDOW_SIZE - 1)
-                    {
-                        mvwprintw(win, pos_x + 5, pos_y, "*");
-                    }
-                }
-            }
-        }
-
-        break;
-    case DOWN:
-        mvwprintw(win, pos_x - 1, pos_y, "*");
-        if ((pos_x - 2) > 0)
-        {
-            mvwprintw(win, pos_x - 2, pos_y, "*");
-            if ((pos_x - 3) > 0)
-            {
-                mvwprintw(win, pos_x - 3, pos_y, "*");
-                if ((pos_x - 4) > 0)
-                {
-                    mvwprintw(win, pos_x - 4, pos_y, "*");
-                    if ((pos_x - 5) > 0)
-                    {
-                        mvwprintw(win, pos_x - 5, pos_y, "*");
-                    }
-                }
-            }
-        }
-
-        break;
-    case LEFT:
-        mvwprintw(win, pos_x, pos_y + 1, "*");
-        if (pos_y + 2 != WINDOW_SIZE - 1)
-        {
-            mvwprintw(win, pos_x, pos_y + 2, "*");
-            if (pos_y + 3 != WINDOW_SIZE - 1)
-            {
-                mvwprintw(win, pos_x, pos_y + 3, "*");
-                if (pos_y + 4 != WINDOW_SIZE - 1)
-                {
-                    mvwprintw(win, pos_x, pos_y + 4, "*");
-                    if (pos_y + 5 != WINDOW_SIZE - 1)
-                    {
-                        mvwprintw(win, pos_x, pos_y + 5, "*");
-                    }
-                }
-            }
-        }
-
-        break;
-    case RIGHT:
-        mvwprintw(win, pos_x, pos_y - 1, "*");
-        if (pos_y - 2 > 0)
-        {
-            mvwprintw(win, pos_x, pos_y - 2, "*");
-            if (pos_y - 3 > 0)
-            {
-                mvwprintw(win, pos_x, pos_y - 3, "*");
-                if (pos_y - 4 > 0)
-                {
-                    mvwprintw(win, pos_x, pos_y - 4, "*");
-                    if (pos_y - 5 > 0)
-                    {
-                        mvwprintw(win, pos_x, pos_y - 5, "*");
-                    }
-                }
-            }
-        }
-
-        break;
-    default:
-        break;
-    }
-}
-
-void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
-{
-    switch (direction)
-    {
-    case UP:
-        mvwprintw(win, pos_x + 1, pos_y, " ");
-        if (pos_x + 2 != WINDOW_SIZE - 1)
-        {
-            mvwprintw(win, pos_x + 2, pos_y, " ");
-            if (pos_x + 3 != WINDOW_SIZE - 1)
-            {
-                mvwprintw(win, pos_x + 3, pos_y, " ");
-                if (pos_x + 4 != WINDOW_SIZE - 1)
-                {
-                    mvwprintw(win, pos_x + 4, pos_y, " ");
-                    if (pos_x + 5 != WINDOW_SIZE - 1)
-                    {
-                        mvwprintw(win, pos_x + 5, pos_y, " ");
-                    }
-                }
-            }
-        }
-
-        break;
-    case DOWN:
-        mvwprintw(win, pos_x - 1, pos_y, " ");
-        if (pos_x - 2 > 0)
-        {
-            mvwprintw(win, pos_x - 2, pos_y, " ");
-            if (pos_x - 3 > 0)
-            {
-                mvwprintw(win, pos_x - 3, pos_y, " ");
-                if (pos_x - 4 > 0)
-                {
-                    mvwprintw(win, pos_x - 4, pos_y, " ");
-                    if (pos_x - 5 > 0)
-                    {
-                        mvwprintw(win, pos_x - 5, pos_y, " ");
-                    }
-                }
-            }
-        }
-
-        break;
-    case LEFT:
-        mvwprintw(win, pos_x, pos_y + 1, " ");
-        if (pos_y + 2 != WINDOW_SIZE - 1)
-        {
-            mvwprintw(win, pos_x, pos_y + 2, " ");
-            if (pos_y + 3 != WINDOW_SIZE - 1)
-            {
-                mvwprintw(win, pos_x, pos_y + 3, " ");
-                if (pos_y + 4 != WINDOW_SIZE - 1)
-                {
-                    mvwprintw(win, pos_x, pos_y + 4, " ");
-                    if (pos_y + 5 != WINDOW_SIZE - 1)
-                    {
-                        mvwprintw(win, pos_x, pos_y + 5, " ");
-                    }
-                }
-            }
-        }
-
-        break;
-    case RIGHT:
-        mvwprintw(win, pos_x, pos_y - 1, " ");
-        if (pos_y - 2 > 0)
-        {
-            mvwprintw(win, pos_x, pos_y - 2, " ");
-            if (pos_y - 3 > 0)
-            {
-                mvwprintw(win, pos_x, pos_y - 3, " ");
-                if (pos_y - 4 > 0)
-                {
-                    mvwprintw(win, pos_x, pos_y - 4, " ");
-                    if (pos_y - 5 > 0)
-                    {
-                        mvwprintw(win, pos_x, pos_y - 5, " ");
-                    }
-                }
-            }
-        }
-
-        break;
-    default:
-        break;
-    }
-}
 
 int main()
 {
@@ -256,11 +80,9 @@ int main()
     box(my_win, 0, 0);
     wrefresh(my_win);
 
-    int ch;
     int pos_x;
     int pos_y;
 
-    direction_t direction;
     while (1)
     {
         zmq_recv(responder, &m, sizeof(m), 0);
@@ -278,6 +100,9 @@ int main()
                     lizard_array[n_lizards].points = 0;
                     lizard_array[n_lizards].pos_x = rand() % (WINDOW_SIZE - 1) + 1;
                     lizard_array[n_lizards].pos_y = rand() % (WINDOW_SIZE - 1) + 1;
+                    
+                    disp_draw_entity(my_win, lizard_array[n_lizards]);
+                    
                     n_lizards++;
                     r.success = 1;
                 }
@@ -297,6 +122,9 @@ int main()
                     roach_array[n_roaches].points = m.ch - '0';
                     roach_array[n_roaches].pos_x = rand() % WINDOW_SIZE + 1;
                     roach_array[n_roaches].pos_y = rand() % WINDOW_SIZE + 1;
+
+                    disp_draw_entity(my_win, roach_array[n_roaches]);
+
                     n_roaches++;
                     r.success = 1;
                 }
@@ -311,64 +139,65 @@ int main()
             default:
                 break;
             }
-        }
-        zmq_send(responder, &r, sizeof(r), 0);
-
-        if (m.msg_type == 1) // if movement request
+        } else if (m.msg_type == 1) // if movement request
         {
-            int ch_pos;
+            int entity_id;
+            entity_t old_entity;
+            entity_t new_entity;
             switch (m.entity_type)
             {
             case LIZARD:
-                ch_pos = find_entity_id(lizard_array, n_lizards, m.ch);
-                if (ch_pos != -1)
+                entity_id = find_entity_id(lizard_array, n_lizards, m.ch);
+                if (entity_id != -1)
                 {
-                    pos_x = lizard_array[ch_pos].pos_x;
-                    pos_y = lizard_array[ch_pos].pos_y;
-                    ch = lizard_array[ch_pos].ch;
-                    /*deletes old place */
-                    wmove(my_win, pos_x, pos_y);
-                    waddch(my_win, ' ');
-                    clear_body(my_win, pos_x, pos_y, direction);
-
-                    /* calculates new direction */
-                    direction = m.direction;
-
-                    /* claculates new mark position */
-                    new_position(&pos_x, &pos_y, direction);
-                    lizard_array[ch_pos].pos_x = pos_x;
-                    lizard_array[ch_pos].pos_y = pos_y;
-                    draw_body(my_win, pos_x, pos_y, direction);
+                    old_entity = lizard_array[entity_id]; //save old values
                 }
                 break;
             case ROACH:
-                ch_pos = find_entity_id(roach_array, n_roaches, m.ch);
-                if (ch_pos != -1)
-                {
-                    pos_x = roach_array[ch_pos].pos_x;
-                    pos_y = roach_array[ch_pos].pos_y;
-                    ch = roach_array[ch_pos].ch;
-                    /*deletes old place */
-                    wmove(my_win, pos_x, pos_y);
-                    waddch(my_win, ' ');
-
-                    /* claculates new direction */
-                    direction = m.direction;
-
-                    /* claculates new mark position */
-                    new_position(&pos_x, &pos_y, direction);
-                    roach_array[ch_pos].pos_x = pos_x;
-                    roach_array[ch_pos].pos_y = pos_y;
-                }
+                    old_entity = roach_array[entity_id]; //save old values
                 break;
             default:
+                r.success = 0;
+                entity_id = -1;
                 break;
             }
-            wmove(my_win, pos_x, pos_y);
-            waddch(my_win, ch | A_BOLD);
-            wrefresh(my_win);
+
+            // Common procedure for both Roaches and Lizards
+            if(entity_id != -1)
+            {
+                pos_x = old_entity.pos_x;
+                pos_y = old_entity.pos_y;
+
+                //Copy old values to new entity
+                new_entity = old_entity;
+                
+                //update new direction rom message
+                new_entity.direction = m.direction;
+                new_position(&pos_x, &pos_y, m.direction); 
+                new_entity.pos_x =  pos_x;  
+                new_entity.pos_y = pos_y;
+
+                //Delete old entity and draw new one
+                disp_clear_entity(my_win, old_entity);
+                disp_draw_entity(my_win, new_entity);
+
+                //Save values in array
+                switch (m.entity_type)
+                {
+                case LIZARD:
+                    lizard_array[entity_id] = new_entity;
+                    break;
+                case ROACH:
+                    roach_array[entity_id] = new_entity;
+                    break;
+                default:
+                    break;
+                }
+            }
+            
         }
-        /* draw mark on new position */
+        wrefresh(my_win);
+        zmq_send(responder, &r, sizeof(r), 0);
     }
     endwin(); /* End curses mode */
 
