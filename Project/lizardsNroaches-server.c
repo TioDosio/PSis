@@ -56,32 +56,82 @@ void draw_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
     {
     case UP:
         mvwprintw(win, pos_x + 1, pos_y, "*");
-        mvwprintw(win, pos_x + 2, pos_y, "*");
-        mvwprintw(win, pos_x + 3, pos_y, "*");
-        mvwprintw(win, pos_x + 4, pos_y, "*");
-        mvwprintw(win, pos_x + 5, pos_y, "*");
+        if (pos_x + 2 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 2, pos_y, "*");
+        }
+        if (pos_x + 3 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 3, pos_y, "*");
+        }
+        if (pos_x + 4 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 4, pos_y, "*");
+        }
+        if (pos_x + 5 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 5, pos_y, "*");
+        }
 
         break;
     case DOWN:
         mvwprintw(win, pos_x - 1, pos_y, "*");
-        mvwprintw(win, pos_x - 2, pos_y, "*");
-        mvwprintw(win, pos_x - 3, pos_y, "*");
-        mvwprintw(win, pos_x - 4, pos_y, "*");
-        mvwprintw(win, pos_x - 5, pos_y, "*");
+        if ((pos_x - 2) > 0)
+        {
+            mvwprintw(win, pos_x - 2, pos_y, "*");
+        }
+        if ((pos_x - 3) > 0)
+        {
+            mvwprintw(win, pos_x - 3, pos_y, "*");
+        }
+        if ((pos_x - 4) > 0)
+        {
+            mvwprintw(win, pos_x - 4, pos_y, "*");
+        }
+        if ((pos_x - 5) > 0)
+        {
+            mvwprintw(win, pos_x - 5, pos_y, "*");
+        }
+
         break;
     case LEFT:
         mvwprintw(win, pos_x, pos_y + 1, "*");
-        mvwprintw(win, pos_x, pos_y + 2, "*");
-        mvwprintw(win, pos_x, pos_y + 3, "*");
-        mvwprintw(win, pos_x, pos_y + 4, "*");
-        mvwprintw(win, pos_x, pos_y + 5, "*");
+        if (pos_y + 2 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 2, "*");
+        }
+        if (pos_y + 3 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 3, "*");
+        }
+        if (pos_y + 4 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 4, "*");
+        }
+        if (pos_y + 5 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 5, "*");
+        }
+
         break;
     case RIGHT:
         mvwprintw(win, pos_x, pos_y - 1, "*");
-        mvwprintw(win, pos_x, pos_y - 2, "*");
-        mvwprintw(win, pos_x, pos_y - 3, "*");
-        mvwprintw(win, pos_x, pos_y - 4, "*");
-        mvwprintw(win, pos_x, pos_y - 5, "*");
+        if (pos_y - 2 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 2, "*");
+        }
+        if (pos_y - 3 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 3, "*");
+        }
+        if (pos_y - 4 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 4, "*");
+        }
+        if (pos_y - 5 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 5, "*");
+        }
         break;
     default:
         break;
@@ -94,31 +144,82 @@ void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
     {
     case UP:
         mvwprintw(win, pos_x + 1, pos_y, " ");
-        mvwprintw(win, pos_x + 2, pos_y, " ");
-        mvwprintw(win, pos_x + 3, pos_y, " ");
-        mvwprintw(win, pos_x + 4, pos_y, " ");
-        mvwprintw(win, pos_x + 5, pos_y, " ");
+        if (pos_x + 2 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 2, pos_y, " ");
+        }
+        if (pos_x + 3 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 3, pos_y, " ");
+        }
+        if (pos_x + 4 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 4, pos_y, " ");
+        }
+        if (pos_x + 5 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x + 5, pos_y, " ");
+        }
         break;
     case DOWN:
         mvwprintw(win, pos_x - 1, pos_y, " ");
-        mvwprintw(win, pos_x - 2, pos_y, " ");
-        mvwprintw(win, pos_x - 3, pos_y, " ");
-        mvwprintw(win, pos_x - 4, pos_y, " ");
-        mvwprintw(win, pos_x - 5, pos_y, " ");
+        if (pos_x - 2 > 0)
+        {
+            mvwprintw(win, pos_x - 2, pos_y, " ");
+        }
+        if (pos_x - 3 > 0)
+        {
+            mvwprintw(win, pos_x - 3, pos_y, " ");
+        }
+        if (pos_x - 4 > 0)
+        {
+            mvwprintw(win, pos_x - 4, pos_y, " ");
+        }
+        if (pos_x - 5 > 0)
+        {
+            mvwprintw(win, pos_x - 5, pos_y, " ");
+        }
+
         break;
     case LEFT:
         mvwprintw(win, pos_x, pos_y + 1, " ");
-        mvwprintw(win, pos_x, pos_y + 2, " ");
-        mvwprintw(win, pos_x, pos_y + 3, " ");
-        mvwprintw(win, pos_x, pos_y + 4, " ");
-        mvwprintw(win, pos_x, pos_y + 5, " ");
+        if (pos_y + 2 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 2, " ");
+        }
+        if (pos_y + 3 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 3, " ");
+        }
+        if (pos_y + 4 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 4, " ");
+        }
+        if (pos_y + 5 != WINDOW_SIZE - 1)
+        {
+            mvwprintw(win, pos_x, pos_y + 5, " ");
+        }
+
         break;
     case RIGHT:
         mvwprintw(win, pos_x, pos_y - 1, " ");
-        mvwprintw(win, pos_x, pos_y - 2, " ");
-        mvwprintw(win, pos_x, pos_y - 3, " ");
-        mvwprintw(win, pos_x, pos_y - 4, " ");
-        mvwprintw(win, pos_x, pos_y - 5, " ");
+        if (pos_y - 2 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 2, " ");
+        }
+        if (pos_y - 3 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 3, " ");
+        }
+        if (pos_y - 4 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 4, " ");
+        }
+        if (pos_y - 5 > 0)
+        {
+            mvwprintw(win, pos_x, pos_y - 5, " ");
+        }
+
         break;
     default:
         break;
