@@ -76,8 +76,8 @@ int main()
     {
         roach_array[i].secrect_code = -1;
     }
-    int n_roaches = 1;
-    int n_lizards = 1;
+    int n_roaches = 0;
+    int n_lizards = 0;
     srand(time(NULL));
 
     generic_msg m;
@@ -114,7 +114,7 @@ int main()
             switch (m.entity_type)
             {
             case LIZARD:
-                if (n_lizards <= MAX_LIZARDS)
+                if (n_lizards < MAX_LIZARDS)
                 {
                     // Save values to Array
                     lizard_array[n_lizards].entity_type = m.entity_type;
@@ -137,7 +137,7 @@ int main()
                 break;
 
             case ROACH:
-                if (n_roaches <= MAX_ROACHES)
+                if (n_roaches < MAX_ROACHES)
                 {
                     // Save values to Array
                     roach_array[n_roaches].entity_type = m.entity_type;
@@ -256,7 +256,6 @@ int main()
 
         wrefresh(my_win);
         zmq_send(responder, &r, sizeof(r), 0);
-        generate_r(&r, 0, 0, 0);
     }
     endwin(); /* End curses mode */
 
