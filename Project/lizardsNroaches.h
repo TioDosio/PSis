@@ -1,7 +1,7 @@
 #ifndef lizardNroaches_H // Include guards to prevent multiple inclusions
 #define lizardNroaches_H
 
-#define ADDRESS_RC "ipc://127.0.0.1:6666"
+#define ADDRESS_RC "tcp://127.0.0.1:6666"
 #define WINDOW_SIZE 30
 #define MAX_ROACHES (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
 #define MAX_LIZARDS 26

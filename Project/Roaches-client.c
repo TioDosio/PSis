@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     zmq_connect(requester, server_address);
     response_msg r;
     srand(time(NULL));
-    int points_roach = rand() % 4 + 1;
+    int points_roach = (rand() % 4) + 1;
 
     generic_msg m;
     m.msg_type = 0;

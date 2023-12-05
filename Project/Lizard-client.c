@@ -28,9 +28,9 @@ int main(int argc, char *argv[])
     // creating request socket
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
-    void *requester = zmq_socket(context, ZMQ_REQ);
-    snprintf(server_address, sizeof(server_address), "icp://%s:%s", server_ip, server_port);
-    zmq_connect(requester, ADDRESS_RC);
+    void *requester = zmq_socket(context, ZMQ_REQ); // "ipc://127.0.0.1:6666"
+    snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
+    zmq_connect(requester, server_address);
     response_msg r;
     //  read the character from the user
     char ch;
