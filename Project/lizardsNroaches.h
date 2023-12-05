@@ -55,8 +55,8 @@ typedef struct response_msg
 
 typedef struct display_update
 {
-    entity_t lizard[26];
-    entity_t roach[300];
+    entity_t lizard[MAX_LIZARDS];
+    entity_t roach[MAX_ROACHES];
 } display_update;
 
 #endif
