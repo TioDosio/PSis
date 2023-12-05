@@ -9,6 +9,18 @@
 #include <time.h>
 #include "display-funcs.h"
 
+void generate_r(response_msg *r, int suc, int code, int score)
+{
+    r->success = suc;
+    r->secrect_code = code;
+    r->score = score;
+}
+
+int generate_code()
+{
+    return rand() % 10000;
+}
+
 void new_position(int *x, int *y, direction_t direction)
 {
     switch (direction)
@@ -56,6 +68,14 @@ int main()
     // Define lizards and roaches
     entity_t lizard_array[MAX_LIZARDS];
     entity_t roach_array[MAX_ROACHES];
+    for (int i = 0; i < MAX_LIZARDS; i++)
+    {
+        lizard_array[i].secrect_code = -1;
+    }
+    for (int i = 0; i < MAX_ROACHES; i++)
+    {
+        roach_array[i].secrect_code = -1;
+    }
     int n_roaches = 0;
     int n_lizards = 0;
     srand(time(NULL));
@@ -82,28 +102,33 @@ int main()
     int pos_x;
     int pos_y;
 
+    int code;
+
     while (1)
     {
         zmq_recv(responder, &m, sizeof(m), 0);
         if (m.msg_type == 0) // if connection request
         {
-            r.success = 0;
+            // Generate Secrete code
+            code = generate_code();
 
             switch (m.entity_type)
             {
             case LIZARD:
                 if (n_lizards <= MAX_LIZARDS)
                 {
+                    // Save values to Array
                     lizard_array[n_lizards].entity_type = m.entity_type;
                     lizard_array[n_lizards].ch = m.ch;
                     lizard_array[n_lizards].points = 0;
-                    lizard_array[n_lizards].pos_x = rand() % (WINDOW_SIZE - 1) + 1;
-                    lizard_array[n_lizards].pos_y = rand() % (WINDOW_SIZE - 1) + 1;
+                    lizard_array[n_lizards].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
+                    lizard_array[n_lizards].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
+                    lizard_array[n_lizards].secrect_code = code;
 
                     disp_draw_entity(my_win, lizard_array[n_lizards]);
 
                     n_lizards++;
-                    r.success = 1;
+                    generate_r(&r, 1, code, 0);
                 }
                 else
                 {
@@ -116,16 +141,18 @@ int main()
             case ROACH:
                 if (n_roaches <= MAX_ROACHES)
                 {
+                    // Save values to Array
                     roach_array[n_roaches].entity_type = m.entity_type;
                     roach_array[n_roaches].ch = m.ch;
                     roach_array[n_roaches].points = m.ch - '0';
-                    roach_array[n_roaches].pos_x = rand() % WINDOW_SIZE + 1;
-                    roach_array[n_roaches].pos_y = rand() % WINDOW_SIZE + 1;
+                    roach_array[n_roaches].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
+                    roach_array[n_roaches].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
+                    roach_array[n_roaches].secrect_code = code;
 
                     disp_draw_entity(my_win, roach_array[n_roaches]);
 
                     n_roaches++;
-                    r.success = 1;
+                    generate_r(&r, 1, code, 0);
                 }
                 else
                 {
@@ -141,20 +168,20 @@ int main()
         }
         else if (m.msg_type == 1) // if movement request
         {
-            int entity_id;
+            int entity_id = m.secrect_code;
             entity_t old_entity;
             entity_t new_entity;
             switch (m.entity_type)
             {
             case LIZARD:
-                entity_id = find_entity_id(lizard_array, n_lizards, m.ch);
                 if (entity_id != -1)
                 {
                     old_entity = lizard_array[entity_id]; // save old values
                 }
+
                 break;
             case ROACH:
-                old_entity = roach_array[entity_id]; // save old values
+                old_entity = roach_array[entity_id];
                 break;
             default:
                 r.success = 0;
@@ -165,6 +192,7 @@ int main()
             // Common procedure for both Roaches and Lizards
             if (entity_id != -1)
             {
+                r.secrect_code = old_entity.secrect_code;
                 pos_x = old_entity.pos_x;
                 pos_y = old_entity.pos_y;
 
@@ -199,8 +227,7 @@ int main()
                     disp_clear_entity(my_win, lizard_array[i]);
                     disp_draw_entity(my_win, lizard_array[i]);
                 }
-                i = 0;
-                for (; i < n_roaches; i++)
+                for (i = 0; i < n_roaches; i++)
                 {
                     disp_clear_entity(my_win, roach_array[i]);
                     disp_draw_entity(my_win, roach_array[i]);

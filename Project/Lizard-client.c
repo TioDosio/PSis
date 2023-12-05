@@ -7,20 +7,29 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <zmq.h>
+#include <time.h>
 
 int main(int argc, char *argv[])
 {
+    char *server_ip = "127.0.0.1";
+    char *server_port = "6666";
     // para colocar o ip e a porta como argumentos
-    /*if (argc != 3)
+    if (argc != 3)
     {
-        printf("You insert %s arguments, you need 3\n", argc);
-        return 1; // Return an error code
-    }*/
+        printf("You insert %d arguments, you need 3\n", argc);
+    }
+    else
+    {
+        server_ip = argv[1];
+        server_port = argv[2];
+    }
 
     // creating request socket
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
     void *requester = zmq_socket(context, ZMQ_REQ);
+    char server_address[256];
+    snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
     zmq_connect(requester, ADDRESS_RC);
     response_msg r;
     //  read the character from the user
@@ -37,11 +46,18 @@ int main(int argc, char *argv[])
     m.msg_type = 0; // connection msg
     m.entity_type = 0;
     m.ch = ch;
+    m.secrect_code = -1;
     zmq_send(requester, &m, sizeof(m), 0);
     zmq_recv(requester, &r, sizeof(r), 0);
-
-    initscr();            /* Start curses mode 		*/
-    cbreak();             /* Line buffering disabled	*/
+    printf("Received reply: %d, secret: %d \n", r.success, r.secrect_code);
+    sleep(5);
+    if (r.success == 0)
+    {
+        printf("Server Full, try again later\n");
+        exit(0);
+    }
+    initscr(); /* Start curses mode 		*/
+    cbreak();  /* Line buffering disabled	*/
     mvprintw(0, 0, "Received reply: %d", r.success);
     keypad(stdscr, TRUE); /* We get F1, F2 etc..		*/
     noecho();             /* Don't echo() while we do getch */
@@ -55,7 +71,7 @@ int main(int argc, char *argv[])
         m.msg_type = 1;
         m.ch = ch;
         m.direction = 0;
-
+        m.secrect_code = r.secrect_code;
         key = getch();
         usleep(10000);
         n++;
@@ -99,7 +115,13 @@ int main(int argc, char *argv[])
         {
             zmq_send(requester, &m, sizeof(m), 0);
             zmq_recv(requester, &r, sizeof(r), 0);
-            mvprintw(1, 0, "Received %d", r.success);
+            mvprintw(1, 0, "22Received %d, secrect: %d", r.success, r.secrect_code);
+            if (r.success == 0)
+            {
+                mvprintw(2, 0, "Server Full, try again later");
+                refresh();
+                exit(0);
+            }
         }
         refresh(); /* Print it on to the real screen */
     } while (key != 27);
