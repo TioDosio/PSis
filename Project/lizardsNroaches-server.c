@@ -76,8 +76,8 @@ int main()
     {
         roach_array[i].secrect_code = -1;
     }
-    int n_roaches = 0;
-    int n_lizards = 0;
+    int n_roaches = 1;
+    int n_lizards = 1;
     srand(time(NULL));
 
     generic_msg m;
@@ -132,8 +132,6 @@ int main()
                 }
                 else
                 {
-                    // mandar response a dizer que nao pode
-                    printf("Too many lizards\n");
                     r.success = 0;
                 }
                 break;
@@ -157,8 +155,6 @@ int main()
                 }
                 else
                 {
-                    // mandar response a dizer que nao pode
-                    printf("Too many roaches\n");
                     r.success = 0;
                 }
                 break;

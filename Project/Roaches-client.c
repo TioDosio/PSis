@@ -43,6 +43,11 @@ int main(int argc, char *argv[])
     zmq_send(requester, &m, sizeof(m), 0);
     zmq_recv(requester, &r, sizeof(r), 0);
     printf("Received %d, secrect: %d\n", r.success, r.secrect_code);
+    if (r.success == 0)
+    {
+        printf("Server Full, try again later\n");
+        exit(0);
+    }
     m.secrect_code = r.secrect_code;
     int sleep_delay;
     direction_t direction;

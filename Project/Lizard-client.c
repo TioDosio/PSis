@@ -113,13 +113,7 @@ int main(int argc, char *argv[])
             zmq_send(requester, &m, sizeof(m), 0);
             zmq_recv(requester, &r, sizeof(r), 0);
             mvprintw(1, 0, "Received %d, secrect: %d", r.success, r.secrect_code);
-            if (r.success == 0)
-            {
-                mvprintw(2, 0, "Server Full, try again later");
-                refresh();
-                exit(0);
-            }
-            else if (r.success == 2)
+            if (r.success == 2)
             {
                 mvprintw(2, 0, "Disconnected from server");
                 refresh();
