@@ -242,8 +242,25 @@ int main()
                 }
             }
         }
+        else if (m.msg_type == 2)
+        {
+            code = m.secrect_code;
+            int entity_id = find_entity_id(lizard_array, n_lizards, code);
+            if (entity_id != -1)
+            {
+                disp_clear_entity(my_win, lizard_array[entity_id]);
+                for (int i = entity_id; i < n_lizards - 1; i++)
+                {
+                    lizard_array[i] = lizard_array[i + 1];
+                }
+                n_lizards--;
+                r.success = 2;
+            }
+        }
+
         wrefresh(my_win);
         zmq_send(responder, &r, sizeof(r), 0);
+        generate_r(&r, 0, 0, 0);
     }
     endwin(); /* End curses mode */
 

@@ -96,12 +96,11 @@ int main(int argc, char *argv[])
             m.direction = UP;
             break;
         case 'q':
+            m.msg_type = 2;
             zmq_send(requester, &m, sizeof(m), 0); // adios
-            exit(0);
             break;
         case 'Q':
             zmq_send(requester, &m, sizeof(m), 0); // adios
-            exit(0);
             break;
         default:
             key = 'x';
@@ -117,6 +116,12 @@ int main(int argc, char *argv[])
             if (r.success == 0)
             {
                 mvprintw(2, 0, "Server Full, try again later");
+                refresh();
+                exit(0);
+            }
+            else if (r.success == 2)
+            {
+                mvprintw(2, 0, "Disconnected from server");
                 refresh();
                 exit(0);
             }
