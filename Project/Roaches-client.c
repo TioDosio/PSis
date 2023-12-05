@@ -42,6 +42,8 @@ int main(int argc, char *argv[])
     m.ch = points_roach + '0';
     zmq_send(requester, &m, sizeof(m), 0);
     zmq_recv(requester, &r, sizeof(r), 0);
+    printf("Received %d, secrect: %d\n", r.success, r.secrect_code);
+    m.secrect_code = r.secrect_code;
     int sleep_delay;
     direction_t direction;
     int n = 0;
@@ -69,10 +71,8 @@ int main(int argc, char *argv[])
 
         m.direction = direction;
         m.msg_type = 1;
-
         zmq_send(requester, &m, sizeof(m), 0);
         zmq_recv(requester, &r, sizeof(r), 0);
-        printf("Received %d\n", r.success);
     }
     zmq_close(requester);
     zmq_ctx_destroy(context);

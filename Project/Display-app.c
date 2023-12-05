@@ -21,5 +21,6 @@ int main(int argc, char *argv[])
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
     void *requester = zmq_socket(context, ZMQ_REQ);
-    zmq_connect(requester, ADDRESS_RC);
+    snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
+    zmq_connect(requester, server_address);
 }

@@ -53,4 +53,10 @@ typedef struct response_msg
     short int secrect_code;     /* secrect code to send */
 } response_msg;
 
+typedef struct display_update
+{
+    entity_t lizard[26];
+    entity_t roach[300];
+} display_update;
+
 #endif
