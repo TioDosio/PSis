@@ -30,11 +30,6 @@ void disp_draw_entity(WINDOW *win, entity_t entity)
     /*write head */
     wmove(win, x, y);
     waddch(win, ch | A_BOLD);
-
-    if (entity.entity_type == LIZARD)
-    {
-        draw_body(win, x, y, entity.direction);
-    }
 }
 
 void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)

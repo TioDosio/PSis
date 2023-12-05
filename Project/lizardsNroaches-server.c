@@ -126,7 +126,7 @@ int main()
                     lizard_array[n_lizards].direction = m.direction;
 
                     disp_draw_entity(my_win, lizard_array[n_lizards]);
-
+                    draw_body(my_win, lizard_array[n_lizards].pos_x, lizard_array[n_lizards].pos_y, lizard_array[n_lizards].direction);
                     n_lizards++;
                     generate_r(&r, 1, code, 0);
                 }
@@ -226,15 +226,19 @@ int main()
                     break;
                 }
                 int i = 0;
-                for (; i < n_lizards; i++)
-                {
-                    disp_clear_entity(my_win, lizard_array[i]);
-                    disp_draw_entity(my_win, lizard_array[i]);
-                }
                 for (i = 0; i < n_roaches; i++)
                 {
                     disp_clear_entity(my_win, roach_array[i]);
                     disp_draw_entity(my_win, roach_array[i]);
+                }
+                for (i = 0; i < n_lizards; i++)
+                {
+                    disp_clear_entity(my_win, lizard_array[i]);
+                    draw_body(my_win, lizard_array[i].pos_x, lizard_array[i].pos_y, lizard_array[i].direction);
+                }
+                for (i = 0; i < n_lizards; i++)
+                {
+                    disp_draw_entity(my_win, lizard_array[i]);
                 }
             }
         }
