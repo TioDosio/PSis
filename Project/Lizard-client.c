@@ -11,6 +11,7 @@
 
 int main(int argc, char *argv[])
 {
+    char server_address[256];
     char *server_ip = "127.0.0.1";
     char *server_port = "6666";
     // para colocar o ip e a porta como argumentos
@@ -28,8 +29,7 @@ int main(int argc, char *argv[])
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
     void *requester = zmq_socket(context, ZMQ_REQ);
-    char server_address[256];
-    snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
+    snprintf(server_address, sizeof(server_address), "icp://%s:%s", server_ip, server_port);
     zmq_connect(requester, ADDRESS_RC);
     response_msg r;
     //  read the character from the user
@@ -47,10 +47,9 @@ int main(int argc, char *argv[])
     m.entity_type = 0;
     m.ch = ch;
     m.secrect_code = -1;
+    m.direction = UP;
     zmq_send(requester, &m, sizeof(m), 0);
     zmq_recv(requester, &r, sizeof(r), 0);
-    printf("Received reply: %d, secret: %d \n", r.success, r.secrect_code);
-    sleep(5);
     if (r.success == 0)
     {
         printf("Server Full, try again later\n");
@@ -70,7 +69,6 @@ int main(int argc, char *argv[])
         //  prepare the movement message
         m.msg_type = 1;
         m.ch = ch;
-        m.direction = 0;
         m.secrect_code = r.secrect_code;
         key = getch();
         usleep(10000);
@@ -115,7 +113,7 @@ int main(int argc, char *argv[])
         {
             zmq_send(requester, &m, sizeof(m), 0);
             zmq_recv(requester, &r, sizeof(r), 0);
-            mvprintw(1, 0, "22Received %d, secrect: %d", r.success, r.secrect_code);
+            mvprintw(1, 0, "Received %d, secrect: %d", r.success, r.secrect_code);
             if (r.success == 0)
             {
                 mvprintw(2, 0, "Server Full, try again later");

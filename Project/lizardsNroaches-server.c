@@ -51,11 +51,11 @@ void new_position(int *x, int *y, direction_t direction)
 }
 
 // returns correct position of the entity from the array
-int find_entity_id(entity_t entity[], int n_entities, int ch)
+int find_entity_id(entity_t entity[], int n_entities, int code)
 {
     for (int i = 0; i < n_entities; i++)
     {
-        if (ch == entity[i].ch)
+        if (code == entity[i].secrect_code)
         {
             return i;
         }
@@ -111,7 +111,6 @@ int main()
         {
             // Generate Secrete code
             code = generate_code();
-
             switch (m.entity_type)
             {
             case LIZARD:
@@ -124,6 +123,7 @@ int main()
                     lizard_array[n_lizards].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
                     lizard_array[n_lizards].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
                     lizard_array[n_lizards].secrect_code = code;
+                    lizard_array[n_lizards].direction = m.direction;
 
                     disp_draw_entity(my_win, lizard_array[n_lizards]);
 
@@ -148,6 +148,7 @@ int main()
                     roach_array[n_roaches].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
                     roach_array[n_roaches].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
                     roach_array[n_roaches].secrect_code = code;
+                    roach_array[n_roaches].direction = m.direction;
 
                     disp_draw_entity(my_win, roach_array[n_roaches]);
 
@@ -168,12 +169,14 @@ int main()
         }
         else if (m.msg_type == 1) // if movement request
         {
-            int entity_id = m.secrect_code;
+            int entity_id;
             entity_t old_entity;
             entity_t new_entity;
+            code = m.secrect_code;
             switch (m.entity_type)
             {
             case LIZARD:
+                entity_id = find_entity_id(lizard_array, n_lizards, code);
                 if (entity_id != -1)
                 {
                     old_entity = lizard_array[entity_id]; // save old values
@@ -181,10 +184,11 @@ int main()
 
                 break;
             case ROACH:
+                entity_id = find_entity_id(roach_array, n_roaches, code);
                 old_entity = roach_array[entity_id];
                 break;
             default:
-                r.success = 0;
+                generate_r(&r, 0, code, 0);
                 entity_id = -1;
                 break;
             }
@@ -214,11 +218,11 @@ int main()
                 {
                 case LIZARD:
                     lizard_array[entity_id] = new_entity;
+                    generate_r(&r, 1, code, new_entity.points);
                     break;
                 case ROACH:
                     roach_array[entity_id] = new_entity;
-                    break;
-                default:
+                    generate_r(&r, 1, code, 0);
                     break;
                 }
                 int i = 0;

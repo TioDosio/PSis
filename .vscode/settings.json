@@ -1,7 +1,9 @@
 {
     "files.associations": {
         "*.rmd": "markdown",
-        "ncurses.h": "c"
+        "ncurses.h": "c",
+        "zmq.h": "c",
+        "time.h": "c"
     },
     "makefile.launchConfigurations": [
         {

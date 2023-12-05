@@ -1,4 +1,9 @@
+all:
+	make project
+	make lab5
+
 project:
+	make clean
 	make -C Project -f Makefile all
 
 lab5: 
