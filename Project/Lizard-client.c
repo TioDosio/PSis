@@ -112,7 +112,8 @@ int main(int argc, char *argv[])
         {
             zmq_send(requester, &m, sizeof(m), 0);
             zmq_recv(requester, &r, sizeof(r), 0);
-            mvprintw(1, 0, "Received %d, secrect: %d", r.success, r.secrect_code);
+            mvprintw(1, 0, "Status: %d", r.success);
+            mvprintw(2, 0, "Score: %d", r.score);
             if (r.success == 2)
             {
                 mvprintw(2, 0, "Disconnected from server");
