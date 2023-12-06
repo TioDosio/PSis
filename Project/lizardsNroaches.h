@@ -55,8 +55,16 @@ typedef struct response_msg
 
 typedef struct display_update
 {
+    unsigned short int n_roaches; /* number of roaches */
+    unsigned short int n_lizards; /* number of lizards */
     entity_t lizard[MAX_LIZARDS];
     entity_t roach[MAX_ROACHES];
 } display_update;
+
+typedef struct response_msg_display
+{
+    unsigned short int type; /* 0 - error, 1 - success, 2 - connect*/
+    short int secrect_code;  /*  secret code to send */
+} response_msg_display;
 
 #endif

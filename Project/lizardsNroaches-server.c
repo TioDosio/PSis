@@ -256,6 +256,7 @@ int main()
 
         wrefresh(my_win);
         zmq_send(responder, &r, sizeof(r), 0);
+        zmq_send(responder, &n_roaches, sizeof(n_roaches), 0);
     }
     endwin(); /* End curses mode */
 
