@@ -82,10 +82,16 @@ int main()
 
     generic_msg m;
     response_msg r;
+    display_update update;
 
     void *context = zmq_ctx_new();
-    void *responder = zmq_socket(context, ZMQ_REP);
-    int rc = zmq_bind(responder, ADDRESS_RC);
+    void *responder = zmq_socket(context, ZMQ_REP); // Create socket por REQ-REP
+    void *publisher = zmq_socket(context, ZMQ_PUB); // Create socket for PUB-SUB
+
+    int rc = zmq_bind(responder, ADDRESS_REQ); // Bind to address
+    assert(rc == 0);
+
+    rc = zmq_bind(publisher, ADDRESS_PUB); // Bind to address
     assert(rc == 0);
 
     // Initialize the screen
@@ -256,7 +262,8 @@ int main()
 
         wrefresh(my_win);
         zmq_send(responder, &r, sizeof(r), 0);
-        zmq_send(responder, &n_roaches, sizeof(n_roaches), 0);
+
+        zmq_send(publisher, &update, sizeof(update), 0);
     }
     endwin(); /* End curses mode */
 

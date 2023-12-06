@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
     char server_address[256];
     char *server_ip = "127.0.0.1";
-    char *server_port = "6666";
+    char *server_port = "6669";
     // para colocar o ip e a porta como argumentos
     if (argc != 3)
     {
@@ -24,17 +24,17 @@ int main(int argc, char *argv[])
         server_ip = argv[1];
         server_port = argv[2];
     }
-    response_msg_display m;
+
     display_update update;
+    update.n_lizards = 0;
+    update.n_roaches = 0;
+
     // creating request socket
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
-    void *requester = zmq_socket(context, ZMQ_REQ);
+    void *subscriber = zmq_socket(context, ZMQ_SUB);
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
-    zmq_connect(requester, server_address);
-    m.type = 2;
-    m.secrect_code = -1;
-    zmp_send(requester, &m, sizeof(m), 0);
+    zmq_connect(subscriber, server_address);
     // Initialize the screen
     initscr();
     cbreak();
@@ -46,16 +46,17 @@ int main(int argc, char *argv[])
     box(my_win, 0, 0);
     wrefresh(my_win);
 
-    int pos_x;
-    int pos_y;
     int n_roaches = 0;
     int n_lizards = 0;
 
     while (1)
     {
-        zmq_recv(requester, &update, sizeof(update), 0);
+        /**/
+        zmq_recv(subscriber, &update, sizeof(update), 0);
+
         n_roaches = update.n_roaches;
         n_lizards = update.n_lizards;
+
         int i = 0;
         for (i = 0; i < n_roaches; i++)
         {
@@ -71,9 +72,7 @@ int main(int argc, char *argv[])
         {
             disp_draw_entity(my_win, update.lizard[i]);
         }
-
         wrefresh(my_win);
-        zmp_send(requester, &m, sizeof(m), 0);
     }
     endwin(); /* End curses mode */
 }

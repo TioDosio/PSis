@@ -1,7 +1,8 @@
 #ifndef lizardNroaches_H // Include guards to prevent multiple inclusions
 #define lizardNroaches_H
 
-#define ADDRESS_RC "tcp://127.0.0.1:6666"
+#define ADDRESS_REQ "tcp://127.0.0.1:6666"
+#define ADDRESS_PUB "tcp://127.0.0.1:6669"
 #define WINDOW_SIZE 30
 #define MAX_ROACHES (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
 #define MAX_LIZARDS 26
@@ -41,11 +42,6 @@ typedef struct generic_msg // connect or movement or disconnect
     short int secrect_code;      /* secrect code to send */
 } generic_msg;
 
-typedef struct display_msg
-{
-    entity_t array_entities[MAX_LIZARDS + MAX_ROACHES];
-} display_msg;
-
 typedef struct response_msg
 {
     unsigned short int success; /* 0 - fail, 1 - success */
@@ -60,11 +56,5 @@ typedef struct display_update
     entity_t lizard[MAX_LIZARDS];
     entity_t roach[MAX_ROACHES];
 } display_update;
-
-typedef struct response_msg_display
-{
-    unsigned short int type; /* 0 - error, 1 - success, 2 - connect*/
-    short int secrect_code;  /*  secret code to send */
-} response_msg_display;
 
 #endif
