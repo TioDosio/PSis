@@ -266,6 +266,10 @@ int main()
         {
             update.lizard[i] = lizard_array[i];
         }
+        for (int i = 0; i < n_lizards; i++)
+        {
+            update.roach[i] = roach_array[i];
+        }
         wrefresh(my_win);
         zmq_send(responder, &r, sizeof(r), 0);
         char *string = "dis";
