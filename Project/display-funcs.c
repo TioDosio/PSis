@@ -126,19 +126,22 @@ void draw_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
     switch (direction)
     {
     case UP:
-        mvwprintw(win, pos_x + 1, pos_y, ".");
-        if (pos_x + 2 != WINDOW_SIZE - 1)
+        if (pos_x + 1 != WINDOW_SIZE - 1)
         {
-            mvwprintw(win, pos_x + 2, pos_y, ".");
-            if (pos_x + 3 != WINDOW_SIZE - 1)
+            mvwprintw(win, pos_x + 1, pos_y, ".");
+            if (pos_x + 2 != WINDOW_SIZE - 1)
             {
-                mvwprintw(win, pos_x + 3, pos_y, ".");
-                if (pos_x + 4 != WINDOW_SIZE - 1)
+                mvwprintw(win, pos_x + 2, pos_y, ".");
+                if (pos_x + 3 != WINDOW_SIZE - 1)
                 {
-                    mvwprintw(win, pos_x + 4, pos_y, ".");
-                    if (pos_x + 5 != WINDOW_SIZE - 1)
+                    mvwprintw(win, pos_x + 3, pos_y, ".");
+                    if (pos_x + 4 != WINDOW_SIZE - 1)
                     {
-                        mvwprintw(win, pos_x + 5, pos_y, ".");
+                        mvwprintw(win, pos_x + 4, pos_y, ".");
+                        if (pos_x + 5 != WINDOW_SIZE - 1)
+                        {
+                            mvwprintw(win, pos_x + 5, pos_y, ".");
+                        }
                     }
                 }
             }

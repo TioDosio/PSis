@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <time.h>
 #include "display-funcs.h"
+#include <string.h>
 
 void generate_r(response_msg *r, int suc, int code, int score)
 {
@@ -259,10 +260,16 @@ int main()
                 r.success = 2;
             }
         }
-
+        update.n_lizards = n_lizards;
+        update.n_roaches = n_roaches;
+        for (int i = 0; i < n_lizards; i++)
+        {
+            update.lizard[i] = lizard_array[i];
+        }
         wrefresh(my_win);
         zmq_send(responder, &r, sizeof(r), 0);
-
+        char *string = "dis";
+        zmq_send(publisher, string, strlen(string), ZMQ_SNDMORE);
         zmq_send(publisher, &update, sizeof(update), 0);
     }
     endwin(); /* End curses mode */

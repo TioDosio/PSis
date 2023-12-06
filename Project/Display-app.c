@@ -8,6 +8,29 @@
 #include <assert.h>
 #include <time.h>
 #include "display-funcs.h"
+#include <string.h>
+
+static char *s_recv(void *socket)
+{
+    enum
+    {
+        cap = 256
+    };
+    char buffer[cap];
+    int size = zmq_recv(socket, buffer, cap - 1, 0);
+    if (size == -1)
+        return NULL;
+    buffer[size < cap ? size : cap - 1] = '\0';
+
+#if (defined(WIN32))
+    return strdup(buffer);
+#else
+    return strndup(buffer, sizeof(buffer) - 1);
+#endif
+
+    // remember that the strdup family of functions use malloc/alloc for space for the new string.  It must be manually
+    // freed when you are done with it.  Failure to do so will allow a heap attack.
+}
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +58,7 @@ int main(int argc, char *argv[])
     void *subscriber = zmq_socket(context, ZMQ_SUB);
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
     zmq_connect(subscriber, server_address);
+    zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "dis", 3);
     // Initialize the screen
     initscr();
     cbreak();
@@ -51,21 +75,29 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        /**/
+        char *cap[256];
+        zmq_recv(subscriber, cap, 3, 0);
+        int i;
+        for (i = 0; i < n_lizards; i++)
+        {
+            disp_clear_entity(my_win, update.lizard[i]);
+        }
+        for (i = 0; i < n_roaches; i++)
+        {
+            disp_clear_entity(my_win, update.roach[i]);
+        }
+
         zmq_recv(subscriber, &update, sizeof(update), 0);
 
         n_roaches = update.n_roaches;
         n_lizards = update.n_lizards;
 
-        int i = 0;
         for (i = 0; i < n_roaches; i++)
-        {
-            disp_clear_entity(my_win, update.roach[i]);
+        {  
             disp_draw_entity(my_win, update.roach[i]);
         }
         for (i = 0; i < n_lizards; i++)
         {
-            disp_clear_entity(my_win, update.lizard[i]);
             draw_body(my_win, update.lizard[i].pos_x, update.lizard[i].pos_y, update.lizard[i].direction);
         }
         for (i = 0; i < n_lizards; i++)
