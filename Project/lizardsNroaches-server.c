@@ -51,6 +51,27 @@ void new_position(int *x, int *y, direction_t direction)
     }
 }
 
+void eat_roaches(entity_t *lizard, entity_t roach_array[], int *n_roaches)
+{
+    int i = 0;
+    int j = 0;
+    int x = lizard->pos_x;
+    int y = lizard->pos_y;
+    for (i = 0; i < *n_roaches; i++)
+    {
+        if (roach_array[i].pos_x == x && roach_array[i].pos_y == y)
+        {
+            lizard->points += roach_array[i].points;
+            // remove roach from array
+            for (j = i; j < *n_roaches - 1; j++)
+            {
+                roach_array[j] = roach_array[j + 1];
+            }
+            (*n_roaches)--;
+        }
+    }
+}
+
 // returns correct position of the entity from the array
 int find_entity_id(entity_t entity[], int n_entities, int code)
 {
@@ -211,6 +232,7 @@ int main()
                 switch (m.entity_type)
                 {
                 case LIZARD:
+                    eat_roaches(&new_entity, roach_array, &n_roaches);
                     lizard_array[entity_id] = new_entity;
                     generate_r(&r, 1, code, new_entity.points);
                     break;
