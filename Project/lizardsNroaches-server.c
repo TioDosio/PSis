@@ -131,9 +131,6 @@ int main()
                     lizard_array[n_lizards].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
                     lizard_array[n_lizards].secrect_code = code;
                     lizard_array[n_lizards].direction = m.direction;
-
-                    disp_draw_entity(my_win, lizard_array[n_lizards]);
-                    draw_body(my_win, lizard_array[n_lizards].pos_x, lizard_array[n_lizards].pos_y, lizard_array[n_lizards].direction);
                     n_lizards++;
                     generate_r(&r, 1, code, 0);
                 }
@@ -155,8 +152,6 @@ int main()
                     roach_array[n_roaches].secrect_code = code;
                     roach_array[n_roaches].direction = m.direction;
 
-                    disp_draw_entity(my_win, roach_array[n_roaches]);
-
                     n_roaches++;
                     generate_r(&r, 1, code, 0);
                 }
@@ -173,8 +168,8 @@ int main()
         else if (m.msg_type == 1) // if movement request
         {
             int entity_id;
-            entity_t old_entity;
-            entity_t new_entity;
+            entity_t old_entity; //aux variable to store current values
+            entity_t new_entity; //aux variable to store new values
             code = m.secrect_code;
             switch (m.entity_type)
             {
@@ -212,10 +207,6 @@ int main()
                 new_entity.pos_x = pos_x;
                 new_entity.pos_y = pos_y;
 
-                // Delete old entity and draw new one
-                disp_clear_entity(my_win, old_entity);
-                disp_draw_entity(my_win, new_entity);
-
                 // Save values in array
                 switch (m.entity_type)
                 {
@@ -228,21 +219,6 @@ int main()
                     generate_r(&r, 1, code, 0);
                     break;
                 }
-                int i = 0;
-                for (i = 0; i < n_roaches; i++)
-                {
-                    disp_clear_entity(my_win, roach_array[i]);
-                    disp_draw_entity(my_win, roach_array[i]);
-                }
-                for (i = 0; i < n_lizards; i++)
-                {
-                    disp_clear_entity(my_win, lizard_array[i]);
-                    draw_body(my_win, lizard_array[i].pos_x, lizard_array[i].pos_y, lizard_array[i].direction);
-                }
-                for (i = 0; i < n_lizards; i++)
-                {
-                    disp_draw_entity(my_win, lizard_array[i]);
-                }
             }
         }
         else if (m.msg_type == 2)
@@ -251,7 +227,6 @@ int main()
             int entity_id = find_entity_id(lizard_array, n_lizards, code);
             if (entity_id != -1)
             {
-                disp_clear_entity(my_win, lizard_array[entity_id]);
                 for (int i = entity_id; i < n_lizards - 1; i++)
                 {
                     lizard_array[i] = lizard_array[i + 1];
@@ -260,18 +235,35 @@ int main()
                 r.success = 2;
             }
         }
+        //Draw entities on empty screen and create display update message
+        disp_clear_window(my_win);
+        int i = 0;
         update.n_lizards = n_lizards;
         update.n_roaches = n_roaches;
-        for (int i = 0; i < n_lizards; i++)
+
+        for (i = 0; i < n_roaches; i++)
         {
-            update.lizard[i] = lizard_array[i];
-        }
-        for (int i = 0; i < n_lizards; i++)
-        {
+            disp_draw_entity(my_win, roach_array[i]);
             update.roach[i] = roach_array[i];
         }
+
+        for (i = 0; i < n_lizards; i++)
+        {
+            draw_body(my_win, lizard_array[i].pos_x, lizard_array[i].pos_y, lizard_array[i].direction);
+            update.lizard[i] = lizard_array[i];
+        }
+        // Draw head of lizards later so it always stays on top
+        for (i = 0; i < n_lizards; i++)
+        {
+            disp_draw_entity(my_win, lizard_array[i]);
+        }
+
+        // Update display
         wrefresh(my_win);
+        //Send reply
         zmq_send(responder, &r, sizeof(r), 0);
+
+        //Send display update
         char *string = "dis";
         zmq_send(publisher, string, strlen(string), ZMQ_SNDMORE);
         zmq_send(publisher, &update, sizeof(update), 0);

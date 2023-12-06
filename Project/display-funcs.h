@@ -16,4 +16,7 @@ void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction);
 // Function to draw body of lizards
 void draw_body(WINDOW *win, int pos_x, int pos_y, direction_t direction);
 
-#endif
+// Function to clear display
+void disp_clear_window(WINDOW *win);
+
+#endif //display_funcs_H

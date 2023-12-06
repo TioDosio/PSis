@@ -10,28 +10,6 @@
 #include "display-funcs.h"
 #include <string.h>
 
-static char *s_recv(void *socket)
-{
-    enum
-    {
-        cap = 256
-    };
-    char buffer[cap];
-    int size = zmq_recv(socket, buffer, cap - 1, 0);
-    if (size == -1)
-        return NULL;
-    buffer[size < cap ? size : cap - 1] = '\0';
-
-#if (defined(WIN32))
-    return strdup(buffer);
-#else
-    return strndup(buffer, sizeof(buffer) - 1);
-#endif
-
-    // remember that the strdup family of functions use malloc/alloc for space for the new string.  It must be manually
-    // freed when you are done with it.  Failure to do so will allow a heap attack.
-}
-
 int main(int argc, char *argv[])
 {
     char server_address[256];
@@ -78,14 +56,11 @@ int main(int argc, char *argv[])
         char *cap[256];
         zmq_recv(subscriber, cap, 3, 0);
         int i;
-        for (i = 0; i < n_lizards; i++)
-        {
-            disp_clear_entity(my_win, update.lizard[i]);
-        }
-        for (i = 0; i < n_roaches; i++)
-        {
-            disp_clear_entity(my_win, update.roach[i]);
-        }
+
+        //Clear the screen
+        wclear(my_win);
+        box(my_win, 0, 0);
+        wrefresh(my_win);
 
         zmq_recv(subscriber, &update, sizeof(update), 0);
 

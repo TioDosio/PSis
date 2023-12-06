@@ -212,3 +212,9 @@ void draw_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
         break;
     }
 }
+
+void disp_clear_window(WINDOW *win)
+{
+    wclear(win);
+    box(win, 0, 0);
+}
