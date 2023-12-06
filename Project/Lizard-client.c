@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     m.msg_type = 0; // connection msg
     m.entity_type = 0;
     m.ch = ch;
-    m.secrect_code = -1;
+    m.secret_code = -1;
     m.direction = UP;
     zmq_send(requester, &m, sizeof(m), 0);
     zmq_recv(requester, &r, sizeof(r), 0);
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         //  prepare the movement message
         m.msg_type = 1;
         m.ch = ch;
-        m.secrect_code = r.secrect_code;
+        m.secret_code = r.secret_code;
         key = getch();
         usleep(10000);
         n++;

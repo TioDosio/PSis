@@ -13,7 +13,7 @@
 void generate_r(response_msg *r, int suc, int code, int score)
 {
     r->success = suc;
-    r->secrect_code = code;
+    r->secret_code = code;
     r->score = score;
 }
 
@@ -77,7 +77,7 @@ int find_entity_id(entity_t entity[], int n_entities, int code)
 {
     for (int i = 0; i < n_entities; i++)
     {
-        if (code == entity[i].secrect_code)
+        if (code == entity[i].secret_code)
         {
             return i;
         }
@@ -92,11 +92,11 @@ int main()
     entity_t roach_array[MAX_ROACHES];
     for (int i = 0; i < MAX_LIZARDS; i++)
     {
-        lizard_array[i].secrect_code = -1;
+        lizard_array[i].secret_code = -1;
     }
     for (int i = 0; i < MAX_ROACHES; i++)
     {
-        roach_array[i].secrect_code = -1;
+        roach_array[i].secret_code = -1;
     }
     int n_roaches = 0;
     int n_lizards = 0;
@@ -150,7 +150,7 @@ int main()
                     lizard_array[n_lizards].points = 0;
                     lizard_array[n_lizards].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
                     lizard_array[n_lizards].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
-                    lizard_array[n_lizards].secrect_code = code;
+                    lizard_array[n_lizards].secret_code = code;
                     lizard_array[n_lizards].direction = m.direction;
                     n_lizards++;
                     generate_r(&r, 1, code, 0);
@@ -170,7 +170,7 @@ int main()
                     roach_array[n_roaches].points = m.ch - '0';
                     roach_array[n_roaches].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
                     roach_array[n_roaches].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
-                    roach_array[n_roaches].secrect_code = code;
+                    roach_array[n_roaches].secret_code = code;
                     roach_array[n_roaches].direction = m.direction;
 
                     n_roaches++;
@@ -191,7 +191,7 @@ int main()
             int entity_id;
             entity_t old_entity; //aux variable to store current values
             entity_t new_entity; //aux variable to store new values
-            code = m.secrect_code;
+            code = m.secret_code;
             switch (m.entity_type)
             {
             case LIZARD:
@@ -215,7 +215,7 @@ int main()
             // Common procedure for both Roaches and Lizards
             if (entity_id != -1)
             {
-                r.secrect_code = old_entity.secrect_code;
+                r.secret_code = old_entity.secret_code;
                 pos_x = old_entity.pos_x;
                 pos_y = old_entity.pos_y;
 
@@ -245,7 +245,7 @@ int main()
         }
         else if (m.msg_type == 2)
         {
-            code = m.secrect_code;
+            code = m.secret_code;
             int entity_id = find_entity_id(lizard_array, n_lizards, code);
             if (entity_id != -1)
             {

@@ -32,13 +32,13 @@ void spawn_roaches(int n, int *roach_codes)
 
         // Wait for response
         zmq_recv(requester, &r, sizeof(r), 0);
-        printf("Received %d, secrect: %d\n", r.success, r.secrect_code);
+        printf("Received %d, secret: %d\n", r.success, r.secret_code);
         if (r.success == 0)
         {
             printf("Server Full, try again later\n");
             break;
         }
-        roach_codes[i] = r.secrect_code;
+        roach_codes[i] = r.secret_code;
     }
 }
 
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     int n_roaches;
 
     // Check if the user provided the correct number of command-line arguments
-    if (argc < 3 || argc > 4)
+    if ((argc < 3) || argc > 4)
     {
         printf("Usage: %s <server_ip> <server_port> [n_roaches]\n", argv[0]);
         return 1;
@@ -63,8 +63,22 @@ int main(int argc, char *argv[])
     {
         if (sscanf(argv[3], "%d", &n_roaches) != 1)
         {
-            printf("Error: n_roaches must be an integer.\n");
+            printf("Error: number of cockroaches must be an integer.\n");
             return 1;
+        }
+        else
+        {
+            printf("n_roaches: %d\n", n_roaches);
+            if (n_roaches > MAX_ROACH_PER_CLIENT)
+            {
+                printf("Error: number of cockroaches must be less than %d.\n", MAX_ROACH_PER_CLIENT);
+                return 1;
+            }
+            else if (n_roaches < 1)
+            {
+                printf("Error: number of cockroaches must be greater than 0.\n");
+                return 1;
+            }
         }
     }
     else
@@ -117,7 +131,7 @@ int main(int argc, char *argv[])
 
             // Set and send message
             m.direction = direction;
-            m.secrect_code = roach_codes[i];
+            m.secret_code = roach_codes[i];
             zmq_send(requester, &m, sizeof(m), 0);
             zmq_recv(requester, &r, sizeof(r), 0);
         }

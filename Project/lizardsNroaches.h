@@ -29,7 +29,7 @@ typedef struct entity_t
     unsigned int points;
     unsigned short int pos_x, pos_y;
     direction_t direction;
-    short int secrect_code;
+    short int secret_code;
 } entity_t;
 
 typedef struct generic_msg // connect or movement or disconnect
@@ -39,14 +39,14 @@ typedef struct generic_msg // connect or movement or disconnect
     unsigned short int msg_type; /* 0 - connect   1 - move   2 - disconnect*/
     char ch;                     /* value to send (points of roaches or char of lizard) */
     direction_t direction;       /* direction of movement */
-    short int secrect_code;      /* secrect code to send */
+    short int secret_code;      /* secret code to send */
 } generic_msg;
 
 typedef struct response_msg
 {
     unsigned short int success; /* 0 - fail, 1 - success */
     unsigned short int score;   /* score of the player */
-    short int secrect_code;     /* secrect code to send */
+    short int secret_code;     /* secret code to send */
 } response_msg;
 
 typedef struct display_update
