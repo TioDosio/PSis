@@ -10,7 +10,7 @@
 #include "display-funcs.h"
 #include <string.h>
 
-time_t start;
+time_t current_time;
 
 void generate_r(response_msg *r, int suc, int code, int score)
 {
@@ -81,23 +81,22 @@ int find_entity_id(entity_t entity[], int n_entities, int code)
     return -1;
 }
 
-entity_t * move_entity(generic_msg m, response_msg *r, entity_t array_entity[], int n_entity, time_t roach_death_time[],time_t current_time){
-    int entity_id;
+entity_t * move_entity(generic_msg m, response_msg *r, entity_t array_entity[], int n_entity, int* entity_id){
     entity_t old_entity; //aux variable to store current values
     entity_t new_entity; //aux variable to store new values
     int code = m.secret_code;
     int pos_x;
     int pos_y;
 
-    entity_id = find_entity_id(array_entity, n_entity, code);
+    *entity_id = find_entity_id(array_entity, n_entity, code);
 
-    if(entity_id == -1) // if entity not found
+    if(*entity_id == -1) // if entity not found
     {
         generate_r(r, 0, code, 0);
         return NULL;
     }
 
-    old_entity = array_entity[entity_id]; // save old values
+    old_entity = array_entity[*entity_id]; // save old values
 
     r->secret_code = old_entity.secret_code;
 
@@ -129,10 +128,10 @@ entity_t * move_entity(generic_msg m, response_msg *r, entity_t array_entity[], 
     new_entity.pos_x = pos_x;
     new_entity.pos_y = pos_y;
         
-    array_entity[entity_id] = new_entity;
+    array_entity[*entity_id] = new_entity;
     generate_r(r, 1, code, new_entity.points);
 
-    return &array_entity[entity_id];
+    return &array_entity[*entity_id];
 
 }
 
@@ -163,13 +162,11 @@ void respawn_roach(entity_t *roach)
 }
 
 int main()
-{   // Start time
-    start = time(NULL);
+{  
     // Define lizards and roaches
     entity_t lizard_array[MAX_LIZARDS];
     entity_t roach_array[MAX_ROACHES];
-    time_t roach_death_time[MAX_ROACHES]; // Array of roaches' death-time
-    time_t current_time;
+    time_t roach_death_time[MAX_ROACHES];
 
     for (int i = 0; i < MAX_LIZARDS; i++)
     {
@@ -215,7 +212,7 @@ int main()
     while (1)
     {
         zmq_recv(responder, &m, sizeof(m), 0);
-        current_time = time(NULL);
+        current_time = time(NULL); // get current time
         if (m.msg_type == 0) // if connection request
         {
             // Generate Secrete code
@@ -285,11 +282,23 @@ int main()
                     array_entity = NULL;
                     break;
             }
-            entity_t *moved_entity = move_entity(m, &r, array_entity, n_entity, roach_death_time, current_time);
+            int id = -1;
+            entity_t *moved_entity = move_entity(m, &r, array_entity, n_entity, &id);
+            if (id==-1 ||  moved_entity == NULL)
+            {
+                continue; // if entity not found, do nothing
+            }
  
             if(m.entity_type == LIZARD)
             {
                 eat_roaches(moved_entity, roach_array, n_roaches, roach_death_time);
+
+            } else if (m.entity_type == ROACH && moved_entity->ch == ' ')
+            {    
+                if (current_time - roach_death_time[id] >= ROACH_RESPAWN_TIME)
+                {
+                    respawn_roach(moved_entity);
+                }
             }
         }
         else if (m.msg_type == 2)
