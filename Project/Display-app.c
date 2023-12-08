@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         }
         for (i = 0; i < n_lizards; i++)
         {
-            draw_body(my_win, update.lizard[i].pos_x, update.lizard[i].pos_y, update.lizard[i].direction);
+            draw_body(my_win, update.lizard[i]);
         }
         for (i = 0; i < n_lizards; i++)
         {
