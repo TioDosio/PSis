@@ -24,6 +24,21 @@ int generate_code()
     return rand() % 10000;
 }
 
+//Returns array pos if it is on the given position
+//Returns -1 if there is no entity on the given position
+int on_pos(entity_t entity[], int n_entities, int x, int y)
+{
+    //Seach for entity on the given position
+    for (int i = 0; i < n_entities; i++)
+    {
+        if (entity[i].pos_x == x && entity[i].pos_y == y)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 void new_position(int *x, int *y, direction_t direction)
 {
     switch (direction)
@@ -53,6 +68,74 @@ void new_position(int *x, int *y, direction_t direction)
     }
 }
 
+// returns correct position of the entity from the array
+int find_entity_id(entity_t entity[], int n_entities, int code)
+{
+    for (int i = 0; i < n_entities; i++)
+    {
+        if (code == entity[i].secret_code)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+entity_t * move_entity(generic_msg m, response_msg *r, entity_t array_entity[], int n_entity, time_t roach_death_time[],time_t current_time){
+    int entity_id;
+    entity_t old_entity; //aux variable to store current values
+    entity_t new_entity; //aux variable to store new values
+    int code = m.secret_code;
+    int pos_x;
+    int pos_y;
+
+    entity_id = find_entity_id(array_entity, n_entity, code);
+
+    if(entity_id == -1) // if entity not found
+    {
+        generate_r(r, 0, code, 0);
+        return NULL;
+    }
+
+    old_entity = array_entity[entity_id]; // save old values
+
+    r->secret_code = old_entity.secret_code;
+
+    // Copy old values to new entity
+    new_entity = old_entity;
+
+    // update new pos from direction message
+    pos_x = old_entity.pos_x;
+    pos_y = old_entity.pos_y;
+    new_entity.direction = m.direction;
+    new_position(&pos_x, &pos_y, m.direction);
+
+    //For lizards, check if there is another lizard on the new position and undo movement if so
+    if(m.entity_type == LIZARD)
+    {
+        int on_pos_id = on_pos(array_entity, n_entity, pos_x, pos_y);
+        if (on_pos_id != -1)
+        {
+            // If there is another snake on the new position, do not move
+            pos_x = old_entity.pos_x;
+            pos_y = old_entity.pos_y;
+            //And average points of both Snakes
+            new_entity.points = (old_entity.points + array_entity[on_pos_id].points) / 2;
+            array_entity[on_pos_id].points = new_entity.points;
+        }
+    }
+
+    //Finish movement and update data
+    new_entity.pos_x = pos_x;
+    new_entity.pos_y = pos_y;
+        
+    array_entity[entity_id] = new_entity;
+    generate_r(r, 1, code, new_entity.points);
+
+    return &array_entity[entity_id];
+
+}
+
 void eat_roaches(entity_t *lizard, entity_t roach_array[], int n, time_t roach_death_time[])
 {
     int i = 0;
@@ -69,34 +152,6 @@ void eat_roaches(entity_t *lizard, entity_t roach_array[], int n, time_t roach_d
             roach_death_time[i] = time(NULL);
         }
     }
-}
-
-//Returns array pos if it is on the given position
-//Returns -1 if there is no entity on the given position
-int on_pos(entity_t entity[], int n_entities, int x, int y)
-{
-    //Seach for entity on the given position
-    for (int i = 0; i < n_entities; i++)
-    {
-        if (entity[i].pos_x == x && entity[i].pos_y == y)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-// returns correct position of the entity from the array
-int find_entity_id(entity_t entity[], int n_entities, int code)
-{
-    for (int i = 0; i < n_entities; i++)
-    {
-        if (code == entity[i].secret_code)
-        {
-            return i;
-        }
-    }
-    return -1;
 }
 
 void respawn_roach(entity_t *roach)
@@ -154,9 +209,6 @@ int main()
     WINDOW *my_win = newwin(WINDOW_SIZE, WINDOW_SIZE, 0, 0);
     box(my_win, 0, 0);
     wrefresh(my_win);
-
-    int pos_x;
-    int pos_y;
 
     int code;
 
@@ -217,86 +269,27 @@ int main()
         }
         else if (m.msg_type == 1) // if movement request
         {
-            int entity_id;
-            entity_t old_entity; //aux variable to store current values
-            entity_t new_entity; //aux variable to store new values
-            code = m.secret_code;
-            switch (m.entity_type)
+            entity_t *array_entity;
+            int n_entity;
+            switch(m.entity_type)
             {
-            case LIZARD:
-                entity_id = find_entity_id(lizard_array, n_lizards, code);
-                if (entity_id != -1)
-                {
-                    old_entity = lizard_array[entity_id]; // save old values
-                }
-
-                break;
-            case ROACH:
-                entity_id = find_entity_id(roach_array, n_roaches, code);
-                old_entity = roach_array[entity_id];
-                //if roach is dead
-                if (old_entity.points == 0)
-                {
-                    //if roach is dead for more than 5 seconds, respawn it
-                    if(difftime(current_time ,roach_death_time[entity_id]) > ROACH_RESPAWN_TIME)
-                    {
-                        respawn_roach(&old_entity);
-                    }
-                }
-
-                break;
-            default:
-                generate_r(&r, 0, code, 0);
-                entity_id = -1;
-                break;
-            }
-
-            // Common procedure for both Roaches and Lizards movement
-            if (entity_id != -1)
-            {
-                r.secret_code = old_entity.secret_code;
-                pos_x = old_entity.pos_x;
-                pos_y = old_entity.pos_y;
-
-                // Copy old values to new entity
-                new_entity = old_entity;
-
-                // update new direction rom message
-                new_entity.direction = m.direction;
-                new_position(&pos_x, &pos_y, m.direction);
-
-                //For snakes, check if there is another snake on the new position
-                if(m.entity_type == LIZARD)
-                {
-                    int on_pos_id = on_pos(lizard_array, n_lizards, pos_x, pos_y);
-                    if (on_pos_id != -1)
-                    {
-                        // If there is another snake on the new position, do not move
-                        pos_x = old_entity.pos_x;
-                        pos_y = old_entity.pos_y;
-
-                        //And average points of both Snakes
-                        new_entity.points = (old_entity.points + lizard_array[on_pos_id].points) / 2;
-                        lizard_array[on_pos_id].points = new_entity.points;
-                    }
-                }
-                
-                new_entity.pos_x = pos_x;
-                new_entity.pos_y = pos_y;
-
-                // Save values in array
-                switch (m.entity_type)
-                {
                 case LIZARD:
-                    eat_roaches(&new_entity, roach_array, n_lizards, roach_death_time);
-                    lizard_array[entity_id] = new_entity;
-                    generate_r(&r, 1, code, new_entity.points);
+                    n_entity = n_lizards;
+                    array_entity = lizard_array;
                     break;
                 case ROACH:
-                    roach_array[entity_id] = new_entity;
-                    generate_r(&r, 1, code, 0);
+                    n_entity = n_roaches;
+                    array_entity = roach_array;
                     break;
-                }
+                default:
+                    array_entity = NULL;
+                    break;
+            }
+            entity_t *moved_entity = move_entity(m, &r, array_entity, n_entity, roach_death_time, current_time);
+ 
+            if(m.entity_type == LIZARD)
+            {
+                eat_roaches(moved_entity, roach_array, n_roaches, roach_death_time);
             }
         }
         else if (m.msg_type == 2)
