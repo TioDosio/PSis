@@ -15,14 +15,15 @@ int main(int argc, char *argv[])
     char *server_ip = "127.0.0.1";
     char *server_port = "6666";
     // para colocar o ip e a porta como argumentos
-    if (argc != 3)
-    {
-        printf("You insert %d arguments, you need 3\n", argc);
-    }
-    else
+    if (argc == 3)
     {
         server_ip = argv[1];
         server_port = argv[2];
+    }
+    else if (argc != 1)
+    {
+        printf("Usage: %s <server_ip> <server_port>\n", argv[0]); // "Usage: %s <server_ip> <server_port>\n
+        return 1;
     }
 
     // creating request socket
@@ -48,8 +49,16 @@ int main(int argc, char *argv[])
     m.ch = ch;
     m.secret_code = -1;
     m.direction = UP;
-    zmq_send(requester, &m, sizeof(m), 0);
-    zmq_recv(requester, &r, sizeof(r), 0);
+    if (zmq_send(requester, &m, sizeof(m), 0) == -1)
+    {
+        printf("Error connecting message\n");
+        exit(0);
+    }
+    if (zmq_recv(requester, &r, sizeof(r), 0) == -1)
+    {
+        printf("Error receiving message\n");
+        exit(0);
+    }
     if (r.success == 0)
     {
         printf("Server Full, try again later\n");
@@ -97,10 +106,10 @@ int main(int argc, char *argv[])
             break;
         case 'q':
             m.msg_type = 2;
-            zmq_send(requester, &m, sizeof(m), 0); // adios
-            break;
-        case 'Q':
-            zmq_send(requester, &m, sizeof(m), 0); // adios
+            if (zmq_send(requester, &m, sizeof(m), 0) == -1)
+            {
+                continue;
+            } // adios
             break;
         default:
             key = 'x';
@@ -110,8 +119,15 @@ int main(int argc, char *argv[])
         // send the movement message
         if (key != 'x')
         {
-            zmq_send(requester, &m, sizeof(m), 0);
-            zmq_recv(requester, &r, sizeof(r), 0);
+            if (zmq_send(requester, &m, sizeof(m), 0) == -1)
+            {
+                continue;
+            }
+            if (zmq_recv(requester, &r, sizeof(r), 0) == -1)
+            {
+                continue;
+            }
+
             mvprintw(1, 0, "Status: %d", r.success);
             mvprintw(2, 0, "Score: %d", r.score);
             if (r.success == 2)

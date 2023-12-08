@@ -218,3 +218,4 @@ void disp_clear_window(WINDOW *win)
     wclear(win);
     box(win, 0, 0);
 }
+

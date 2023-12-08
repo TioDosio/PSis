@@ -189,8 +189,8 @@ int main()
         else if (m.msg_type == 1) // if movement request
         {
             int entity_id;
-            entity_t old_entity; //aux variable to store current values
-            entity_t new_entity; //aux variable to store new values
+            entity_t old_entity; // aux variable to store current values
+            entity_t new_entity; // aux variable to store new values
             code = m.secret_code;
             switch (m.entity_type)
             {
@@ -257,7 +257,7 @@ int main()
                 r.success = 2;
             }
         }
-        //Draw entities on empty screen and create display update message
+        // Draw entities on empty screen and create display update message
         disp_clear_window(my_win);
         int i = 0;
         update.n_lizards = n_lizards;
@@ -282,13 +282,48 @@ int main()
 
         // Update display
         wrefresh(my_win);
-        //Send reply
-        zmq_send(responder, &r, sizeof(r), 0);
+        // Send reply
+        if (zmq_send(responder, &r, sizeof(r), 0) == -1)
+        {
+            if (m.entity_type == LIZARD)
+            {
+                code = m.secret_code;
+                int entity_id = find_entity_id(lizard_array, n_lizards, code);
+                if (entity_id != -1)
+                {
+                    for (int i = entity_id; i < n_lizards - 1; i++)
+                    {
+                        lizard_array[i] = lizard_array[i + 1];
+                    }
+                    n_lizards--;
+                }
+            }
+            else if (m.entity_type == ROACH)
+            {
+                for (int i = 0; i < n_roaches; i++)
+                {
+                    if (roach_array[i].secret_code == code)
+                    {
+                        for (int j = i; j < n_roaches - 1; j++)
+                        {
+                            roach_array[j] = roach_array[j + 1];
+                        }
+                        n_roaches--;
+                    }
+                }
+            }
+        }
 
-        //Send display update
+        // Send display update
         char *string = "dis";
-        zmq_send(publisher, string, strlen(string), ZMQ_SNDMORE);
+        if (zmq_send(publisher, string, strlen(string), ZMQ_SNDMORE) == -1)
+        {
+            continue;
+        }
         zmq_send(publisher, &update, sizeof(update), 0);
+        {
+            continue;
+        }
     }
     endwin(); /* End curses mode */
 

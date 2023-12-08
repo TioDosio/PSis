@@ -16,14 +16,15 @@ int main(int argc, char *argv[])
     char *server_ip = "127.0.0.1";
     char *server_port = "6669";
     // para colocar o ip e a porta como argumentos
-    if (argc != 3)
-    {
-        printf("You insert %d arguments, you need 3\n", argc);
-    }
-    else
+    if (argc == 3)
     {
         server_ip = argv[1];
         server_port = argv[2];
+    }
+    else if (argc != 1)
+    {
+        printf("Usage: %s <server_ip> <server_port>\n", argv[0]);
+        return 1;
     }
 
     display_update update;
@@ -57,7 +58,7 @@ int main(int argc, char *argv[])
         zmq_recv(subscriber, cap, 3, 0);
         int i;
 
-        //Clear the screen
+        // Clear the screen
         wclear(my_win);
         box(my_win, 0, 0);
         wrefresh(my_win);
@@ -68,7 +69,7 @@ int main(int argc, char *argv[])
         n_lizards = update.n_lizards;
 
         for (i = 0; i < n_roaches; i++)
-        {  
+        {
             disp_draw_entity(my_win, update.roach[i]);
         }
         for (i = 0; i < n_lizards; i++)

@@ -49,42 +49,44 @@ int main(int argc, char *argv[])
     char *server_port = "6666";
     int n_roaches;
 
-    // Check if the user provided the correct number of command-line arguments
-    if ((argc < 3) || argc > 4)
+    switch (argc)
     {
-        printf("Usage: %s <server_ip> <server_port> [n_roaches]\n", argv[0]);
-        return 1;
-    }
-    server_ip = argv[1];
-    server_port = argv[2];
-
-    // Set default value for n_roaches if not provided
-    if (argc == 4)
-    {
-        if (sscanf(argv[3], "%d", &n_roaches) != 1)
+    case 1:
+        n_roaches = rand() % MAX_ROACH_PER_CLIENT + 1;
+        printf("n_roaches: %d\n", n_roaches);
+        break;
+    case 3:
+        server_ip = argv[1];
+        server_port = argv[2];
+        n_roaches = rand() % MAX_ROACH_PER_CLIENT + 1;
+        break;
+    case 4:
+        server_ip = argv[1];
+        server_port = argv[2];
+        if (sscanf(argv[3], "%d", &n_roaches) == 1)
         {
-            printf("Error: number of cockroaches must be an integer.\n");
-            return 1;
-        }
-        else
-        {
-            printf("n_roaches: %d\n", n_roaches);
             if (n_roaches > MAX_ROACH_PER_CLIENT)
             {
-                printf("Error: number of cockroaches must be less than %d.\n", MAX_ROACH_PER_CLIENT);
+                printf("Max cockroaches per client is %d\n", MAX_ROACH_PER_CLIENT);
                 return 1;
             }
             else if (n_roaches < 1)
             {
-                printf("Error: number of cockroaches must be greater than 0.\n");
+                printf("The number of cockroaches need to be positive\n");
                 return 1;
             }
         }
+        else
+        {
+            printf("Invalid input for the number os cockroaches\n");
+            return 1;
+        }
+        break;
+    default:
+        printf("Usage: %s <server_ip> <server_port> [n_roaches]\n", argv[0]);
+        return 1;
     }
-    else
-    {
-        n_roaches = rand() % MAX_ROACH_PER_CLIENT + 1;
-    }
+    // Check if the user provided the correct number of command-line arguments
 
     int roach_codes[MAX_ROACH_PER_CLIENT];
 
