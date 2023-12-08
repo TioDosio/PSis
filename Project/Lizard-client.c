@@ -31,7 +31,9 @@ int main(int argc, char *argv[])
     void *context = zmq_ctx_new();
     void *requester = zmq_socket(context, ZMQ_REQ); // "ipc://127.0.0.1:6666"
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
-    zmq_connect(requester, server_address);
+    int rc;
+    rc = zmq_connect(requester, server_address);
+    assert(rc != -1);
     response_msg r;
     //  read the character from the user
     char ch;
@@ -49,16 +51,12 @@ int main(int argc, char *argv[])
     m.ch = ch;
     m.secret_code = -1;
     m.direction = UP;
-    if (zmq_send(requester, &m, sizeof(m), 0) == -1)
-    {
-        printf("Error connecting message\n");
-        exit(0);
-    }
-    if (zmq_recv(requester, &r, sizeof(r), 0) == -1)
-    {
-        printf("Error receiving message\n");
-        exit(0);
-    }
+    rc = zmq_send(requester, &m, sizeof(m), 0);
+    assert(rc != -1);
+
+    rc = zmq_recv(requester, &r, sizeof(r), 0);
+    assert(rc != -1);
+
     if (r.success == 0)
     {
         printf("Server Full, try again later\n");
@@ -109,7 +107,7 @@ int main(int argc, char *argv[])
             if (zmq_send(requester, &m, sizeof(m), 0) == -1)
             {
                 continue;
-            } // adios
+            }
             break;
         default:
             key = 'x';

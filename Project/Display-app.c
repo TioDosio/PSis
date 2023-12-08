@@ -30,14 +30,18 @@ int main(int argc, char *argv[])
     display_update update;
     update.n_lizards = 0;
     update.n_roaches = 0;
+    int rc;
 
     // creating request socket
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
     void *subscriber = zmq_socket(context, ZMQ_SUB);
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
-    zmq_connect(subscriber, server_address);
-    zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "dis", 3);
+    rc = zmq_connect(subscriber, server_address);
+    assert(rc != -1);
+
+    rc = zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "dis", 3);
+    assert(rc);
     // Initialize the screen
     initscr();
     cbreak();
@@ -55,7 +59,8 @@ int main(int argc, char *argv[])
     while (1)
     {
         char *cap[256];
-        zmq_recv(subscriber, cap, 3, 0);
+        rc = zmq_recv(subscriber, cap, 3, 0);
+        assert(rc != -1);
         int i;
 
         // Clear the screen
@@ -63,7 +68,8 @@ int main(int argc, char *argv[])
         box(my_win, 0, 0);
         wrefresh(my_win);
 
-        zmq_recv(subscriber, &update, sizeof(update), 0);
+        rc = zmq_recv(subscriber, &update, sizeof(update), 0);
+        assert(rc != -1);
 
         n_roaches = update.n_roaches;
         n_lizards = update.n_lizards;

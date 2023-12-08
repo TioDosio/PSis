@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <zmq.h>
 #include <time.h>
+#include <assert.h>
 
 generic_msg m;
 response_msg r;
@@ -19,7 +20,7 @@ char server_address[256];
 
 void spawn_roaches(int n, int *roach_codes)
 {
-
+    int rc;
     for (int i = 0; i < n; i++)
     {
         int points_roach = (rand() % 4) + 1; // 1 to 4
@@ -28,10 +29,14 @@ void spawn_roaches(int n, int *roach_codes)
         m.msg_type = 0;
         m.entity_type = ROACH;
         m.ch = points_roach + '0';
-        zmq_send(requester, &m, sizeof(m), 0);
+
+        rc = zmq_send(requester, &m, sizeof(m), 0);
+        assert(rc != -1);
 
         // Wait for response
-        zmq_recv(requester, &r, sizeof(r), 0);
+        rc = zmq_recv(requester, &r, sizeof(r), 0);
+        assert(rc != -1);
+
         printf("Received %d, secret: %d\n", r.success, r.secret_code);
         if (r.success == 0)
         {
@@ -93,12 +98,14 @@ int main(int argc, char *argv[])
     int sleep_delay;
     direction_t direction;
     int n = 0;
+    int rc;
     // creating request socket
     printf("Connecting to server…\n");
     context = zmq_ctx_new();
     requester = zmq_socket(context, ZMQ_REQ);
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
-    zmq_connect(requester, server_address);
+    rc = zmq_connect(requester, server_address);
+    assert(rc != -1);
 
     // Send n_roaches connection messages
     spawn_roaches(n_roaches, roach_codes);
@@ -134,8 +141,11 @@ int main(int argc, char *argv[])
             // Set and send message
             m.direction = direction;
             m.secret_code = roach_codes[i];
-            zmq_send(requester, &m, sizeof(m), 0);
-            zmq_recv(requester, &r, sizeof(r), 0);
+            rc = zmq_send(requester, &m, sizeof(m), 0);
+            assert(rc != -1);
+
+            rc = zmq_recv(requester, &r, sizeof(r), 0);
+            assert(rc != -1);
         }
     }
     zmq_close(requester);
