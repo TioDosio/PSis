@@ -332,7 +332,7 @@ int main()
 
         for (i = 0; i < n_lizards; i++)
         {
-            draw_body(my_win, lizard_array[i].pos_x, lizard_array[i].pos_y, lizard_array[i].direction);
+            draw_body(my_win, lizard_array[i]);
             update.lizard[i] = lizard_array[i];
         }
         // Draw head of lizards later so it always stays on top
