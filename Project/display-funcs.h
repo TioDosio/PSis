@@ -1,4 +1,4 @@
-#ifndef display_funcs_H  // Include guards to prevent multiple inclusions
+#ifndef display_funcs_H // Include guards to prevent multiple inclusions
 #define display_funcs_H
 
 #include "lizardsNroaches.h"
@@ -19,4 +19,6 @@ void draw_body(WINDOW *win, entity_t lizard);
 // Function to clear display
 void disp_clear_window(WINDOW *win);
 
-#endif //display_funcs_H
+int find_entity_id(entity_t entity[], int n_entities, int code);
+
+#endif // display_funcs_H

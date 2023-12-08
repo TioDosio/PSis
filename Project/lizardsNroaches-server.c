@@ -68,19 +68,6 @@ void new_position(int *x, int *y, direction_t direction)
     }
 }
 
-// returns correct position of the entity from the array
-int find_entity_id(entity_t entity[], int n_entities, int code)
-{
-    for (int i = 0; i < n_entities; i++)
-    {
-        if (code == entity[i].secret_code)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
 entity_t *move_entity(generic_msg m, response_msg *r, entity_t array_entity[], int n_entity, int *entity_id)
 {
     entity_t old_entity; // aux variable to store current values
@@ -184,6 +171,8 @@ int main()
     generic_msg m;
     response_msg r;
     display_update update;
+    connect_display connect;
+    connect_display_resp resp_connect;
 
     void *context = zmq_ctx_new();
     void *responder = zmq_socket(context, ZMQ_REP); // Create socket por REQ-REP
@@ -303,8 +292,9 @@ int main()
                     respawn_roach(moved_entity);
                 }
             }
+            update.entity = *moved_entity;
         }
-        else if (m.msg_type == 2)
+        else if (m.msg_type == 2) // if disconnect request from lizards
         {
             code = m.secret_code;
             int entity_id = find_entity_id(lizard_array, n_lizards, code);
@@ -318,22 +308,37 @@ int main()
                 r.success = 2;
             }
         }
+
+        if (connect.entity_type == 1)
+        {
+            resp_connect.n_lizards = n_lizards;
+            resp_connect.n_roaches = n_roaches;
+            resp_connect.address_port = ADDRESS_PUB;
+            for (int i = 0; i < n_lizards; i++)
+            {
+                resp_connect.lizard[i] = lizard_array[i];
+            }
+            for (int i = 0; i < n_roaches; i++)
+            {
+                resp_connect.roach[i] = roach_array[i];
+            }
+            if (zmq_send(responder, &resp_connect, sizeof(resp_connect), 0) == -1)
+            {
+                continue;
+            }
+            connect.entity_type = 0;
+        }
         // Draw entities on empty screen and create display update message
         disp_clear_window(my_win);
         int i = 0;
-        update.n_lizards = n_lizards;
-        update.n_roaches = n_roaches;
 
         for (i = 0; i < n_roaches; i++)
         {
             disp_draw_entity(my_win, roach_array[i]);
-            update.roach[i] = roach_array[i];
         }
-
         for (i = 0; i < n_lizards; i++)
         {
             draw_body(my_win, lizard_array[i]);
-            update.lizard[i] = lizard_array[i];
         }
         // Draw head of lizards later so it always stays on top
         for (i = 0; i < n_lizards; i++)

@@ -229,3 +229,16 @@ void disp_clear_window(WINDOW *win)
     wclear(win);
     box(win, 0, 0);
 }
+
+// returns correct position of the entity from the array
+int find_entity_id(entity_t entity[], int n_entities, int code)
+{
+    for (int i = 0; i < n_entities; i++)
+    {
+        if (code == entity[i].secret_code)
+        {
+            return i;
+        }
+    }
+    return -1;
+}

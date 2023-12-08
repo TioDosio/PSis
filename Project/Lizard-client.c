@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
         printf("Usage: %s <server_ip> <server_port>\n", argv[0]); // "Usage: %s <server_ip> <server_port>\n
         return 1;
     }
+    else if (argc == 1)
+    {
+        printf("Default address and port: 127.0.0.1 6666\n");
+    }
 
     // creating request socket
     printf("Connecting to server…\n");

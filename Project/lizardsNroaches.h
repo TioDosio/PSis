@@ -35,27 +35,37 @@ typedef struct entity_t
 
 typedef struct generic_msg // connect or movement or disconnect
 {
-    short int header;            /* header to send */
     entity_type_t entity_type;   /* type of entity */
     unsigned short int msg_type; /* 0 - connect   1 - move   2 - disconnect*/
     char ch;                     /* value to send (points of roaches or char of lizard) */
     direction_t direction;       /* direction of movement */
-    short int secret_code;      /* secret code to send */
+    short int secret_code;       /* secret code to send */
 } generic_msg;
 
 typedef struct response_msg
 {
     unsigned short int success; /* 0 - fail, 1 - success */
     unsigned short int score;   /* score of the player */
-    short int secret_code;     /* secret code to send */
+    short int secret_code;      /* secret code to send */
 } response_msg;
 
 typedef struct display_update
 {
-    unsigned short int n_roaches; /* number of roaches */
-    unsigned short int n_lizards; /* number of lizards */
+    entity_t entity;
+} display_update;
+
+typedef struct connect_display
+{
+    unsigned short int entity_type;
+} connect_display;
+
+typedef struct connect_display_resp
+{
     entity_t lizard[MAX_LIZARDS];
     entity_t roach[MAX_ROACHES];
-} display_update;
+    int n_lizards;
+    int n_roaches;
+    char *address_port; // tcp://127.0.0.0:6666 /////////////////// mudar tamanho
+} connect_display_resp;
 
 #endif
