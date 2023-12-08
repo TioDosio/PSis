@@ -7,6 +7,7 @@
 #define MAX_ROACHES (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
 #define MAX_LIZARDS 26
 #define MAX_ROACH_PER_CLIENT 10
+#define ROACH_RESPAWN_TIME 5
 
 typedef enum entity_type_t
 {

@@ -10,6 +10,8 @@
 #include "display-funcs.h"
 #include <string.h>
 
+time_t start;
+
 void generate_r(response_msg *r, int suc, int code, int score)
 {
     r->success = suc;
@@ -51,23 +53,20 @@ void new_position(int *x, int *y, direction_t direction)
     }
 }
 
-void eat_roaches(entity_t *lizard, entity_t roach_array[], int *n_roaches)
+void eat_roaches(entity_t *lizard, entity_t roach_array[], int n, time_t roach_death_time[])
 {
     int i = 0;
-    int j = 0;
     int x = lizard->pos_x;
     int y = lizard->pos_y;
-    for (i = 0; i < *n_roaches; i++)
+    for (i = 0; i < n; i++)
     {
         if (roach_array[i].pos_x == x && roach_array[i].pos_y == y)
         {
             lizard->points += roach_array[i].points;
-            // remove roach from array
-            for (j = i; j < *n_roaches - 1; j++)
-            {
-                roach_array[j] = roach_array[j + 1];
-            }
-            (*n_roaches)--;
+            // turn roach invisible and pointless for five seconds
+            roach_array[i].points = 0;
+            roach_array[i].ch = ' ';
+            roach_death_time[i] = time(NULL);
         }
     }
 }
@@ -100,11 +99,23 @@ int find_entity_id(entity_t entity[], int n_entities, int code)
     return -1;
 }
 
-int main()
+void respawn_roach(entity_t *roach)
 {
+    roach->points = (rand() % 4) + 1; // 1 to 4
+    roach->ch = roach->points + '0';
+    roach->pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
+    roach->pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
+}
+
+int main()
+{   // Start time
+    start = time(NULL);
     // Define lizards and roaches
     entity_t lizard_array[MAX_LIZARDS];
     entity_t roach_array[MAX_ROACHES];
+    time_t roach_death_time[MAX_ROACHES]; // Array of roaches' death-time
+    time_t current_time;
+
     for (int i = 0; i < MAX_LIZARDS; i++)
     {
         lizard_array[i].secret_code = -1;
@@ -115,6 +126,8 @@ int main()
     }
     int n_roaches = 0;
     int n_lizards = 0;
+    
+
     srand(time(NULL));
 
     generic_msg m;
@@ -150,6 +163,7 @@ int main()
     while (1)
     {
         zmq_recv(responder, &m, sizeof(m), 0);
+        current_time = time(NULL);
         if (m.msg_type == 0) // if connection request
         {
             // Generate Secrete code
@@ -220,6 +234,16 @@ int main()
             case ROACH:
                 entity_id = find_entity_id(roach_array, n_roaches, code);
                 old_entity = roach_array[entity_id];
+                //if roach is dead
+                if (old_entity.points == 0)
+                {
+                    //if roach is dead for more than 5 seconds, respawn it
+                    if(difftime(current_time ,roach_death_time[entity_id]) > ROACH_RESPAWN_TIME)
+                    {
+                        respawn_roach(&old_entity);
+                    }
+                }
+
                 break;
             default:
                 generate_r(&r, 0, code, 0);
@@ -241,19 +265,22 @@ int main()
                 new_entity.direction = m.direction;
                 new_position(&pos_x, &pos_y, m.direction);
 
-                //Check if there is another snake on the new position
-                int on_pos_id = on_pos(lizard_array, n_lizards, pos_x, pos_y);
-                if (on_pos_id != -1)
+                //For snakes, check if there is another snake on the new position
+                if(m.entity_type == LIZARD)
                 {
-                    // If there is another snake on the new position, do not move
-                    pos_x = old_entity.pos_x;
-                    pos_y = old_entity.pos_y;
+                    int on_pos_id = on_pos(lizard_array, n_lizards, pos_x, pos_y);
+                    if (on_pos_id != -1)
+                    {
+                        // If there is another snake on the new position, do not move
+                        pos_x = old_entity.pos_x;
+                        pos_y = old_entity.pos_y;
 
-                    //And average points of both Snakes
-                    new_entity.points = (old_entity.points + lizard_array[on_pos_id].points) / 2;
-                    lizard_array[on_pos_id].points = new_entity.points;
+                        //And average points of both Snakes
+                        new_entity.points = (old_entity.points + lizard_array[on_pos_id].points) / 2;
+                        lizard_array[on_pos_id].points = new_entity.points;
+                    }
                 }
-
+                
                 new_entity.pos_x = pos_x;
                 new_entity.pos_y = pos_y;
 
@@ -261,7 +288,7 @@ int main()
                 switch (m.entity_type)
                 {
                 case LIZARD:
-                    eat_roaches(&new_entity, roach_array, &n_roaches);
+                    eat_roaches(&new_entity, roach_array, n_lizards, roach_death_time);
                     lizard_array[entity_id] = new_entity;
                     generate_r(&r, 1, code, new_entity.points);
                     break;
