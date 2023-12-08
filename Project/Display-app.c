@@ -39,9 +39,8 @@ int main(int argc, char *argv[])
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
     rc = zmq_connect(subscriber, server_address);
     assert(rc != -1);
+    zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "dis", 3);
 
-    rc = zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "dis", 3);
-    assert(rc);
     // Initialize the screen
     initscr();
     cbreak();

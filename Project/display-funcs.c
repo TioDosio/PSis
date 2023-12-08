@@ -126,35 +126,32 @@ void draw_body(WINDOW *win, entity_t lizard)
     int pos_x = lizard.pos_x;
     int pos_y = lizard.pos_y;
     direction_t direction = lizard.direction;
-    char c[2];
-    c[0] = '.';
-    c[1] = '\0';
+    char c = '.';
 
     // If points more than 50, use c = '*'
     if (lizard.points >= 50)
     {
-        c[0] = '*';
+        c = '*';
     }
 
-    
     switch (direction)
     {
     case UP:
         if (pos_x + 1 != WINDOW_SIZE - 1)
         {
-            mvwprintw(win, pos_x + 1, pos_y, c);
+            mvwprintw(win, pos_x + 1, pos_y, "%c", c);
             if (pos_x + 2 != WINDOW_SIZE - 1)
             {
-                mvwprintw(win, pos_x + 2, pos_y, c);
+                mvwprintw(win, pos_x + 2, pos_y, "%c", c);
                 if (pos_x + 3 != WINDOW_SIZE - 1)
                 {
-                    mvwprintw(win, pos_x + 3, pos_y, c);
+                    mvwprintw(win, pos_x + 3, pos_y, "%c", c);
                     if (pos_x + 4 != WINDOW_SIZE - 1)
                     {
-                        mvwprintw(win, pos_x + 4, pos_y, c);
+                        mvwprintw(win, pos_x + 4, pos_y, "%c", c);
                         if (pos_x + 5 != WINDOW_SIZE - 1)
                         {
-                            mvwprintw(win, pos_x + 5, pos_y, c);
+                            mvwprintw(win, pos_x + 5, pos_y, "%c", c);
                         }
                     }
                 }
@@ -163,19 +160,19 @@ void draw_body(WINDOW *win, entity_t lizard)
 
         break;
     case DOWN:
-        mvwprintw(win, pos_x - 1, pos_y, c);
+        mvwprintw(win, pos_x - 1, pos_y, "%c", c);
         if ((pos_x - 2) > 0)
         {
-            mvwprintw(win, pos_x - 2, pos_y, c);
+            mvwprintw(win, pos_x - 2, pos_y, "%c", c);
             if ((pos_x - 3) > 0)
             {
-                mvwprintw(win, pos_x - 3, pos_y, c);
+                mvwprintw(win, pos_x - 3, pos_y, "%c", c);
                 if ((pos_x - 4) > 0)
                 {
-                    mvwprintw(win, pos_x - 4, pos_y, c);
+                    mvwprintw(win, pos_x - 4, pos_y, "%c", c);
                     if ((pos_x - 5) > 0)
                     {
-                        mvwprintw(win, pos_x - 5, pos_y, c);
+                        mvwprintw(win, pos_x - 5, pos_y, "%c", c);
                     }
                 }
             }
@@ -183,19 +180,19 @@ void draw_body(WINDOW *win, entity_t lizard)
 
         break;
     case LEFT:
-        mvwprintw(win, pos_x, pos_y + 1, c);
+        mvwprintw(win, pos_x, pos_y + 1, "%c", c);
         if (pos_y + 2 != WINDOW_SIZE - 1)
         {
-            mvwprintw(win, pos_x, pos_y + 2, c);
+            mvwprintw(win, pos_x, pos_y + 2, "%c", c);
             if (pos_y + 3 != WINDOW_SIZE - 1)
             {
-                mvwprintw(win, pos_x, pos_y + 3, c);
+                mvwprintw(win, pos_x, pos_y + 3, "%c", c);
                 if (pos_y + 4 != WINDOW_SIZE - 1)
                 {
-                    mvwprintw(win, pos_x, pos_y + 4, c);
+                    mvwprintw(win, pos_x, pos_y + 4, "%c", c);
                     if (pos_y + 5 != WINDOW_SIZE - 1)
                     {
-                        mvwprintw(win, pos_x, pos_y + 5, c);
+                        mvwprintw(win, pos_x, pos_y + 5, "%c", c);
                     }
                 }
             }
@@ -203,19 +200,19 @@ void draw_body(WINDOW *win, entity_t lizard)
 
         break;
     case RIGHT:
-        mvwprintw(win, pos_x, pos_y - 1, c);
+        mvwprintw(win, pos_x, pos_y - 1, "%c", c);
         if (pos_y - 2 > 0)
         {
-            mvwprintw(win, pos_x, pos_y - 2, c);
+            mvwprintw(win, pos_x, pos_y - 2, "%c", c);
             if (pos_y - 3 > 0)
             {
-                mvwprintw(win, pos_x, pos_y - 3, c);
+                mvwprintw(win, pos_x, pos_y - 3, "%c", c);
                 if (pos_y - 4 > 0)
                 {
-                    mvwprintw(win, pos_x, pos_y - 4, c);
+                    mvwprintw(win, pos_x, pos_y - 4, "%c", c);
                     if (pos_y - 5 > 0)
                     {
-                        mvwprintw(win, pos_x, pos_y - 5, c);
+                        mvwprintw(win, pos_x, pos_y - 5, "%c", c);
                     }
                 }
             }
@@ -232,4 +229,3 @@ void disp_clear_window(WINDOW *win)
     wclear(win);
     box(win, 0, 0);
 }
-
