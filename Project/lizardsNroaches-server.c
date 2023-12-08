@@ -72,6 +72,21 @@ void eat_roaches(entity_t *lizard, entity_t roach_array[], int *n_roaches)
     }
 }
 
+//Returns array pos if it is on the given position
+//Returns -1 if there is no entity on the given position
+int on_pos(entity_t entity[], int n_entities, int x, int y)
+{
+    //Seach for entity on the given position
+    for (int i = 0; i < n_entities; i++)
+    {
+        if (entity[i].pos_x == x && entity[i].pos_y == y)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 // returns correct position of the entity from the array
 int find_entity_id(entity_t entity[], int n_entities, int code)
 {
@@ -212,7 +227,7 @@ int main()
                 break;
             }
 
-            // Common procedure for both Roaches and Lizards
+            // Common procedure for both Roaches and Lizards movement
             if (entity_id != -1)
             {
                 r.secret_code = old_entity.secret_code;
@@ -225,6 +240,20 @@ int main()
                 // update new direction rom message
                 new_entity.direction = m.direction;
                 new_position(&pos_x, &pos_y, m.direction);
+
+                //Check if there is another snake on the new position
+                int on_pos_id = on_pos(lizard_array, n_lizards, pos_x, pos_y);
+                if (on_pos_id != -1)
+                {
+                    // If there is another snake on the new position, do not move
+                    pos_x = old_entity.pos_x;
+                    pos_y = old_entity.pos_y;
+
+                    //And average points of both Snakes
+                    new_entity.points = (old_entity.points + lizard_array[on_pos_id].points) / 2;
+                    lizard_array[on_pos_id].points = new_entity.points;
+                }
+
                 new_entity.pos_x = pos_x;
                 new_entity.pos_y = pos_y;
 
