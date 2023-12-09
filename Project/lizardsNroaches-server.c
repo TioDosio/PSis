@@ -223,8 +223,13 @@ int main()
                     lizard_array[n_lizards].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
                     lizard_array[n_lizards].secret_code = code;
                     lizard_array[n_lizards].direction = m.direction;
+
+                    // Send new entity to display
+                    update.entity = lizard_array[n_lizards];
+
                     n_lizards++;
                     generate_r(&r, 1, code, 0);
+                    
                 }
                 else
                 {
@@ -243,6 +248,9 @@ int main()
                     roach_array[n_roaches].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
                     roach_array[n_roaches].secret_code = code;
                     roach_array[n_roaches].direction = m.direction;
+
+                    // Send new entity to display
+                    update.entity = roach_array[n_roaches];
 
                     n_roaches++;
                     generate_r(&r, 1, code, 0);

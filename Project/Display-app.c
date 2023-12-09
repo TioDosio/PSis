@@ -119,10 +119,22 @@ int main(int argc, char *argv[])
         {
         case 0:
             id = find_entity_id(array_lizards, n_lizards, update.entity.secret_code);
+            if (id == -1) // If it's a new lizard, add it to the array
+            {
+                array_lizards[n_lizards] = update.entity;
+                n_lizards++;
+            }
+            else
             array_lizards[id] = update.entity;
             break;
         case 1:
             id = find_entity_id(array_roaches, n_roaches, update.entity.secret_code);
+            if (id == -1) // If it's a new roach, add it to the array
+            {
+                array_roaches[n_roaches] = update.entity;
+                n_roaches++;
+            }
+            else
             array_roaches[id] = update.entity;
             break;
 
