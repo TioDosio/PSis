@@ -117,7 +117,6 @@ entity_t *move_entity(generic_msg m, response_msg *r, entity_t array_entity[], i
     new_entity.pos_y = pos_y;
 
     array_entity[*entity_id] = new_entity;
-    generate_r(r, 1, code, new_entity.points);
 
     return &array_entity[*entity_id];
 }
@@ -321,6 +320,7 @@ int main()
                     respawn_roach(moved_entity);
                 }
             }
+            generate_r(&r, 1, code, moved_entity->points);
             update.entity = *moved_entity;
         }
         else if (m.msg_type == 2) // if disconnect request from lizards
