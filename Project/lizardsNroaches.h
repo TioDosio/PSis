@@ -8,11 +8,13 @@
 #define MAX_LIZARDS 26
 #define MAX_ROACH_PER_CLIENT 10
 #define ROACH_RESPAWN_TIME 5
+#define BUFFER_SIZE 30
 
 typedef enum entity_type_t
 {
     LIZARD,
-    ROACH
+    ROACH,
+    DISPLAY
 } entity_type_t;
 
 typedef enum direction_t
@@ -54,18 +56,13 @@ typedef struct display_update
     entity_t entity;
 } display_update;
 
-typedef struct connect_display
-{
-    unsigned short int entity_type;
-} connect_display;
-
 typedef struct connect_display_resp
 {
     entity_t lizard[MAX_LIZARDS];
     entity_t roach[MAX_ROACHES];
     int n_lizards;
     int n_roaches;
-    char *address_port; // tcp://127.0.0.0:6666 /////////////////// mudar tamanho
+    char address_port[BUFFER_SIZE]; 
 } connect_display_resp;
 
 #endif

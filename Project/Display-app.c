@@ -12,14 +12,15 @@
 
 int main(int argc, char *argv[])
 {
-    char server_address[256];
-    char *server_ip = "127.0.0.1";
-    char *server_port = "6666";
+    char server_address[BUFFER_SIZE];
+    char server_ip[BUFFER_SIZE] = "127.0.0.1";
+    char server_port[BUFFER_SIZE] = "6666";
+    
     // para colocar o ip e a porta como argumentos
     if (argc == 3)
     {
-        server_ip = argv[1];
-        server_port = argv[2];
+        strcpy(server_ip, argv[1]);
+        strcpy(server_port, argv[2]);
     }
     else if (argc != 1)
     {
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
     }
 
     connect_display_resp resp_connect;
-    connect_display msg_connect;
+    generic_msg msg_connect;
     display_update update;
 
     resp_connect.n_lizards = 0;
@@ -41,28 +42,32 @@ int main(int argc, char *argv[])
 
     // creating request socket REQ-REP
     printf("Connecting to server…\n");
-    void *context_req = zmq_ctx_new();
-    void *requester = zmq_socket(context_req, ZMQ_REQ);
+    void *context = zmq_ctx_new();
+    void *requester = zmq_socket(context, ZMQ_REQ);
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
     rc = zmq_connect(requester, server_address);
     assert(rc != -1);
 
     // send connection message
-    msg_connect.entity_type = 1;
+    msg_connect.entity_type = DISPLAY;
+    /*Irrelevant values*/
+    msg_connect.msg_type = 0;
+    msg_connect.ch = ' ';
+    msg_connect.direction = UP;
+    msg_connect.secret_code = 0;
+    /*Irrelevant values*/
+
     rc = zmq_send(requester, &msg_connect, sizeof(msg_connect), 0);
     assert(rc != -1);
     rc = zmq_recv(requester, &resp_connect, sizeof(resp_connect), 0);
     assert(rc != -1);
-    char *address = resp_connect.address_port;
-    printf("BANANA\n");
+
     // creating request socket PUB-SUB
-    void *context_sub = zmq_ctx_new();
-    void *subscriber = zmq_socket(context_sub, ZMQ_SUB);
-    rc = zmq_connect(subscriber, address); /////////////////////////////////////////////////////// erro aqui
+    void *subscriber = zmq_socket(context, ZMQ_SUB);
+    rc = zmq_connect(subscriber, resp_connect.address_port); 
     assert(rc != -1);
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "dis", 3);
 
-    msg_connect.entity_type = 0; // already connected
     // Initialize the screen
     initscr();
     cbreak();

@@ -171,7 +171,6 @@ int main()
     generic_msg m;
     response_msg r;
     display_update update;
-    connect_display connect;
     connect_display_resp resp_connect;
 
     void *context = zmq_ctx_new();
@@ -196,6 +195,7 @@ int main()
     wrefresh(my_win);
 
     int code;
+    int skip_reply = 0; //Used to skip generic reply when sending display reply
 
     while (1)
     {
@@ -205,6 +205,7 @@ int main()
         }
 
         current_time = time(NULL); // get current time
+
         if (m.msg_type == 0)       // if connection request
         {
             // Generate Secrete code
@@ -250,6 +251,26 @@ int main()
                 {
                     r.success = 0;
                 }
+                break;
+            case DISPLAY:
+                // Write response message
+                resp_connect.n_lizards = n_lizards;
+                resp_connect.n_roaches = n_roaches;
+                strncpy(resp_connect.address_port, ADDRESS_PUB, BUFFER_SIZE);
+                for (int i = 0; i < n_lizards; i++)
+                {
+                    resp_connect.lizard[i] = lizard_array[i];
+                }
+                for (int i = 0; i < n_roaches; i++)
+                {
+                    resp_connect.roach[i] = roach_array[i];
+                }
+                // Send response message
+                if (zmq_send(responder, &resp_connect, sizeof(resp_connect), 0) == -1)
+                {
+                    continue;
+                }
+                skip_reply = 1;
                 break;
 
             default:
@@ -309,25 +330,6 @@ int main()
             }
         }
 
-        if (connect.entity_type == 1)
-        {
-            resp_connect.n_lizards = n_lizards;
-            resp_connect.n_roaches = n_roaches;
-            resp_connect.address_port = ADDRESS_PUB;
-            for (int i = 0; i < n_lizards; i++)
-            {
-                resp_connect.lizard[i] = lizard_array[i];
-            }
-            for (int i = 0; i < n_roaches; i++)
-            {
-                resp_connect.roach[i] = roach_array[i];
-            }
-            if (zmq_send(responder, &resp_connect, sizeof(resp_connect), 0) == -1)
-            {
-                continue;
-            }
-            connect.entity_type = 0;
-        }
         // Draw entities on empty screen and create display update message
         disp_clear_window(my_win);
         int i = 0;
@@ -348,7 +350,14 @@ int main()
 
         // Update display
         wrefresh(my_win);
-        // Send reply
+        
+        // Skip response if it is a display reply
+        if (skip_reply == 1)
+        {
+            skip_reply = 0;
+            continue;
+        }
+        // Send response message
         if (zmq_send(responder, &r, sizeof(r), 0) == -1)
         {
             if (m.entity_type == LIZARD)
