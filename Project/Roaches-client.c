@@ -37,7 +37,6 @@ void spawn_roaches(int n, int *roach_codes)
         rc = zmq_recv(requester, &r, sizeof(r), 0);
         assert(rc != -1);
 
-        printf("Received %d, secret: %d\n", r.success, r.secret_code);
         if (r.success == 0)
         {
             printf("Server Full, try again later\n");

@@ -117,13 +117,13 @@ int main(int argc, char *argv[])
                 continue;
             }
 
-            mvprintw(1, 0, "Status: %d", r.success);
             mvprintw(2, 0, "Score: %d", r.score);
             if (r.success == 2)
             {
-                mvprintw(2, 0, "Disconnected from server");
+                mvprintw(2, 0, "Disconnected from server\n");
                 refresh();
-                exit(0);
+                key = 27;
+                break;
             }
         }
         refresh(); /* Print it on to the real screen */
