@@ -10,14 +10,14 @@
 #define ROACH_RESPAWN_TIME 5
 #define BUFFER_SIZE 70
 
-typedef enum entity_type_t
+typedef enum entity_type_t // entity type
 {
     LIZARD,
     ROACH,
     DISPLAY
 } entity_type_t;
 
-typedef enum direction_t
+typedef enum direction_t // direction of movement
 {
     UP,
     DOWN,
@@ -27,12 +27,12 @@ typedef enum direction_t
 
 typedef struct entity_t
 {
-    entity_type_t entity_type;
-    char ch;
-    unsigned int points;
-    unsigned short int pos_x, pos_y;
-    direction_t direction;
-    short int secret_code;
+    entity_type_t entity_type;       /* type of entity */
+    char ch;                         /* value to send (points of roaches) */
+    unsigned int points;             /* points of roaches */
+    unsigned short int pos_x, pos_y; /* position of entity */
+    direction_t direction;           /* direction of movement */
+    short int secret_code;           /* secret code to send */
 } entity_t;
 
 typedef struct generic_msg // connect or movement or disconnect
@@ -53,18 +53,18 @@ typedef struct response_msg
 
 typedef struct display_update
 {
-    entity_t entity;
+    entity_t entity;               /* entity to update */
     unsigned short int disconnect; /* 0 - no disconnect, 1 - disconnect */
     short int id_l_bumped;         /* id of lizard bumped */
 } display_update;
 
 typedef struct connect_display_resp
 {
-    entity_t lizard[MAX_LIZARDS];
-    entity_t roach[MAX_ROACHES];
-    int n_lizards;
-    int n_roaches;
-    char address_port[BUFFER_SIZE];
+    entity_t lizard[MAX_LIZARDS];   /* array of lizards */
+    entity_t roach[MAX_ROACHES];    /* array of roaches */
+    int n_lizards;                  /* number of lizards */
+    int n_roaches;                  /* number of roaches */
+    char address_port[BUFFER_SIZE]; /* address and port of publisher */
 } connect_display_resp;
 
 #endif
