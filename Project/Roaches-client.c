@@ -30,7 +30,7 @@ void spawn_roaches(int n, int *roach_codes)
     int rc;
     for (int i = 0; i < n; i++)
     {
-        int points_roach = (rand() % 4) + 1;
+        int points_roach = (rand() % 5) + 1;
 
         // Set and send message
         m.msg_type = 0;
