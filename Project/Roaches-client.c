@@ -23,7 +23,7 @@ void spawn_roaches(int n, int *roach_codes)
     int rc;
     for (int i = 0; i < n; i++)
     {
-        int points_roach = (rand() % 4) + 1; // 1 to 4
+        int points_roach = (rand() % 4) + 1;
 
         // Set and send message
         m.msg_type = 0;
@@ -50,16 +50,12 @@ void spawn_roaches(int n, int *roach_codes)
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    char *server_ip = "127.0.0.1";
-    char *server_port = "6666";
+    char *server_ip;
+    char *server_port;
     int n_roaches;
 
     switch (argc)
     {
-    case 1:
-        n_roaches = rand() % MAX_ROACH_PER_CLIENT + 1;
-        printf("n_roaches: %d\n", n_roaches);
-        break;
     case 3:
         server_ip = argv[1];
         server_port = argv[2];

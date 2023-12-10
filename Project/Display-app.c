@@ -10,27 +10,9 @@
 #include "display-funcs.h"
 #include <string.h>
 
-int main(int argc, char *argv[])
+int main()
 {
-    char server_address[BUFFER_SIZE];
-    char server_ip[BUFFER_SIZE] = "127.0.0.1";
-    char server_port[BUFFER_SIZE] = "6666";
-
-    // para colocar o ip e a porta como argumentos
-    if (argc == 3)
-    {
-        strcpy(server_ip, argv[1]);
-        strcpy(server_port, argv[2]);
-    }
-    else if (argc != 1)
-    {
-        printf("Usage: %s <server_ip> <server_port>\n", argv[0]);
-        return 1;
-    }
-    else if (argc == 1)
-    {
-        printf("Default address and port: 127.0.0.1 6666\n");
-    }
+    char server_address[] = "tcp://127.0.0.1:6666";
 
     connect_display_resp resp_connect;
     generic_msg msg_connect;
@@ -44,7 +26,6 @@ int main(int argc, char *argv[])
     printf("Connecting to server…\n");
     void *context = zmq_ctx_new();
     void *requester = zmq_socket(context, ZMQ_REQ);
-    snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
     rc = zmq_connect(requester, server_address);
     assert(rc != -1);
 
@@ -105,7 +86,7 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        char *cap[256]; ///////////////////77//// Alterar tamanho
+        char *cap[4];
         rc = zmq_recv(subscriber, cap, 3, 0);
         assert(rc != -1);
         int i;
@@ -158,6 +139,23 @@ int main(int argc, char *argv[])
             continue;
             break;
         }
+
+        // Check if roaches got eaten
+        for (int i = 0; i < n_roaches; i++)
+        {
+            for (int j = 0; j < n_lizards; j++)
+            {
+                if (array_lizards[j].pos_x == array_roaches[i].pos_x && array_lizards[j].pos_y == array_roaches[i].pos_y)
+                {
+                    array_roaches[i].ch = ' ';
+                }
+            }
+        }
+        // Check if lizards got eaten
+        if (update.id_l_bumped != -1)
+        {
+            array_lizards[update.id_l_bumped].points = update.entity.points;
+        }
         // desenhar tudo porque bodys e sobreposições
         for (i = 0; i < n_roaches; i++)
         {
@@ -171,6 +169,9 @@ int main(int argc, char *argv[])
         {
             disp_draw_entity(my_win, array_lizards[i]);
         }
+
+        wclear(lines_win);
+        // Display Scores
         for (int i = 0; i < n_lizards; i++)
         {
             mvwprintw(lines_win, i, 1, "%c: %d", array_lizards[i].ch, array_lizards[i].points);

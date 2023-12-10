@@ -13,22 +13,18 @@
 int main(int argc, char *argv[])
 {
     char server_address[256];
-    char *server_ip = "127.0.0.1";
-    char *server_port = "6666";
+    char *server_ip;
+    char *server_port;
     // para colocar o ip e a porta como argumentos
     if (argc == 3)
     {
         server_ip = argv[1];
         server_port = argv[2];
     }
-    else if (argc != 1)
+    else
     {
         printf("Usage: %s <server_ip> <server_port>\n", argv[0]); // "Usage: %s <server_ip> <server_port>\n
         return 1;
-    }
-    else if (argc == 1)
-    {
-        printf("Default address and port: 127.0.0.1 6666\n");
     }
 
     // creating request socket
@@ -40,20 +36,12 @@ int main(int argc, char *argv[])
     rc = zmq_connect(requester, server_address);
     assert(rc != -1);
     response_msg r;
-    //  read the character from the user
-    char ch;
-    do
-    {
-        printf("what is your character(a..z)?: ");
-        ch = getchar();
-        ch = tolower(ch);
-    } while (!isalpha(ch));
 
     // send connection message
     generic_msg m;
     m.msg_type = 0; // connection msg
     m.entity_type = 0;
-    m.ch = ch;
+    m.ch = ' ';
     m.secret_code = -1;
     m.direction = UP;
     rc = zmq_send(requester, &m, sizeof(m), 0);
@@ -80,10 +68,11 @@ int main(int argc, char *argv[])
     {
         //  prepare the movement message
         m.msg_type = 1;
-        m.ch = ch;
+        m.ch = ' ';
         m.secret_code = r.secret_code;
         key = getch();
         usleep(10000);
+        clear();
         n++;
         switch (key)
         {
@@ -108,6 +97,13 @@ int main(int argc, char *argv[])
             m.direction = UP;
             break;
         case 'q':
+            m.msg_type = 2;
+            if (zmq_send(requester, &m, sizeof(m), 0) == -1)
+            {
+                continue;
+            }
+            break;
+        case 'Q':
             m.msg_type = 2;
             if (zmq_send(requester, &m, sizeof(m), 0) == -1)
             {

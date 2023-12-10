@@ -19,6 +19,29 @@ void generate_r(response_msg *r, int suc, int code, int score)
     r->score = score;
 }
 
+char generateRandomChar()
+{
+    static char usedChars[26] = {0}; // Keeps track of used characters
+    int randomIndex;
+
+    // Seed the random number generator
+    srand(time(NULL));
+
+    // Loop until a unique character is found
+    do
+    {
+        randomIndex = rand() % 26; // Generate a random index between 0 and 25
+    } while (usedChars[randomIndex] == 1);
+
+    // Mark the character as used
+    usedChars[randomIndex] = 1;
+
+    // Convert the index to the corresponding character
+    char randomChar = 'a' + randomIndex;
+
+    return randomChar;
+}
+
 // Function generates a random code that is not in use. Works well for current number of entities, but may not work well for a large number of entities
 int generate_code(entity_t lizard_array[], entity_t roach_array[], int n_lizards, int n_roaches)
 {
@@ -80,29 +103,29 @@ void new_position(int *x, int *y, direction_t direction)
     case UP:
         (*x)--;
         if (*x == 0)
-            *x = 2;
+            *x = 1;
         break;
     case DOWN:
         (*x)++;
         if (*x == WINDOW_SIZE - 1)
-            *x = WINDOW_SIZE - 3;
+            *x = WINDOW_SIZE - 2;
         break;
     case LEFT:
         (*y)--;
         if (*y == 0)
-            *y = 2;
+            *y = 1;
         break;
     case RIGHT:
         (*y)++;
         if (*y == WINDOW_SIZE - 1)
-            *y = WINDOW_SIZE - 3;
+            *y = WINDOW_SIZE - 2;
         break;
     default:
         break;
     }
 }
 
-entity_t *move_entity(generic_msg m, response_msg *r, entity_t array_entity[], int n_entity, int *entity_id)
+entity_t *move_entity(generic_msg m, response_msg *r, entity_t array_entity[], entity_t lizard_array[], int n_entity, int n_lizards, int *entity_id, int *id_bumped)
 {
     entity_t old_entity; // aux variable to store current values
     entity_t new_entity; // aux variable to store new values
@@ -131,18 +154,18 @@ entity_t *move_entity(generic_msg m, response_msg *r, entity_t array_entity[], i
     new_entity.direction = m.direction;
     new_position(&pos_x, &pos_y, m.direction);
 
-    // For lizards, check if there is another lizard on the new position and undo movement if so
-    if (m.entity_type == LIZARD)
+    // Check if there is another lizard on the new position and undo movement if so
+    *id_bumped = on_pos(lizard_array, n_lizards, pos_x, pos_y);
+    if (*id_bumped != -1)
     {
-        int on_pos_id = on_pos(array_entity, n_entity, pos_x, pos_y);
-        if (on_pos_id != -1)
+        // If there is a snake on the new position, do not move
+        pos_x = old_entity.pos_x;
+        pos_y = old_entity.pos_y;
+        // If moving a lizard, average points of both
+        if (new_entity.entity_type == LIZARD)
         {
-            // If there is another snake on the new position, do not move
-            pos_x = old_entity.pos_x;
-            pos_y = old_entity.pos_y;
-            // And average points of both Snakes
-            new_entity.points = (old_entity.points + array_entity[on_pos_id].points) / 2;
-            array_entity[on_pos_id].points = new_entity.points;
+            new_entity.points = (old_entity.points + array_entity[*id_bumped].points) / 2;
+            array_entity[*id_bumped].points = new_entity.points;
         }
     }
 
@@ -164,9 +187,9 @@ void eat_roaches(entity_t *lizard, entity_t roach_array[], int n, time_t roach_d
     {
         if (roach_array[i].pos_x == x && roach_array[i].pos_y == y)
         {
-            lizard->points += roach_array[i].points;
+            if (roach_array[i].ch != ' ')
+                lizard->points += roach_array[i].ch - '0'; // if roach exists, gain points
             // turn roach invisible and pointless for five seconds
-            roach_array[i].points = 0;
             roach_array[i].ch = ' ';
             roach_death_time[i] = time(NULL);
         }
@@ -175,7 +198,6 @@ void eat_roaches(entity_t *lizard, entity_t roach_array[], int n, time_t roach_d
 
 void respawn_roach(entity_t *roach)
 {
-    roach->points = (rand() % 4) + 1; // 1 to 4
     roach->ch = roach->points + '0';
     roach->pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
     roach->pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
@@ -254,7 +276,7 @@ int main()
                 {
                     // Save values to Array
                     lizard_array[n_lizards].entity_type = m.entity_type;
-                    lizard_array[n_lizards].ch = m.ch;
+                    lizard_array[n_lizards].ch = generateRandomChar();
                     lizard_array[n_lizards].points = 0;
                     lizard_array[n_lizards].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
                     lizard_array[n_lizards].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
@@ -279,8 +301,8 @@ int main()
                 {
                     // Save values to Array
                     roach_array[n_roaches].entity_type = m.entity_type;
-                    roach_array[n_roaches].ch = m.ch;
                     roach_array[n_roaches].points = m.ch - '0';
+                    roach_array[n_roaches].ch = m.ch;
                     roach_array[n_roaches].pos_x = (rand() % (WINDOW_SIZE - 2)) + 1;
                     roach_array[n_roaches].pos_y = (rand() % (WINDOW_SIZE - 2)) + 1;
                     roach_array[n_roaches].secret_code = code;
@@ -341,8 +363,8 @@ int main()
                 array_entity = NULL;
                 break;
             }
-            int id = -1;
-            entity_t *moved_entity = move_entity(m, &r, array_entity, n_entity, &id);
+            int id = -1, id_bumped = -1;
+            entity_t *moved_entity = move_entity(m, &r, array_entity, lizard_array, n_entity, n_lizards, &id, &id_bumped);
             if (id == -1 || moved_entity == NULL)
             {
                 continue; // if entity not found, do nothing
@@ -362,6 +384,7 @@ int main()
             generate_r(&r, 1, moved_entity->secret_code, moved_entity->points);
             update.entity = *moved_entity;
             update.disconnect = 0;
+            update.id_l_bumped = id_bumped;
         }
         else if (m.msg_type == 2) // if disconnect request from lizards
         {
@@ -374,9 +397,10 @@ int main()
                     lizard_array[i] = lizard_array[i + 1];
                 }
                 n_lizards--;
-                generate_r(&r, 1, code, 0);
+                generate_r(&r, 2, code, 0);
                 update.entity = lizard_array[entity_id];
                 update.disconnect = 1;
+                update.id_l_bumped = -1;
             }
         }
 
@@ -418,6 +442,7 @@ int main()
                 {
                     remove_entity(lizard_array, &n_lizards, entity_id);
                     update.entity = lizard_array[entity_id];
+                    update.id_l_bumped = -1;
                 }
             }
             else if (m.entity_type == ROACH)
@@ -429,11 +454,13 @@ int main()
                     {
                         remove_entity(roach_array, &n_roaches, i);
                         update.entity = roach_array[entity_id];
+                        update.id_l_bumped = -1;
                     }
                 }
             }
             update.disconnect = 1;
         }
+        wclear(lines_win);
         for (int i = 0; i < n_lizards; i++)
         {
             mvwprintw(lines_win, i, 1, "%c: %d", lizard_array[i].ch, lizard_array[i].points);

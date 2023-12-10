@@ -8,7 +8,7 @@
 #define MAX_LIZARDS 26
 #define MAX_ROACH_PER_CLIENT 10
 #define ROACH_RESPAWN_TIME 5
-#define BUFFER_SIZE 30
+#define BUFFER_SIZE 70
 
 typedef enum entity_type_t
 {
@@ -46,7 +46,7 @@ typedef struct generic_msg // connect or movement or disconnect
 
 typedef struct response_msg
 {
-    unsigned short int success; /* 0 - fail, 1 - success */
+    unsigned short int success; /* 0 - fail, 1 - success, 2 - success in disconnection*/
     unsigned short int score;   /* score of the player */
     short int secret_code;      /* secret code to send */
 } response_msg;
@@ -55,6 +55,7 @@ typedef struct display_update
 {
     entity_t entity;
     unsigned short int disconnect; /* 0 - no disconnect, 1 - disconnect */
+    short int id_l_bumped;         /* id of lizard bumped */
 } display_update;
 
 typedef struct connect_display_resp
@@ -63,7 +64,7 @@ typedef struct connect_display_resp
     entity_t roach[MAX_ROACHES];
     int n_lizards;
     int n_roaches;
-    char address_port[BUFFER_SIZE]; 
+    char address_port[BUFFER_SIZE];
 } connect_display_resp;
 
 #endif
