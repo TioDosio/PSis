@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     char server_address[BUFFER_SIZE];
     char server_ip[BUFFER_SIZE] = "127.0.0.1";
     char server_port[BUFFER_SIZE] = "6666";
-    
+
     // para colocar o ip e a porta como argumentos
     if (argc == 3)
     {
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
 
     // creating request socket PUB-SUB
     void *subscriber = zmq_socket(context, ZMQ_SUB);
-    rc = zmq_connect(subscriber, resp_connect.address_port); 
+    rc = zmq_connect(subscriber, resp_connect.address_port);
     assert(rc != -1);
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "dis", 3);
 
@@ -78,6 +78,9 @@ int main(int argc, char *argv[])
     WINDOW *my_win = newwin(WINDOW_SIZE, WINDOW_SIZE, 0, 0);
     box(my_win, 0, 0);
     wrefresh(my_win);
+
+    // Create another window for lines below the box
+    WINDOW *lines_win = newwin(26, WINDOW_SIZE, WINDOW_SIZE, 0);
 
     entity_t *array_lizards = resp_connect.lizard;
     entity_t *array_roaches = resp_connect.roach;
@@ -132,7 +135,7 @@ int main(int argc, char *argv[])
                     remove_entity(array_lizards, &n_lizards, id);
                 }
             }
-                break;
+            break;
         case 1:
             id = find_entity_id(array_roaches, n_roaches, update.entity.secret_code);
             if (id == -1) // If it's a new roach, add it to the array
@@ -168,7 +171,13 @@ int main(int argc, char *argv[])
         {
             disp_draw_entity(my_win, array_lizards[i]);
         }
+        for (int i = 0; i < n_lizards; i++)
+        {
+            mvwprintw(lines_win, i, 1, "%c: %d", array_lizards[i].ch, array_lizards[i].points);
+        }
+        wmove(lines_win, 0, 0);
         wrefresh(my_win);
+        wrefresh(lines_win);
     }
     endwin(); /* End curses mode */
 }

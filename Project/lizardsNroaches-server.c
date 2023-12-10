@@ -22,7 +22,7 @@ void generate_r(response_msg *r, int suc, int code, int score)
 // Function generates a random code that is not in use. Works well for current number of entities, but may not work well for a large number of entities
 int generate_code(entity_t lizard_array[], entity_t roach_array[], int n_lizards, int n_roaches)
 {
-    while(1)
+    while (1)
     {
         int found = 0;
         short int code = rand() % 30000;
@@ -227,8 +227,11 @@ int main()
     box(my_win, 0, 0);
     wrefresh(my_win);
 
+    // Create another window for lines below the box
+    WINDOW *lines_win = newwin(26, WINDOW_SIZE, WINDOW_SIZE, 0);
+
     int code;
-    int skip_reply = 0; //Used to skip generic reply when sending display reply
+    int skip_reply = 0; // Used to skip generic reply when sending display reply
 
     while (1)
     {
@@ -240,7 +243,7 @@ int main()
 
         current_time = time(NULL); // get current time
 
-        if (m.msg_type == 0)       // if connection request
+        if (m.msg_type == 0) // if connection request
         {
             // Generate Secrete code
             code = generate_code(lizard_array, roach_array, n_lizards, n_roaches);
@@ -264,7 +267,6 @@ int main()
 
                     n_lizards++;
                     generate_r(&r, 1, code, 0);
-                    
                 }
                 else
                 {
@@ -398,7 +400,7 @@ int main()
 
         // Update display
         wrefresh(my_win);
-        
+
         // Skip response if it is a display reply
         if (skip_reply == 1)
         {
@@ -432,6 +434,12 @@ int main()
             }
             update.disconnect = 1;
         }
+        for (int i = 0; i < n_lizards; i++)
+        {
+            mvwprintw(lines_win, i, 1, "%c: %d", lizard_array[i].ch, lizard_array[i].points);
+        }
+        wmove(lines_win, 0, 0);
+        wrefresh(lines_win);
 
         // Send display update
         char *string = "dis";
