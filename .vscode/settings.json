@@ -1,10 +1,14 @@
 {
     "files.associations": {
-        "*.rmd": "markdown",
-        "ncurses.h": "c",
-        "zmq.h": "c",
-        "time.h": "c"
-    },
+      "*.rmd": "markdown",
+      "ncurses.h": "c",
+      "zmq.h": "c",
+      "time.h": "c",
+      "display-funcs.h": "c",
+      "lizardsnroaches.h": "c",
+      "server-func.h": "c",
+      "types.h": "c"
+   },
     "makefile.launchConfigurations": [
         {
            "cwd": "/home/guilherme/Psis/Group/PSis/Project",
