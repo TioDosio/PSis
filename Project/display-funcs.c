@@ -2,7 +2,13 @@
 #include <ncurses.h>
 #include "display-funcs.h"
 
-// Function to clear entity from display
+/*
+ * @brief clear entity from display
+ *
+ * @param win window to be cleared
+ * @param entity entity to be cleared
+ *
+ */
 void disp_clear_entity(WINDOW *win, entity_t entity)
 {
     // get values
@@ -19,7 +25,13 @@ void disp_clear_entity(WINDOW *win, entity_t entity)
     }
 }
 
-// Function to draw entity on display
+/*
+ * @brief draw entity on display
+ *
+ * @param win window to be drawn on
+ * @param entity entity to be drawn
+ *
+ */
 void disp_draw_entity(WINDOW *win, entity_t entity)
 {
     // get values
@@ -31,7 +43,15 @@ void disp_draw_entity(WINDOW *win, entity_t entity)
     wmove(win, x, y);
     waddch(win, ch | A_BOLD);
 }
-
+/*
+ * @brief clear lizard body
+ *
+ * @param win window to be cleared
+ * @param pos_x x position of the lizard
+ * @param pos_y y position of the lizard
+ * @param direction direction of the lizard
+ *
+ */
 void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
 {
     switch (direction)
@@ -121,6 +141,13 @@ void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction)
     }
 }
 
+/*
+ * @brief draw lizard body
+ *
+ * @param win window to be drawn on
+ * @param lizard lizard to be drawn
+ *
+ */
 void draw_body(WINDOW *win, entity_t lizard)
 {
     int pos_x = lizard.pos_x;
@@ -224,13 +251,28 @@ void draw_body(WINDOW *win, entity_t lizard)
     }
 }
 
+/*
+    * @brief clear window
+    *
+    * @param win window to be cleared
+    *
+
+*/
 void disp_clear_window(WINDOW *win)
 {
     wclear(win);
     box(win, 0, 0);
 }
 
-// returns correct position of the entity from the array
+/*
+ * @brief entity id in array
+ *
+ * @param entity[] array of entities
+ * @param n_entities number of entities
+ * @param code secret code of the entity to be found
+ *
+ *
+ */
 int find_entity_id(entity_t entity[], int n_entities, int code)
 {
     for (int i = 0; i < n_entities; i++)
@@ -242,7 +284,14 @@ int find_entity_id(entity_t entity[], int n_entities, int code)
     }
     return -1;
 }
+/*
+* @brief remove entity from array
 
+* @param entity[] array of entities
+* @param n_entities number of entities
+* @param id id of the entity to be removed
+
+*/
 void remove_entity(entity_t entity[], int *n_entities, int id)
 {
     for (int i = id; i < *n_entities - 1; i++)

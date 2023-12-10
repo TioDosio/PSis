@@ -12,6 +12,15 @@
 
 time_t current_time;
 
+/*
+ * @brief clear responde parameters
+ *
+ * @param r response message to be cleared
+ * @param suc success parameter
+ * @param code secret code parameter
+ * @param score score parameter
+ *
+ */
 void generate_r(response_msg *r, int suc, int code, int score)
 {
     r->success = suc;
@@ -19,6 +28,12 @@ void generate_r(response_msg *r, int suc, int code, int score)
     r->score = score;
 }
 
+/*
+ * @brief generate random character
+ *
+ * @return random character
+ *
+ */
 char generateRandomChar()
 {
     static char usedChars[26] = {0}; // Keeps track of used characters
@@ -42,7 +57,17 @@ char generateRandomChar()
     return randomChar;
 }
 
-// Function generates a random code that is not in use. Works well for current number of entities, but may not work well for a large number of entities
+/*
+ * @brief generate random code
+ *
+ * @param lizard_array array of lizards
+ * @param roach_array array of roaches
+ * @param n_lizards number of lizards
+ * @param n_roaches number of roaches
+ *
+ * @return random code
+ *
+ */
 int generate_code(entity_t lizard_array[], entity_t roach_array[], int n_lizards, int n_roaches)
 {
     while (1)
@@ -83,6 +108,18 @@ int generate_code(entity_t lizard_array[], entity_t roach_array[], int n_lizards
 
 // Returns array pos if it is on the given position
 // Returns -1 if there is no entity on the given position
+
+/*
+ * @brief  check if there is an entity on the given position
+ *
+ * @param entity[] array of entities
+ * @param n_entities number of entities
+ * @param x x position
+ * @param y y position
+ *
+ * @return array pos if it is on the given position
+ *
+ */
 int on_pos(entity_t entity[], int n_entities, int x, int y)
 {
     // Seach for entity on the given position
@@ -96,6 +133,14 @@ int on_pos(entity_t entity[], int n_entities, int x, int y)
     return -1;
 }
 
+/*
+ * @brief  set new position based on direction
+ *
+ * @param x x position
+ * @param y y position
+ * @param direction direction of movement
+ *
+ */
 void new_position(int *x, int *y, direction_t direction)
 {
     switch (direction)

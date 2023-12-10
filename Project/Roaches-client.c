@@ -18,6 +18,13 @@ void *context;
 void *requester;
 char server_address[256];
 
+/*
+ * @brief spawn n roaches
+ *
+ * @param n number of roaches to spawn
+ * @param roach_codes array to store the secret codes of the roaches
+ *
+ */
 void spawn_roaches(int n, int *roach_codes)
 {
     int rc;
