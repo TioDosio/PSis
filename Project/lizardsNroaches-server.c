@@ -437,15 +437,16 @@ int main()
             int entity_id = find_entity_id(lizard_array, n_lizards, code);
             if (entity_id != -1)
             {
+                generate_r(&r, 2, code, 0);
+                update.entity = lizard_array[entity_id];
+                update.disconnect = 1;
+                update.id_l_bumped = -1;
+
                 for (int i = entity_id; i < n_lizards - 1; i++)
                 {
                     lizard_array[i] = lizard_array[i + 1];
                 }
                 n_lizards--;
-                generate_r(&r, 2, code, 0);
-                update.entity = lizard_array[entity_id];
-                update.disconnect = 1;
-                update.id_l_bumped = -1;
             }
         }
 
