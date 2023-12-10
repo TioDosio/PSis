@@ -19,9 +19,43 @@ void generate_r(response_msg *r, int suc, int code, int score)
     r->score = score;
 }
 
-int generate_code()
+// Function generates a random code that is not in use. Works well for current number of entities, but may not work well for a large number of entities
+int generate_code(entity_t lizard_array[], entity_t roach_array[], int n_lizards, int n_roaches)
 {
-    return rand() % 10000;
+    while(1)
+    {
+        int found = 0;
+        short int code = rand() % 30000;
+
+        // Check if code is already in use (lizards)
+        for (int i = 0; i < n_lizards; i++)
+        {
+            if (lizard_array[i].secret_code == code)
+            {
+                found = 1;
+                break;
+            }
+        }
+        // If code is already in use, generate another one
+        if (found)
+        {
+            continue;
+        }
+        // Check if code is already in use (roaches)
+        for (int i = 0; i < n_roaches; i++)
+        {
+            if (roach_array[i].secret_code == code)
+            {
+                found = 1;
+                break;
+            }
+        }
+        // If code is not in use, return it
+        if (!found)
+        {
+            return code;
+        }
+    }
 }
 
 // Returns array pos if it is on the given position
@@ -208,7 +242,7 @@ int main()
         if (m.msg_type == 0)       // if connection request
         {
             // Generate Secrete code
-            code = generate_code();
+            code = generate_code(lizard_array, roach_array, n_lizards, n_roaches);
             switch (m.entity_type)
             {
             case LIZARD:
