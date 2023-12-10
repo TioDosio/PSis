@@ -11,7 +11,7 @@ Lizard-client: Lizard-client.c
 	$(CC) $(CFLAGS) -o Lizard-client Lizard-client.c $(LIBS)
 
 lizardsNroaches-server: lizardsNroaches-server.c
-	$(CC) $(CFLAGS) -o lizardsNroaches-server lizardsNroaches-server.c display-funcs.c $(LIBS)
+	$(CC) $(CFLAGS) -o lizardsNroaches-server lizardsNroaches-server.c display-funcs.c server-func.c $(LIBS)
 
 Roaches-client: Roaches-client.c
 	$(CC) $(CFLAGS) -o Roaches-client Roaches-client.c $(LIBS)
