@@ -232,6 +232,7 @@ int main()
 
     while (1)
     {
+        skip_reply = 0;
         if (zmq_recv(responder, &m, sizeof(m), 0) == -1)
         {
             continue;
@@ -356,7 +357,7 @@ int main()
                     respawn_roach(moved_entity);
                 }
             }
-            generate_r(&r, 1, code, moved_entity->points);
+            generate_r(&r, 1, moved_entity->secret_code, moved_entity->points);
             update.entity = *moved_entity;
             update.disconnect = 0;
         }
@@ -438,7 +439,7 @@ int main()
         {
             continue;
         }
-        zmq_send(publisher, &update, sizeof(update), 0);
+        if (zmq_send(publisher, &update, sizeof(update), 0) == -1)
         {
             continue;
         }
