@@ -125,8 +125,14 @@ int main(int argc, char *argv[])
                 n_lizards++;
             }
             else
-            array_lizards[id] = update.entity;
-            break;
+            {
+                array_lizards[id] = update.entity;
+                if (update.disconnect == 1)
+                {
+                    remove_entity(array_lizards, &n_lizards, id);
+                }
+            }
+                break;
         case 1:
             id = find_entity_id(array_roaches, n_roaches, update.entity.secret_code);
             if (id == -1) // If it's a new roach, add it to the array
@@ -135,7 +141,13 @@ int main(int argc, char *argv[])
                 n_roaches++;
             }
             else
-            array_roaches[id] = update.entity;
+            {
+                array_roaches[id] = update.entity;
+                if (update.disconnect == 1)
+                {
+                    remove_entity(array_roaches, &n_roaches, id);
+                }
+            }
             break;
 
         default:

@@ -54,6 +54,7 @@ typedef struct response_msg
 typedef struct display_update
 {
     entity_t entity;
+    unsigned short int disconnect; /* 0 - no disconnect, 1 - disconnect */
 } display_update;
 
 typedef struct connect_display_resp

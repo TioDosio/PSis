@@ -242,3 +242,12 @@ int find_entity_id(entity_t entity[], int n_entities, int code)
     }
     return -1;
 }
+
+void remove_entity(entity_t entity[], int *n_entities, int id)
+{
+    for (int i = id; i < *n_entities - 1; i++)
+    {
+        entity[i] = entity[i + 1];
+    }
+    *n_entities = *n_entities - 1;
+}

@@ -21,4 +21,6 @@ void disp_clear_window(WINDOW *win);
 
 int find_entity_id(entity_t entity[], int n_entities, int code);
 
+void remove_entity(entity_t entity[], int *n_entities, int id);
+
 #endif // display_funcs_H

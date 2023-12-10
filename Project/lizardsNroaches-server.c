@@ -225,6 +225,7 @@ int main()
 
                     // Send new entity to display
                     update.entity = lizard_array[n_lizards];
+                    update.disconnect = 0;
 
                     n_lizards++;
                     generate_r(&r, 1, code, 0);
@@ -250,6 +251,7 @@ int main()
 
                     // Send new entity to display
                     update.entity = roach_array[n_roaches];
+                    update.disconnect = 0;
 
                     n_roaches++;
                     generate_r(&r, 1, code, 0);
@@ -322,6 +324,7 @@ int main()
             }
             generate_r(&r, 1, code, moved_entity->points);
             update.entity = *moved_entity;
+            update.disconnect = 0;
         }
         else if (m.msg_type == 2) // if disconnect request from lizards
         {
@@ -334,7 +337,9 @@ int main()
                     lizard_array[i] = lizard_array[i + 1];
                 }
                 n_lizards--;
-                r.success = 2;
+                generate_r(&r, 1, code, 0);
+                update.entity = lizard_array[entity_id];
+                update.disconnect = 1;
             }
         }
 
@@ -368,33 +373,29 @@ int main()
         // Send response message
         if (zmq_send(responder, &r, sizeof(r), 0) == -1)
         {
+            code = m.secret_code;
             if (m.entity_type == LIZARD)
             {
-                code = m.secret_code;
                 int entity_id = find_entity_id(lizard_array, n_lizards, code);
                 if (entity_id != -1)
                 {
-                    for (int i = entity_id; i < n_lizards - 1; i++)
-                    {
-                        lizard_array[i] = lizard_array[i + 1];
-                    }
-                    n_lizards--;
+                    remove_entity(lizard_array, &n_lizards, entity_id);
+                    update.entity = lizard_array[entity_id];
                 }
             }
             else if (m.entity_type == ROACH)
             {
+                int entity_id = find_entity_id(roach_array, n_roaches, code);
                 for (int i = 0; i < n_roaches; i++)
                 {
                     if (roach_array[i].secret_code == code)
                     {
-                        for (int j = i; j < n_roaches - 1; j++)
-                        {
-                            roach_array[j] = roach_array[j + 1];
-                        }
-                        n_roaches--;
+                        remove_entity(roach_array, &n_roaches, i);
+                        update.entity = roach_array[entity_id];
                     }
                 }
             }
+            update.disconnect = 1;
         }
 
         // Send display update
