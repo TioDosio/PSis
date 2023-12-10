@@ -97,18 +97,8 @@ int main(int argc, char *argv[])
             m.direction = UP;
             break;
         case 'q':
-            m.msg_type = 2;
-            if (zmq_send(requester, &m, sizeof(m), 0) == -1)
-            {
-                continue;
-            }
-            break;
         case 'Q':
             m.msg_type = 2;
-            if (zmq_send(requester, &m, sizeof(m), 0) == -1)
-            {
-                continue;
-            }
             break;
         default:
             key = 'x';

@@ -23,6 +23,15 @@
                "arg2"
             ],
             "stopAtEntry": true
+         },
+         {
+            "cwd": "/home/guilherme/Psis/Group/PSis/Project",
+            "binaryPath": "/home/guilherme/Psis/Group/PSis/Project/Lizard-client",
+            "binaryArgs": [
+               "127.0.0.1",
+               "6666"
+            ],
+            "stopAtEntry": true
          }
       ]
 }
