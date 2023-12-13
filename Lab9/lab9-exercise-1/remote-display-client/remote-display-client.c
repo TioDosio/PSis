@@ -66,19 +66,27 @@ int main()
     //         create a buffer
     //         pack the C structure (payperview_req__pack) into the buffer
 
-    remote_char_t m_cc;
-    m_cc.msg_type = 2;
-    strcpy(m_cc.creditcard_number, "999123222222");
-    strcpy(m_cc.subscriber_name, "Joao Silva");
+    PayperviewReq payperview_req = PAYPERVIEW_REQ__INIT;
+    payperview_req.subscriber_name = client_name;
+    payperview_req.creditcard_number = cc_str;
 
-    zmq_send(requester, &m_cc, sizeof(m_cc), 0);
-    // TODO 2
+    size_t packed_size = payperview_req__get_packed_size(&payperview_req);
+    char *buffer = malloc(packed_size);
 
+    payperview_req__pack(&payperview_req, buffer);
 
+    zmq_send(requester, &buffer, packed_size, 0);
 
     // TODO 5 -  read and process the payperview_resp message
-    subscrition_ok_m resp_m;
-    zmq_recv(requester, &resp_m, sizeof(resp_m), 0);
+    zmq_msg_t msg_raw;
+    zmq_msg_init (&msg_raw);
+    int n_bytes = zmq_recvmsg(requester, &msg_raw, 0);
+    char *packed_msg = zmq_msg_data (&msg_raw);
+    PayperviewResp * ret_value = payperview_resp__unpack(NULL, n_bytes, packed_msg);
+    zmq_msg_close (&msg_raw);
+
+    PayperviewResp resp_m = *ret_value;
+
     printf("secret %d\n", resp_m.random_secret);
     // TODO 5
 

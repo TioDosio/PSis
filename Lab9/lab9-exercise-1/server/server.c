@@ -139,16 +139,27 @@ int main()
             //          replace the zmq_recv by a zmq_recvmsg
             //          get the message buffer with zmq_msg_data
             //          get the C message structure with the payperview_req__unpack
-            zmq_recv (responder, &m, sizeof(remote_char_t), 0);
+            
+            zmq_msg_t msg_raw;
+            zmq_msg_init (&msg_raw);
+            int n_bytes = zmq_recvmsg(responder, &msg_raw, 0);
+            char *packed_msg = zmq_msg_data (&msg_raw);
+
+            PayperviewReq * ret_value = payperview_req__unpack(NULL, n_bytes, packed_msg);
+            zmq_msg_close (&msg_raw);
+
             // TODO 3
 
             // VERIFY if CC correct 
 
 
             // TODO 4 –  send the reply as a protocol buffer payperview_resp message
-            subscrition_ok_m rep_m;
-            rep_m.random_secret = random_secret;
-            zmq_send(responder, &rep_m, sizeof(rep_m), 0);
+            PayperviewResp payperview_resp = PAYPERVIEW_RESP__INIT;
+            payperview_resp.random_secret = random_secret;
+            size_t packed_size = payperview_resp__get_packed_size(&payperview_resp);
+            char *buffer = malloc(packed_size);
+            payperview_resp__pack(&payperview_resp, buffer);
+            zmq_send(responder, &buffer, packed_size, 0);
             // TODO 4
             continue;
         }

@@ -20,8 +20,8 @@
            "stopAtEntry": true
         },
         {
-            "cwd": "/home/guilherme/Psis/Group/PSis/Project",
-            "binaryPath": "/home/guilherme/Psis/Group/PSis/Project/Display-app",
+            "cwd": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1",
+            "binaryPath": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1/remote-display-client/remote-display-client",
             "binaryArgs": [
                "arg1",
                "arg2"
@@ -34,6 +34,15 @@
             "binaryArgs": [
                "127.0.0.1",
                "6666"
+            ],
+            "stopAtEntry": true
+         },
+         {
+            "cwd": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1",
+            "binaryPath": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1/server/server",
+            "binaryArgs": [
+               "arg1",
+               "arg2"
             ],
             "stopAtEntry": true
          }
