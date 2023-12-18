@@ -1,6 +1,6 @@
 #sudo apt install protobuf-c-compiler
 #sudo apt install libprotobuf-c-dev
-all: balls.pb-c.c server.c remote-display-client.c
+all: balls.pb-c.c server.c remote-display-client.c human-client.c
 
 
 balls.pb-c.c: balls.proto
@@ -11,4 +11,8 @@ server.c:
 
 remote-display-client.c: 
 	make -C remote-display-client -f Makefile all
+
+human-client.c:
+	make -C human-client -f Makefile all
+
 	
