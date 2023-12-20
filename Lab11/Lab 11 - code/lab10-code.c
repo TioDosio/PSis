@@ -5,10 +5,13 @@
 
 #define LENGTH_ARRAY 1000
 int rand_num_array[LENGTH_ARRAY];
-// int prime_array[LENGTH_ARRAY]; // exercise 4
+int prime_array[LENGTH_ARRAY];
 
-//int next_random = 0; //exercise 1
+int next_random_index = 0; 
+int total_primes = 0;
 
+// Mutex for protecting the shared counter
+pthread_mutex_t counter_mutex;
 
 #define N_THREADS 2
 /**
@@ -43,20 +46,43 @@ void * inc_thread(void * arg){
     int int_arg = (int) arg;
     int partial_count = 0;
     int n_primes = 0;
+    int current_index = 0;
+    
+    
 
-    int i = 0;
+    while (next_random_index<LENGTH_ARRAY)
+    {   
+        // Lock the mutex before accessing the shared resource
+        pthread_mutex_lock(&counter_mutex);
 
-    while(i<LENGTH_ARRAY){
-        if(verify_prime(rand_num_array[i]) == 1){
-            //printf("\t\t%d %lu is prime\n", i,rand_num_array[i]);
-            n_primes ++;
-        }else{
-            //printf("\t\t%d %lu is not prime\n", i,rand_num_array[i]);
+        //Critical section
+        current_index = next_random_index;
+        next_random_index++;
+
+        // Unlock the mutex after updating the shared resource
+        pthread_mutex_unlock(&counter_mutex);
+
+        // Check if the index is out of bounds
+        if(current_index >= LENGTH_ARRAY){
+            break;
         }
-        i++;
+
+        if(verify_prime(rand_num_array[current_index]) == 1){
+            printf("\tThread %d:\t\t%d %lu is prime\n",int_arg, current_index,rand_num_array[current_index]);
+            n_primes ++;
+            prime_array[total_primes] = rand_num_array[current_index];
+            total_primes ++;
+        }else{
+            printf("\tThread %d:\t\t%d %lu is not prime\n",int_arg, current_index,rand_num_array[current_index]);
+        }
+
+
         partial_count++;
 
-    } 
+    }
+    
+    
+
     printf("Thread %d found %d primes on %d numbers\n", int_arg, n_primes, partial_count);
     pthread_exit(NULL);
 
@@ -68,6 +94,9 @@ void * inc_thread(void * arg){
  * @return int 
  */
 int main(){
+
+     // Initialize the mutex
+    pthread_mutex_init(&counter_mutex, NULL);
 
 
     for(int  i= 0 ; i < LENGTH_ARRAY; i++){
@@ -88,6 +117,7 @@ int main(){
         pthread_join(t_id[i], &ret_val);
     }
 
-    //    printf("main - total primes %i\n", total_primes); // exercise 4
+    printf("main - total primes %i\n", total_primes);
+    pthread_mutex_destroy(&counter_mutex);
     exit(0);
 }
