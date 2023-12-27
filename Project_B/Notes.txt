@@ -1,0 +1,6 @@
+Wasp is represented by the # symbol
+Wasps decreases 10 points if stings the lizard
+Lizard loses if have negative points
+
+
+
