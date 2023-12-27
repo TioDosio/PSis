@@ -1,31 +1,60 @@
  General rules:
     -lizards colide = half points for both
     -lizard eats roach = + 1 points
-    -lizard stung by wasp = - 10 points
+    -lizard stung (colide) by wasp = - 10 points
     -win at 50
     -lose at <0
 
 
--lizardNroaches-server
+-lizardNroachesNwasps-server
+    -Every change => send update display
+    -Max players =26
+    -Roaches + wasps < 1/3 of field
+    -Receiving connect => add to array
+    -4 threads for lizards
+        - All threads have the same code 
+            - Read msg, execute, reply and send update
+
+    -1 thread for roaches + wasps (use protocal buffer)
+    - all threads finish by updating display and sending update msg
+    - roaches can share cells (but can't move to heads)
+    - Wasps can't share cells
+    - both (re)spawn on random locations
+    - lizards at 50 points = body with *
+    - lizards at <0 points = no body
+    - if animal doesn't receive msg for >1m, disconnect
+    - if animal was removed (through timeout), reply with "invalid msg"
 
 All clients:
     - Connect msg
     - Send moves
     - Disconnect msgs
-    - 
+    - Always gets replies
+    - address + port is cmd line argument
+    - 1 min of no msgs = disconnect
+    - If trying to move something that was removed, receive "invalid msg"
+    - NPCs must use protocol buffers
 
 -Roaches-client
-    -sends moves of 10
-    -receives response
-    -can disconnect (and receives response too)
+    - controls 10
+    - define score for each roach (1 to 5)    
+
 
 -Wasps-client
-    -sends moves of 10
-    -receives response
-    -can disconnect (and receives response too)
+    -controls 10
+    -programed in python
+
 
 -Lizard-client
-    -sends moves
-    -receives response
-    -receives display
-    -can disconnect (and receives response too)
+    -display on a thread
+        -same code as before
+    -msgs on a thread
+        -reply must get the letter (at the start)
+        -reply must get the points (when moving)
+        -q or Q sends disconnect (after reply, exit)
+    
+
+- Critical Sections:
+    - connects
+    - points, to avoid error when exists colisions while increasing or decreasing points
+    
