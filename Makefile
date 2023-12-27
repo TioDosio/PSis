@@ -1,17 +1,14 @@
 all:
-	make lab9
+	make project-b 
 
-project:
+project-a:
 	make clean
-	make -C Project -f Makefile all
+	make -C Project_A -f Makefile all
 
-lab5: 
-	make -C Lab5/Lab5files/lab3-exercise-3-solution -f Makefile all
-
-lab9:
-	make -C Lab9/lab9-exercise-1 -f Makefile all
+project-b:
+	make -C Project_B/lizardsNroachesNwasps_group26 -f Makefile clean
+	make -C Project_BlizardsNroachesNwasps_group26 -f Makefile all
 
 clean:
-	make -C Lab5/Lab5files/lab3-exercise-3-solution -f Makefile all clean
-	make -C Project -f Makefile clean
+	make -C Project_B/lizardsNroachesNwasps_group26 -f Makefile clean
 

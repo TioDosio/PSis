@@ -1,6 +1,31 @@
-Wasp is represented by the # symbol
-Wasps decreases 10 points if stings the lizard
-Lizard loses if have negative points
+ General rules:
+    -lizards colide = half points for both
+    -lizard eats roach = + 1 points
+    -lizard stung by wasp = - 10 points
+    -win at 50
+    -lose at <0
 
 
+-lizardNroaches-server
 
+All clients:
+    - Connect msg
+    - Send moves
+    - Disconnect msgs
+    - 
+
+-Roaches-client
+    -sends moves of 10
+    -receives response
+    -can disconnect (and receives response too)
+
+-Wasps-client
+    -sends moves of 10
+    -receives response
+    -can disconnect (and receives response too)
+
+-Lizard-client
+    -sends moves
+    -receives response
+    -receives display
+    -can disconnect (and receives response too)
