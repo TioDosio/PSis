@@ -4,7 +4,7 @@
 #define ADDRESS_REQ "tcp://127.0.0.1:6666"
 #define ADDRESS_PUB "tcp://127.0.0.1:6669"
 #define WINDOW_SIZE 30
-#define MAX_ROACHES (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
+#define MAX_NPCS (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
 #define MAX_LIZARDS 26
 #define MAX_ROACH_PER_CLIENT 10
 #define ROACH_RESPAWN_TIME 5
@@ -61,7 +61,7 @@ typedef struct display_update
 typedef struct connect_display_resp
 {
     entity_t lizard[MAX_LIZARDS];   /* array of lizards */
-    entity_t roach[MAX_ROACHES];    /* array of roaches */
+    entity_t roach[MAX_NPCS];       /* array of roaches */
     int n_lizards;                  /* number of lizards */
     int n_roaches;                  /* number of roaches */
     char address_port[BUFFER_SIZE]; /* address and port of publisher */
