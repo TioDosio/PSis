@@ -7,7 +7,8 @@
       "display-funcs.h": "c",
       "lizardsnroaches.h": "c",
       "server-func.h": "c",
-      "types.h": "c"
+      "types.h": "c",
+      "lizardsnroachesnwasps.h": "c"
    },
     "makefile.launchConfigurations": [
         {
