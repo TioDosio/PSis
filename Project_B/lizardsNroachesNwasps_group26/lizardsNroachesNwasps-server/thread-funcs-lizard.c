@@ -1,4 +1,4 @@
-#include "lizard-funcs.h"
+#include "thread-funcs.h"
 #include "../common-files/lizardsNroachesNwasps.h"
 #include <pthread.h>
 #include <zmq.h>
@@ -47,7 +47,7 @@ void *lizard_thread(void *lizard_args)
                 code = generate_code();
 
                 //CRITICAL SECTION
-                pthread_mutex_lock(&mutex);
+                pthread_mutex_lock(&mutex_lizard);
 
                 // Check if there is room for more lizards
                 if (shared->n_lizards < MAX_LIZARDS)
@@ -63,7 +63,7 @@ void *lizard_thread(void *lizard_args)
                 }
 
                 //END CRITICAL SECTION
-                pthread_mutex_unlock(&mutex);
+                pthread_mutex_unlock(&mutex_lizard);
                 
                 // Send response
                 generate_r(responder, success, code, 0);
@@ -72,7 +72,7 @@ void *lizard_thread(void *lizard_args)
 
             case DISCONNECT:
                 //CRITICAL SECTION
-                pthread_mutex_lock(&mutex);
+                pthread_mutex_lock(&mutex_lizard);
 
                 // Check if lizard exists
                 for (int i = 0; i < shared->n_lizards; i++)
@@ -90,14 +90,17 @@ void *lizard_thread(void *lizard_args)
                 }
 
                 //END CRITICAL SECTION
-                pthread_mutex_unlock(&mutex);
+                pthread_mutex_unlock(&mutex_lizard);
 
                 // Send response
                 generate_r(responder, success, m.secret_code, 0);
 
                 break;
 
-            case MOVE: //TO DO
+            case MOVE:
+                move(m.secret_code, m.content, shared);
+
+                break;
 
         }
 

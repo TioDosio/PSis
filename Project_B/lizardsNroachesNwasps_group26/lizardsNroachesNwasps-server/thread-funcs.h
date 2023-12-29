@@ -1,16 +1,9 @@
 #include "../common-files/lizardsNroachesNwasps.h"
 #include <pthread.h>
 
-// Struct for arguments to lizard thread
-typedef struct thread_args
-{
-    entity_t *lizard_array;
-    entity_t *npc_array;
-    int n_lizards;
-    int n_npc;
-    int *roach_death_time;
-
-} thread_args;
+// Mutex for protecting the shared content
+pthread_mutex_t mutex_lizard;
+pthread_mutex_t mutex_npc;
 
 /**
  * @brief Thread function for handeling lizard messages and exacute actions

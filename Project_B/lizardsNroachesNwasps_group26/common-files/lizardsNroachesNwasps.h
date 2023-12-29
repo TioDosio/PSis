@@ -1,6 +1,7 @@
 #ifndef lizardNroaches_H // Include guards to prevent multiple inclusions
 #define lizardNroaches_H
 
+
 #define ADDRESS_REQ "tcp://127.0.0.1:6666"
 #define ADDRESS_PUB "tcp://127.0.0.1:6669"
 #define BACK_END_ADDRESS "inproc://back-end"
@@ -13,8 +14,8 @@
 #define ROACH_RESPAWN_TIME 5
 #define BUFFER_SIZE 70
 
-// Mutex for protecting the shared content
-pthread_mutex_t mutex;
+//ZMQ context
+void *context;
 
 typedef enum entity_type_t // entity type
 {
@@ -79,5 +80,16 @@ typedef struct connect_display_resp
     int n_npc;                      /* number of npcs */
     char address_port[BUFFER_SIZE]; /* address and port of publisher */
 } connect_display_resp;
+
+// Struct for arguments for threads
+typedef struct thread_args
+{
+    entity_t *lizard_array;
+    entity_t *npc_array;
+    int n_lizards;
+    int n_npc;
+    int *roach_death_time;
+
+} thread_args;
 
 #endif

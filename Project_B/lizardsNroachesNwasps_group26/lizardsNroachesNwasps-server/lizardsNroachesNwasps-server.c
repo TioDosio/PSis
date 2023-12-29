@@ -10,7 +10,7 @@
 #include "display-funcs.h"
 #include <string.h>
 #include <pthread.h>
-#include "lizard-funcs.h"
+#include "thread-funcs.h"
 #include "npc-funcs.h"
 
 time_t current_time;

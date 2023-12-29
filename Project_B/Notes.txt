@@ -58,3 +58,6 @@ All clients:
     - connects
     - points, to avoid error when exists colisions while increasing or decreasing points
     
+
+
+    -To do: mudar shared para ser global
