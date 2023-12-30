@@ -9,12 +9,13 @@ void *lizard_thread(void *lizard_args)
     thread_args *shared = (thread_args *)lizard_args;
     
     // Initialize ZMQ 
+    // Socket to reply to clients
     void *responder = zmq_socket(context, ZMQ_REP); // Create socket por REQ-REP
-    //void *publisher = zmq_socket(context, ZMQ_PUB); // Create socket for PUB-SUB
-
     int rc = zmq_connect(responder, BACK_END_ADDRESS); // Bind to address
     assert(rc == 0);
 
+    // Socket to send display updates
+    // void *publisher = zmq_socket(context, ZMQ_PUB); // Create socket for PUB-SUB
     // rc = zmq_bind(publisher, ADDRESS_PUB); // Bind to address
     // assert(rc == 0);
 
@@ -65,7 +66,7 @@ void *lizard_thread(void *lizard_args)
                 //END CRITICAL SECTION
                 pthread_mutex_unlock(&mutex_lizard);
                 
-                // Send response
+                // Send response [HERE] MUST SEND DISPLAY_CONNECT?
                 generate_r(responder, success, code, 0);
                  
                 break;
@@ -98,21 +99,16 @@ void *lizard_thread(void *lizard_args)
                 break;
 
             case MOVE:
-                move(m.secret_code, m.content, shared);
+                move_lizard(m.secret_code, m.content, shared);
 
                 break;
 
         }
 
+        // Update display
+        update_display(shared);
+        // Send display update to lizard-clients
+        // zmq_send(publisher, &update, sizeof(update), 0);
+
     }
-}
-
-void generate_r(void *responder, int success, int secret_code, int score)
-{
-    response_msg r;
-    r.success = success;
-    r.secret_code = secret_code;
-    r.score = score;
-
-    zmq_send(responder, &r, sizeof(r), 0);
 }

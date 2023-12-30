@@ -11,9 +11,6 @@
 #include <string.h>
 #include <pthread.h>
 #include "thread-funcs.h"
-#include "npc-funcs.h"
-
-time_t current_time;
 
 int main()
 {
@@ -36,5 +33,42 @@ int main()
     int n_lizards = 0;
     int n_npc = 0;
 
+    // Create shared thread arguments
+    thread_args shared;
+    shared.lizard_array = lizard_array;
+    shared.npc_array = npc_array;
+    shared.n_lizards = n_lizards;
+    shared.n_npc = n_npc;
+    shared.roach_death_time = roach_death_time;
+
+    //* Intitizalize ZMQ*//
+    context = zmq_ctx_new ();
+    //  Socket facing Lizard clients
+    void *frontend = zmq_socket (context, ZMQ_ROUTER);
+    int rc = zmq_bind (frontend, ADDRESS_REQ_LIZ);
+    assert (rc == 0);
+    //  Socket facing lizard threads
+    void *backend = zmq_socket (context, ZMQ_DEALER);
+    rc = zmq_bind (backend, BACK_END_ADDRESS);
+    assert (rc == 0);
+
+    // Initialize display
+    WINDOW *game_win;
+    WINDOW *lines_win;
+    display_start(game_win, lines_win);
+    
+    // Call thread functions
+    for(int i = 0; i < LIZARD_THREADS; i++)
+    {   pthread_t lizard;
+        pthread_create(&lizard, NULL, lizard_thread, (void *)&shared);
+    }
+
+    pthread_t npc;
+    pthread_create(&npc, NULL, npc_thread, (void *)&shared);
+ 
+    //  Start the proxy
+    zmq_proxy (frontend, backend, NULL);
+
+    // We never get here...
     return 0;
 }

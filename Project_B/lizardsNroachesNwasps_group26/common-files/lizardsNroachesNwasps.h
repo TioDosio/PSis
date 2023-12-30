@@ -2,10 +2,10 @@
 #define lizardNroaches_H
 
 
-#define ADDRESS_REQ "tcp://127.0.0.1:6666"
+#define ADDRESS_REQ_LIZ "tcp://127.0.0.1:6666"
+#define ADDRESS_REQ_NPC "tcp://127.0.0.1:6667"
 #define ADDRESS_PUB "tcp://127.0.0.1:6669"
 #define BACK_END_ADDRESS "inproc://back-end"
-#define FRONT_END_ADDRESS "inproc://front-end"
 
 #define WINDOW_SIZE 30
 #define MAX_NPCS (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
@@ -13,6 +13,7 @@
 #define MAX_ROACH_PER_CLIENT 10
 #define ROACH_RESPAWN_TIME 5
 #define BUFFER_SIZE 70
+#define LIZARD_THREADS 4
 
 //ZMQ context
 void *context;

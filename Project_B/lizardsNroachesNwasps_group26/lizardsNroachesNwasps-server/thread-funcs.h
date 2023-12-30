@@ -6,12 +6,20 @@ pthread_mutex_t mutex_lizard;
 pthread_mutex_t mutex_npc;
 
 /**
- * @brief Thread function for handeling lizard messages and exacute actions
+ * @brief Thread function for handeling lizard messages and execute actions
  * 
  * @param lizard_args pointer to struct with arguments for the thread
  * 
  */
 void *lizard_thread(void *lizard_args);
+
+/**
+ * @brief Thread function for handeling NPC messages and execute actions
+ * 
+ * @param lizard_args pointer to struct with arguments for the thread
+ * 
+ */
+void *npc_thread(void *lizard_args);
 
 /**
  * @brief Function to generate and send response to lizard client
