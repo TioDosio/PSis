@@ -9,11 +9,11 @@ void disp_update(thread_args *shared, game_win, lines_win)
 
     for (i = 0; i < shared->n_lizards; i++)
     {
-        disp_clear_entity(my_win, shared->lizard_array[i]); // clear all lizards heads and bodys
+        disp_clear_entity(game_win, shared->lizard_array[i]); // clear all lizards heads and bodys
     }
     for (i = 0; i < shared->n_lizards; i++)
     {
-        draw_body(my_win, shared->lizard_array[i]); // draw all bodys
+        draw_body(game_win, shared->lizard_array[i]); // draw all bodys
     }
     // Draw head of lizards later so it always stays on top
     for (i = 0; i < shared->n_lizards; i++)
@@ -22,10 +22,15 @@ void disp_update(thread_args *shared, game_win, lines_win)
         {
             continue;
         }
-        disp_draw_entity(my_win, shared->lizard_array[i]); // draw all heads
+        disp_draw_entity(game_win, shared->lizard_array[i]); // draw all heads
+    }
+    for (int i = 0; i < n_lizards; i++)
+    {
+        mvwprintw(lines_win, i, 1, "%c: %d", shared->lizard_array[i].ch, shared->lizard_array[i].points);
     }
     // Update display
-    wrefresh(my_win);
+    wrefresh(game_win);
+    wrefresh(lines_win);
 }
 
 void *lizard_thread(void *lizard_args)
