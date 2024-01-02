@@ -279,23 +279,37 @@ void remove_entity(entity_t entity[], int *n_entities, int id)
     *n_entities = *n_entities - 1;
 }
 
-void update_display(thread_args *game)
+void disp_update(thread_args *game)
 {
+    int i = 0;
+
     // Clear window
     disp_clear_window(game->game_win);
+    disp_clear_window(game->lines_win);
 
-    // Draw entities
-    for (int i = 0; i < game->n_lizards; i++)
+    // Draw all lizards
+    for (i = 0; i < game->n_lizards; i++)
+    {
+        draw_body(game->game_win, game->lizard_array[i]); // draw all bodys
+    }
+    // Draw head of lizards later so it always stays on top
+    for (i = 0; i < game->n_lizards; i++)
     {
         disp_draw_entity(game->game_win, game->lizard_array[i]);
-        draw_body(game->game_win, game->lizard_array[i]);
     }
 
-    for (int i = 0; i < game->n_npc; i++)
+    // Draw all npcs
+    for (i = 0; i < game->n_npc; i++)
     {
         disp_draw_entity(game->game_win, game->npc_array[i]);
     }
-
-    // Refresh window
+    
+    // Print scores
+    for (int i = 0; i < game->n_lizards; i++)
+    {
+        mvwprintw(game->lines_win, i, 1, "%c: %d", game->lizard_array[i].ch, game->lizard_array[i].points);
+    }
+    // Update display
     wrefresh(game->game_win);
+    wrefresh(game->lines_win);
 }

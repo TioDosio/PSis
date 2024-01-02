@@ -3,36 +3,6 @@
 #include <pthread.h>
 #include <zmq.h>
 
-void disp_update(thread_args *shared, game_win, lines_win)
-{
-    int i = 0;
-
-    for (i = 0; i < shared->n_lizards; i++)
-    {
-        disp_clear_entity(game_win, shared->lizard_array[i]); // clear all lizards heads and bodys
-    }
-    for (i = 0; i < shared->n_lizards; i++)
-    {
-        draw_body(game_win, shared->lizard_array[i]); // draw all bodys
-    }
-    // Draw head of lizards later so it always stays on top
-    for (i = 0; i < shared->n_lizards; i++)
-    {
-        if (shared->lizard_array[i].secret_code == -1) // if lizard is disconnected???
-        {
-            continue;
-        }
-        disp_draw_entity(game_win, shared->lizard_array[i]); // draw all heads
-    }
-    for (int i = 0; i < n_lizards; i++)
-    {
-        mvwprintw(lines_win, i, 1, "%c: %d", shared->lizard_array[i].ch, shared->lizard_array[i].points);
-    }
-    // Update display
-    wrefresh(game_win);
-    wrefresh(lines_win);
-}
-
 void *lizard_thread(void *lizard_args)
 {
     // Load shared variables
@@ -137,7 +107,7 @@ void *lizard_thread(void *lizard_args)
         }
         update.entity = shared->lizard_array[m.secret_code];
         // Update display
-        disp_update(shared, game_win, lines_win); // need to pass this arguments to this function from maint ot write to display
+        disp_update(shared);
         // Send display update to lizard-clients
         zmq_send(publisher, &update, sizeof(update), 0);
     }
