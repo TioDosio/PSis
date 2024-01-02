@@ -1,6 +1,6 @@
-#include "../common-files/lizardsNroaches.h"
 #include <ncurses.h>
 #include "display-funcs.h"
+#include "../common-files/lizardsNroachesNwasps.h"
 
 
 void display_start( WINDOW *game_win, WINDOW *lines_win)
@@ -154,6 +154,12 @@ void draw_body(WINDOW *win, entity_t lizard)
         c = '*';
     }
 
+    // If points less than 0, don't draw body
+    if (lizard.points < 0)
+    {
+        return;
+    }
+
     switch (direction)
     {
     case UP:
@@ -271,4 +277,25 @@ void remove_entity(entity_t entity[], int *n_entities, int id)
         entity[i] = entity[i + 1];
     }
     *n_entities = *n_entities - 1;
+}
+
+void update_display(thread_args *game)
+{
+    // Clear window
+    disp_clear_window(game->game_win);
+
+    // Draw entities
+    for (int i = 0; i < game->n_lizards; i++)
+    {
+        disp_draw_entity(game->game_win, game->lizard_array[i]);
+        draw_body(game->game_win, game->lizard_array[i]);
+    }
+
+    for (int i = 0; i < game->n_npc; i++)
+    {
+        disp_draw_entity(game->game_win, game->npc_array[i]);
+    }
+
+    // Refresh window
+    wrefresh(game->game_win);
 }

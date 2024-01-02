@@ -33,14 +33,6 @@ int main()
     int n_lizards = 0;
     int n_npc = 0;
 
-    // Create shared thread arguments
-    thread_args shared;
-    shared.lizard_array = lizard_array;
-    shared.npc_array = npc_array;
-    shared.n_lizards = n_lizards;
-    shared.n_npc = n_npc;
-    shared.roach_death_time = roach_death_time;
-
     //* Intitizalize ZMQ*//
     context = zmq_ctx_new ();
     //  Socket facing Lizard clients
@@ -56,6 +48,14 @@ int main()
     WINDOW *game_win;
     WINDOW *lines_win;
     display_start(game_win, lines_win);
+
+    // Create shared thread arguments
+    thread_args shared;
+    shared.lizard_array = lizard_array;
+    shared.npc_array = npc_array;
+    shared.n_lizards = n_lizards;
+    shared.n_npc = n_npc;
+    shared.roach_death_time = roach_death_time;
     
     // Call thread functions
     for(int i = 0; i < LIZARD_THREADS; i++)

@@ -1,7 +1,7 @@
 #ifndef display_funcs_H // Include guards to prevent multiple inclusions
 #define display_funcs_H
 
-#include "../common-files/lizardsNroaches.h"
+#include "../common-files/lizardsNroachesNwasps.h"
 #include <ncurses.h>
 
 /*
@@ -77,5 +77,13 @@ int find_entity_id(entity_t entity[], int n_entities, int code);
 
 */
 void remove_entity(entity_t entity[], int *n_entities, int id);
+
+/*
+* @brief Updates display
+
+* @param game thread arguments
+    
+*/
+void update_display(thread_args *game);
 
 #endif // display_funcs_H

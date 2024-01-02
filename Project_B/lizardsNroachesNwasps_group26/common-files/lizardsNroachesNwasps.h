@@ -90,6 +90,8 @@ typedef struct thread_args
     int n_lizards;
     int n_npc;
     int *roach_death_time;
+    void *game_win;
+    void *lines_win;
 
 } thread_args;
 
