@@ -1,12 +1,10 @@
 #include <zmq.h>
-#include <ncurses.h>
 #include "../common-files/lizardsNroachesNwasps.h"
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <time.h>
 #include "display-funcs.h"
 #include <string.h>
 #include <pthread.h>
@@ -44,11 +42,20 @@ int main()
     rc = zmq_bind (backend, BACK_END_ADDRESS);
     assert (rc == 0);
 
-    // Initialize display
-    WINDOW *game_win;
-    WINDOW *lines_win;
-    display_start(game_win, lines_win);
+    // Initialize the screen
+    initscr();
+    cbreak();
+    keypad(stdscr, TRUE);
+    noecho();
+    
+    WINDOW *game_win = newwin(WINDOW_SIZE, WINDOW_SIZE, 0, 0);
+    WINDOW *lines_win = newwin(MAX_LIZARDS, WINDOW_SIZE, WINDOW_SIZE, 0);
 
+    /* creates a window and draws a border */
+    box(game_win, 0, 0);
+    wrefresh(game_win);
+
+ 
     // Create shared thread arguments
     thread_args shared;
     shared.lizard_array = lizard_array;
@@ -56,6 +63,8 @@ int main()
     shared.n_lizards = n_lizards;
     shared.n_npc = n_npc;
     shared.roach_death_time = roach_death_time;
+    shared.game_win = game_win;
+    shared.lines_win = lines_win;
     
     // Call thread functions
     for(int i = 0; i < LIZARD_THREADS; i++)
@@ -64,7 +73,7 @@ int main()
     }
 
     pthread_t npc;
-    pthread_create(&npc, NULL, npc_thread, (void *)&shared);
+    //pthread_create(&npc, NULL, npc_thread, (void *)&shared);
  
     //  Start the proxy
     zmq_proxy (frontend, backend, NULL);

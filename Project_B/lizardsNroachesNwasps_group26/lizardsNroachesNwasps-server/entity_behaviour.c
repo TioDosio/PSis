@@ -1,5 +1,6 @@
 #include "entity_behaviour.h"
 #include "thread-funcs.h"
+#include <stdlib.h>
 
 int move_lizard(int code, direction_t dir , thread_args *game)
 {
@@ -12,10 +13,13 @@ int move_lizard(int code, direction_t dir , thread_args *game)
     //Critial section - Lizard mutex always locked first
     pthread_mutex_lock(&mutex_lizard);
     pthread_mutex_lock(&mutex_npc);
-    int success = (lizard_index = find_entity_index(game->lizard_array, game->n_lizards, code) != -1);
+    
+    int success = (lizard_index = find_entity_index(game->lizard_array, game->n_lizards, code)) != -1;
 
     if(success)
     {
+        int points;
+        
         // Save old values
         lizard_after_move = game->lizard_array[lizard_index];
         pos_x = game->lizard_array[lizard_index].pos_x;
@@ -26,7 +30,7 @@ int move_lizard(int code, direction_t dir , thread_args *game)
 
         // Check if collision with NPC or another lizard
         int collision_index = -1;
-        entity_t collision_type; 
+        entity_type_t collision_type; 
 
         //If movement is valid
         if (valid_pos(game, pos_x, pos_y, &collision_index, &collision_type))
@@ -40,11 +44,11 @@ int move_lizard(int code, direction_t dir , thread_args *game)
             lizard_after_move.points += eat_roaches(game, pos_x, pos_y);
         } else {
             // Handle collision and do not move
-            switch (collision_type.entity_type)
+            switch (collision_type)
             {
                 case LIZARD:
                     // If lizard, average points for both Lizards
-                    int points = (lizard_after_move.points + collision_type.points) / 2;
+                    points = (lizard_after_move.points + game->lizard_array[collision_index].points) / 2;
                     lizard_after_move.points = points;
                     game->lizard_array[collision_index].points = points;
                     break;
@@ -128,4 +132,90 @@ int eat_roaches(thread_args *game, int pos_x, int pos_y)
         }
     }
     return points;
+}
+
+int find_entity_index(entity_t *entity_array, int n_entities, int code)
+{
+    // Seach for entity with the given code
+    for (int i = 0; i < n_entities; i++)
+    {
+        if (entity_array[i].secret_code == code)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void new_position(int *x, int *y, direction_t direction)
+{
+    switch (direction)
+    {
+    case UP:
+        (*x)--;
+        if (*x == 0)
+            *x = 1;
+        break;
+    case DOWN:
+        (*x)++;
+        if (*x == WINDOW_SIZE - 1)
+            *x = WINDOW_SIZE - 2;
+        break;
+    case LEFT:
+        (*y)--;
+        if (*y == 0)
+            *y = 1;
+        break;
+    case RIGHT:
+        (*y)++;
+        if (*y == WINDOW_SIZE - 1)
+            *y = WINDOW_SIZE - 2;
+        break;
+    default:
+        break;
+    }
+}
+
+void spawn_entity(thread_args *game, entity_type_t entity_type)
+{
+    entity_t new_entity;
+    int pos_x, pos_y;
+    int collision_index;            //not used, but needed for valid_pos
+    entity_type_t collision_type;   //not used, but needed for valid_pos
+
+    // Generate random position
+    pos_x = rand() % (WINDOW_SIZE - 2) + 1;
+    pos_y = rand() % (WINDOW_SIZE - 2) + 1;
+
+    // Check if position is valid
+    if (valid_pos(game, pos_x, pos_y, &collision_index, &collision_type))
+    {
+        // Set entity values
+        new_entity.entity_type = entity_type;
+        new_entity.points = 0;
+        new_entity.pos_x = pos_x;
+        new_entity.pos_y = pos_y;
+        new_entity.direction = UP;
+        new_entity.secret_code = generate_code();
+
+        // Add entity to array
+        if (entity_type == LIZARD)
+        {
+            new_entity.ch = 'a'+game->n_lizards;
+            game->lizard_array[game->n_lizards] = new_entity;
+            game->n_lizards++;
+        }
+        else 
+        {
+            if(entity_type == ROACH)
+                new_entity.ch = '0' + rand() % 5;
+            else
+                new_entity.ch = '#';
+            game->npc_array[game->n_npc] = new_entity;
+            game->n_npc++;
+        }
+    } else {
+        // If position is not valid, try again
+        spawn_entity(game, entity_type);
+    }
 }

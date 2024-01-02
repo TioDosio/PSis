@@ -1,6 +1,8 @@
 #ifndef lizardNroaches_H // Include guards to prevent multiple inclusions
 #define lizardNroaches_H
 
+#include <time.h>
+#include <ncurses.h>
 
 #define ADDRESS_REQ_LIZ "tcp://127.0.0.1:6666"
 #define ADDRESS_REQ_NPC "tcp://127.0.0.1:6667"
@@ -89,9 +91,9 @@ typedef struct thread_args
     entity_t *npc_array;
     int n_lizards;
     int n_npc;
-    int *roach_death_time;
-    void *game_win;
-    void *lines_win;
+    time_t *roach_death_time;
+    WINDOW *game_win;
+    WINDOW *lines_win;
 
 } thread_args;
 

@@ -1,7 +1,7 @@
-all: client clean
+all: clean client 
 
-client: Lizard-client
-	gcc Lizard-client.c -o Lizard-client -lzmq
+client: 
+	gcc -g Lizard-client.c -o Lizard-client -lzmq -lncurses 
 
 clean:
 	rm -f Lizard-client

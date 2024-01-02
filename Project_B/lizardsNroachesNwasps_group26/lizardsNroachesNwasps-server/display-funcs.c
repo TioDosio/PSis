@@ -3,24 +3,6 @@
 #include "../common-files/lizardsNroachesNwasps.h"
 
 
-void display_start( WINDOW *game_win, WINDOW *lines_win)
-{
-    // Initialize the screen
-    initscr();
-    cbreak();
-    keypad(stdscr, TRUE);
-    noecho();
-
-    /* creates a window and draws a border */
-    game_win = newwin(WINDOW_SIZE, WINDOW_SIZE, 0, 0);
-    box(game_win, 0, 0);
-    wrefresh(game_win);
-
-    // Create another window for lines below the box
-    lines_win = newwin(26, WINDOW_SIZE, WINDOW_SIZE, 0);
-}
-
-
 void disp_clear_entity(WINDOW *win, entity_t entity)
 {
     // get values

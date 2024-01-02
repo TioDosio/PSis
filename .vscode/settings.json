@@ -1,28 +1,12 @@
 {
+    "makefile.makefilePath": "",
     "files.associations": {
-      "*.rmd": "markdown",
-      "ncurses.h": "c",
-      "zmq.h": "c",
-      "time.h": "c",
-      "display-funcs.h": "c",
-      "lizardsnroaches.h": "c",
-      "server-func.h": "c",
-      "types.h": "c",
-      "lizardsnroachesnwasps.h": "c"
-   },
+        "zmq.h": "c"
+    },
     "makefile.launchConfigurations": [
         {
-           "cwd": "/home/guilherme/Psis/Group/PSis/Project",
-           "binaryPath": "/home/guilherme/Psis/Group/PSis/Project/lizardsNroaches-server",
-           "binaryArgs": [
-              "arg1",
-              "arg2"
-           ],
-           "stopAtEntry": true
-        },
-        {
-            "cwd": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1",
-            "binaryPath": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1/remote-display-client/remote-display-client",
+            "cwd": "/home/guilherme/Psis/Group/PSis/Project_B/lizardsNroachesNwasps_group26",
+            "binaryPath": "/home/guilherme/Psis/Group/PSis/Project_B/lizardsNroachesNwasps_group26/Lizard-client/Lizard-client",
             "binaryArgs": [
                "arg1",
                "arg2"
@@ -30,17 +14,8 @@
             "stopAtEntry": true
          },
          {
-            "cwd": "/home/guilherme/Psis/Group/PSis/Project",
-            "binaryPath": "/home/guilherme/Psis/Group/PSis/Project/Lizard-client",
-            "binaryArgs": [
-               "127.0.0.1",
-               "6666"
-            ],
-            "stopAtEntry": true
-         },
-         {
-            "cwd": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1",
-            "binaryPath": "/home/guilherme/Psis/Group/PSis/Lab9/lab9-exercise-1/server/server",
+            "cwd": "/home/guilherme/Psis/Group/PSis/Project_B/lizardsNroachesNwasps_group26",
+            "binaryPath": "Project_B/lizardsNroachesNwasps_group26/lizardsNroachesNwasps-server/lizardsNroachesNwasps",
             "binaryArgs": [
                "arg1",
                "arg2"
@@ -48,4 +23,5 @@
             "stopAtEntry": true
          }
       ]
+     
 }

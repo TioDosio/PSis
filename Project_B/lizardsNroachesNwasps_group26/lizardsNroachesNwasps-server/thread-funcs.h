@@ -1,5 +1,12 @@
+#ifndef HEADER_FILE_THREAD_FUNCS_H
+#define HEADER_FILE_THREAD_FUNCS_H
 #include "../common-files/lizardsNroachesNwasps.h"
 #include <pthread.h>
+#include <pthread.h>
+#include <zmq.h>
+#include <assert.h>
+#include "entity_behaviour.h"
+
 
 // Mutex for protecting the shared content
 pthread_mutex_t mutex_lizard;
@@ -32,4 +39,24 @@ void *npc_thread(void *lizard_args);
  */
 void generate_r(void *responder, int success, int secret_code, int score);
 
+/**
+ * @brief Updates the display with the current state of the shared data.
+ *
+ * This function is responsible for updating the display with the current state of the shared data.
+ * It takes a pointer to a thread_args structure as a parameter.
+ *
+ * @param shared A pointer to a thread_args structure containing the shared data.
+ */
+
 void disp_update(thread_args *shared);
+
+
+/**
+ * @brief Function to generate a random code
+ *
+ * @return int random code
+ *
+ */
+int generate_code();
+
+#endif

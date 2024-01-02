@@ -6,8 +6,7 @@ project-a:
 	make -C Project_A -f Makefile all
 
 project-b:
-	make -C Project_B/lizardsNroachesNwasps_group26 -f Makefile clean
-	make -C Project_BlizardsNroachesNwasps_group26 -f Makefile all
+	make -C Project_B/lizardsNroachesNwasps_group26 -f Makefile all
 
 clean:
 	make -C Project_B/lizardsNroachesNwasps_group26 -f Makefile clean

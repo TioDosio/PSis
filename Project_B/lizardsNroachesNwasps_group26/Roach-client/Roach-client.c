@@ -1,4 +1,4 @@
-#include "../common-files/lizardsNroaches.h"
+#include "../common-files/lizardsNroachesNwasps.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,7 +11,7 @@
 #include <time.h>
 #include <assert.h>
 
-generic_msg m;
+client_msg m;
 response_msg r;
 
 void *context;
@@ -35,7 +35,7 @@ void spawn_roaches(int n, int *roach_codes)
         // Set and send message
         m.msg_type = 0;
         m.entity_type = ROACH;
-        m.ch = points_roach + '0';
+        m.content = points_roach + '0';
 
         rc = zmq_send(requester, &m, sizeof(m), 0);
         assert(rc != -1);
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
             }
 
             // Set and send message
-            m.direction = direction;
+            m.content = direction;
             m.secret_code = roach_codes[i];
             rc = zmq_send(requester, &m, sizeof(m), 0);
             assert(rc != -1);

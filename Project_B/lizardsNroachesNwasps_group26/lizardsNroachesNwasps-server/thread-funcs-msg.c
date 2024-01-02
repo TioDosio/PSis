@@ -12,3 +12,11 @@ void generate_r(void *responder, int success, int secret_code, int score)
 
     zmq_send(responder, &r, sizeof(r), 0);
 }
+
+int generate_code()
+{
+    // Unique code will be current time of execution
+    int code = time(NULL);
+
+    return code;
+}

@@ -1,5 +1,14 @@
 #include "../common-files/lizardsNroachesNwasps.h"
 
+/**
+ * Spawns an entity in the game.
+ *
+ * This function is responsible for spawning a new entity of the specified type in the game.
+ *
+ * @param game The game structure containing the necessary information.
+ * @param entity_type The type of entity to be spawned.
+ */
+void spawn_entity(thread_args *game, entity_type_t entity_type);
 
 /**
  * @brief Function to move lizard with given code in given direction
@@ -56,3 +65,25 @@ int eat_roaches(thread_args *game, int pos_x, int pos_y);
  * 
  */
 int collision_check(entity_t * entity_array, int n_entities, int x, int y);
+
+/**
+ * @brief Finds the index of the specified entity in the entity list.
+ *
+ * @param entity_array The array of entities to search.
+ * @param n_entities The number of entities in the array.
+ * @param code The code of the entity to find the index of.
+ * @return The index of the entity in the entity list, or -1 if the entity is not found.
+ */
+int find_entity_index(entity_t *entity_array, int n_entities, int code);
+
+
+/**
+ * @brief Updates the position of an entity based on a given direction.
+ *
+ * This function updates the position of an entity by modifying the values of the x and y coordinates.
+ *
+ * @param x Pointer to the current x coordinate of the entity.
+ * @param y Pointer to the current y coordinate of the entity.
+ * @param direction The direction in which the entity should move.
+ */
+void new_position(int *x, int *y, direction_t direction);

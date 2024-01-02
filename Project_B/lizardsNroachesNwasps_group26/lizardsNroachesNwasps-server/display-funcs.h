@@ -4,12 +4,6 @@
 #include "../common-files/lizardsNroachesNwasps.h"
 #include <ncurses.h>
 
-/*
- * @brief Initialize the screen
- *
- */
-void display_start( WINDOW *game_win, WINDOW *lines_win);
-
 
 /*
  * @brief clear entity from display
