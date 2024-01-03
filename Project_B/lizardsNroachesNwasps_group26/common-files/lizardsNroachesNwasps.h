@@ -49,7 +49,7 @@ typedef struct entity_t
     unsigned int points;             /* ammount of points */
     unsigned short int pos_x, pos_y; /* position of entity */
     direction_t direction;           /* direction of last movement */
-    short int secret_code;           /* secret code to send */
+    int secret_code;                 /* secret code to send */
 
 } entity_t;
 

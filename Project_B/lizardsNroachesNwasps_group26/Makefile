@@ -1,6 +1,7 @@
 all:
 	make lizard
 	make server 
+	make roach
 
 lizard:
 	make -C Lizard-client -f Makefile all

@@ -20,8 +20,8 @@
     - roaches can share cells (but can't move to heads)
     - Wasps can't share cells
     - both (re)spawn on random locations
-    - lizards at 50 points = body with *
-    - lizards at <0 points = no body
+    o- lizards at 50 points = body with *
+    o- lizards at <0 points = no body
     - if animal doesn't receive msg for >1m, disconnect
     - if animal was removed (through timeout), reply with "invalid msg"
 
@@ -59,5 +59,5 @@ All clients:
     - points, to avoid error when exists colisions while increasing or decreasing points
     
 
-
-    -To do: mudar shared para ser global
+- Notas extra:
+    -Extra thread em server para gerir display updates msgs

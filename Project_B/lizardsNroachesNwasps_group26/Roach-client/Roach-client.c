@@ -25,7 +25,7 @@ char server_address[256];
  * @param roach_codes array to store the secret codes of the roaches
  *
  */
-void spawn_roaches(int n, int *roach_codes)
+void connect_roaches(int n, int *roach_codes)
 {
     int rc;
     for (int i = 0; i < n; i++)
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     assert(rc != -1);
 
     // Send n_roaches connection messages
-    spawn_roaches(n_roaches, roach_codes);
+    connect_roaches(n_roaches, roach_codes);
 
     while (1)
     {

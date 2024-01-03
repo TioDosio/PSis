@@ -2,12 +2,12 @@
 
 void *npc_thread(void *npc_args){
     // Load shared variables
-    /*thread_args *shared = (thread_args *)npc_args;
+    thread_args *shared = (thread_args *)npc_args;
     
     // Initialize ZMQ
     // Socket to reply to clients
     void *responder = zmq_socket(context, ZMQ_REP);    // Create socket por REQ-REP
-    int rc = zmq_connect(responder, BACK_END_ADDRESS); // Bind to address
+    int rc = zmq_connect(responder, ADDRESS_REQ_NPC); // Bind to address
     assert(rc == 0);
 
     // Socket to send display updates
@@ -15,7 +15,7 @@ void *npc_thread(void *npc_args){
     //rc = zmq_bind(publisher, ADDRESS_PUB);          // Bind to address
     assert(rc == 0);
 
-    // Initialize variablesx
+    // Initialize variables
     client_msg m;
     int code;
     display_update update;
@@ -50,7 +50,7 @@ void *npc_thread(void *npc_args){
             pthread_mutex_lock(&mutex_npc);
 
             // Check if there is room for more npc's
-            if (shared.n_npc < MAX_NPCS)
+            if (shared->n_npc < MAX_NPCS)
             {
                 // Add the npc to array
                 spawn_entity(shared,m.entity_type);
@@ -104,5 +104,5 @@ void *npc_thread(void *npc_args){
         disp_update(shared);
         // Send display update to lizard-clients
         //zmq_send(publisher, &update, sizeof(update), 0);
-    }*/
+    }
 }

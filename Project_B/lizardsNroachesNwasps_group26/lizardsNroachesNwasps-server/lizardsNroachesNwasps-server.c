@@ -33,6 +33,7 @@ int main()
 
     //* Intitizalize ZMQ*//
     context = zmq_ctx_new ();
+
     //  Socket facing Lizard clients
     void *frontend = zmq_socket (context, ZMQ_ROUTER);
     int rc = zmq_bind (frontend, ADDRESS_REQ_LIZ);

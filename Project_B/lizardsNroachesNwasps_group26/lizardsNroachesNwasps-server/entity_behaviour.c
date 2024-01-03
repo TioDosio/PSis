@@ -70,6 +70,71 @@ int move_lizard(int code, direction_t dir , thread_args *game)
     return success;
 }
 
+int move_npc(int code, direction_t dir , thread_args *game){
+
+    entity_t npc_after_move;
+    int npc_index;
+    entity_type_t type_of_npc;
+
+    int pos_x = -1;
+    int pos_y = -1;
+    
+    //Critial section - Lizard mutex always locked first
+    pthread_mutex_lock(&mutex_lizard);
+    pthread_mutex_lock(&mutex_npc);
+    
+    int success = (npc_index = find_entity_index(game->npc_array, game->n_npc, code)) != -1;
+
+    if(success)
+    {
+        // Save old values
+        npc_after_move = game->npc_array[npc_index];
+        pos_x = game->npc_array[npc_index].pos_x;
+        pos_y = game->npc_array[npc_index].pos_y;
+        type_of_npc = game->npc_array[npc_index].entity_type;
+
+        // Find new position
+        new_position(&pos_x, &pos_y, dir);
+
+        // Check if collision with Lizard or another NPC
+        int collision_index = -1;
+        entity_type_t collision_type; 
+
+        //If movement is valid
+        if (valid_pos(game, pos_x, pos_y, &collision_index, &collision_type))
+        {
+            //Update new position and direction
+            npc_after_move.pos_x = pos_x;
+            npc_after_move.pos_y = pos_y;
+            npc_after_move.direction = dir;
+        } else {
+            // Handle collision and do not move
+            if(type_of_npc == WASP) //Only wasps can collide with other entities
+                switch (collision_type)
+                {
+                    case LIZARD:
+                        // If lizard, remove 10 points from lizard
+                        game->lizard_array[collision_index].points -= 10;
+                        break;
+                    case ROACH:
+                    case WASP:
+                        // If wasp or Roach, do nothing. 
+                        break;
+                }
+        }
+
+        // Update NPC array
+        game->npc_array[npc_index] = npc_after_move;
+    }
+    
+    pthread_mutex_unlock(&mutex_lizard);
+    pthread_mutex_unlock(&mutex_npc);
+    
+
+    return success;
+}
+
+
 
 int valid_pos(thread_args *game,int pos_x,int pos_y, int *collision_index, entity_type_t *collision_type)
 {

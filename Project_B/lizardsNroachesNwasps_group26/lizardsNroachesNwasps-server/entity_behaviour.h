@@ -22,6 +22,21 @@ void spawn_entity(thread_args *game, entity_type_t entity_type);
  */
 int move_lizard (int code, direction_t dir , thread_args *game);
 
+
+/**
+ * @brief Moves the non-player character (NPC) in the specified direction.
+ *
+ * This function is responsible for moving the NPC in the specified direction
+ * based on the given code. The NPC's movement is performed within the context
+ * of the provided game thread arguments.
+ *
+ * @param code The code representing the NPC.
+ * @param dir The direction in which the NPC should move.
+ * @param game The thread arguments containing the game context.
+ * @return An integer indicating the success or failure of the NPC's movement.
+ */
+int move_npc(int code, direction_t dir , thread_args *game);
+
 /**
  * @note FUNCTION MUST BE CALLED WITH LOCKED MUTEXES.
  * @brief Analizes if position is valid for movement (if there is no Liz or Wasp). 
