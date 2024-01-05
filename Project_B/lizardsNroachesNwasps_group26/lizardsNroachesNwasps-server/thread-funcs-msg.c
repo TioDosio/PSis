@@ -6,12 +6,19 @@
 
 void generate_r(void *responder, int success, int secret_code, int score)
 {
-    response_msg r;
-    r.success = success;
-    r.secret_code = secret_code;
-    r.score = score;
+    ResponseMessage resp = RESPONSE_MESSAGE__INIT;
 
-    zmq_send(responder, &r, sizeof(r), 0);
+    resp.success = success;
+    resp.secret_code = secret_code;
+    resp.score = score;
+
+    int resp_len = response_message__get_packed_size(&resp);
+    char *resp_buf = malloc(resp_len);
+    response_message__pack(&resp, resp_buf);
+
+    printf("Sending message of length %d\n", resp_len);
+    int rc = zmq_send(responder, resp_buf, resp_len, 0);
+    assert(rc != -1);
 }
 
 int generate_code()

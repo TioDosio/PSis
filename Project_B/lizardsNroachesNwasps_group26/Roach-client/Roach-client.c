@@ -13,7 +13,8 @@
 #include "../common-files/messages.pb-c.h"
 
 ClientMessage msg = CLIENT_MESSAGE__INIT;
-ResponseMessage resp = RESPONSE_MESSAGE__INIT;
+ResponseMessage *resp;
+
 client_msg m;
 response_msg r;
 
@@ -30,6 +31,8 @@ char server_address[256];
  */
 void connect_roaches(int n, int *roach_codes)
 {
+    zmq_msg_t zmq_msg;
+    zmq_msg_init(&zmq_msg);
     int rc;
     for (int i = 0; i < n; i++)
     {
@@ -48,10 +51,17 @@ void connect_roaches(int n, int *roach_codes)
         printf("Sending message of length %d\n", msg_len);
         rc = zmq_send(requester, msg_buf, msg_len, 0);
         assert(rc != -1);
+
         // Wait for response
         printf("Waiting for response\n");
-        rc = zmq_recv(requester, &r, sizeof(r), 0);
-        assert(rc != -1);
+        int resp_len = zmq_recvmsg(requester, &zmq_msg, 0);
+
+        void *resp_data = zmq_msg_data(&zmq_msg);
+        resp = response_message__unpack(NULL, resp_len, resp_data);
+        r.score = resp->score;
+        r.success = resp->success;
+        r.secret_code = resp->secret_code;
+        response_message__free_unpacked(resp, NULL);
 
         printf("Secret code: %d\n", r.secret_code);
         printf("success: %d\n", r.success);
@@ -68,6 +78,8 @@ void connect_roaches(int n, int *roach_codes)
 
 int main(int argc, char *argv[])
 {
+    zmq_msg_t zmq_msg;
+    zmq_msg_init(&zmq_msg);
     srand(time(NULL));
     char *server_ip;
     char *server_port;

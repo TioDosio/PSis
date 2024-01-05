@@ -9,9 +9,15 @@
 #include <zmq.h>
 #include <time.h>
 #include <assert.h>
+#include "../common-files/messages.pb-c.h"
 
 int main(int argc, char *argv[])
 {
+    ClientMessage msg = CLIENT_MESSAGE__INIT;
+    ResponseMessage *resp;
+    zmq_msg_t zmq_msg;
+    zmq_msg_init(&zmq_msg);
+
     char server_address[256];
     char *server_ip;
     char *server_port;
@@ -39,7 +45,7 @@ int main(int argc, char *argv[])
 
     // send connection message
     client_msg m;
-    m.msg_type = CONNECT; 
+    m.msg_type = CONNECT;
     m.entity_type = LIZARD;
     m.content = 0;
     m.secret_code = -1;

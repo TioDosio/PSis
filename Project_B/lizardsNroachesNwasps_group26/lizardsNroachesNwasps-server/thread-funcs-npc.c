@@ -38,12 +38,8 @@ void *npc_thread(void *npc_args)
         // Set success to 0
 
         // Receive message
-        /*
-        zmq_recv(responder, &m, sizeof(m), 0);
-        */
-        printf("Bananaaaaa");
+
         int msg_len = zmq_recvmsg(responder, &zmq_msg, 0);
-        printf("Received %d bytes\n", msg_len);
 
         void *msg_data = zmq_msg_data(&zmq_msg);
         msg = client_message__unpack(NULL, msg_len, msg_data);
@@ -51,7 +47,6 @@ void *npc_thread(void *npc_args)
         m.entity_type = msg->entity_type;
         m.msg_type = msg->msg_type;
         m.secret_code = msg->secret_code;
-        printf("Received message of length %d\n", m.content);
         client_message__free_unpacked(msg, NULL);
         if (m.entity_type == LIZARD)
         {
