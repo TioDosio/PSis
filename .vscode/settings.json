@@ -1,8 +1,10 @@
 {
     "makefile.makefilePath": "",
     "files.associations": {
-        "zmq.h": "c"
-    },
+      "*.rmd": "markdown",
+      "zmq.h": "c",
+      "lizardsnroachesnwasps.h": "c"
+   },
     "makefile.launchConfigurations": [
         {
             "cwd": "/home/guilherme/Psis/Group/PSis/Project_B/lizardsNroachesNwasps_group26",

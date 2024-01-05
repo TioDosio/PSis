@@ -51,7 +51,7 @@ void *npc_thread(void *npc_args)
         if (m.entity_type == LIZARD)
         {
             // Send error message
-            generate_r(responder, 0, -1, 0);
+            generate_r_npc(responder, 0, -1, 0);
             continue;
         }
         printf("Sending response %d\n", success);
@@ -77,7 +77,7 @@ void *npc_thread(void *npc_args)
 
             // Send response [HERE] MUST SEND DISPLAY_CONNECT?
             printf("Sending response %d\n", success);
-            generate_r(responder, success, code, 0);
+            generate_r_npc(responder, success, code, 0);
 
             break;
 
@@ -105,7 +105,7 @@ void *npc_thread(void *npc_args)
             pthread_mutex_unlock(&mutex_npc);
 
             // Send response
-            generate_r(responder, success, m.secret_code, 0);
+            generate_r_npc(responder, success, m.secret_code, 0);
 
             break;
 
@@ -113,7 +113,7 @@ void *npc_thread(void *npc_args)
             move_npc(m.secret_code, m.content, shared);
 
             // Send response
-            generate_r(responder, success, m.secret_code, 0);
+            generate_r_npc(responder, success, m.secret_code, 0);
             break;
         }
         // update.entity = shared->npc_array[];

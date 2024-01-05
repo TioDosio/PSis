@@ -6,6 +6,16 @@
 
 void generate_r(void *responder, int success, int secret_code, int score)
 {
+    response_msg r;
+    r.success = success;
+    r.secret_code = secret_code;
+    r.score = score;
+
+    zmq_send(responder, &r, sizeof(r), 0);
+}
+
+void generate_r_npc(void *responder, int success, int secret_code, int score)
+{
     ResponseMessage resp = RESPONSE_MESSAGE__INIT;
 
     resp.success = success;
