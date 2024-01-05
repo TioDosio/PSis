@@ -49,24 +49,11 @@ int main(int argc, char *argv[])
     m.entity_type = LIZARD;
     m.content = 0;
     m.secret_code = -1;
-    int msg_len = client_message__get_packed_size(&msg);
-    char *msg_buf = malloc(msg_len);
-    client_message__pack(&msg, msg_buf);
-
-    printf("Sending message of length %d\n", msg_len);
-    rc = zmq_send(requester, msg_buf, msg_len, 0);
+    rc = zmq_send(requester, &m, sizeof(m), 0);
     assert(rc != -1);
 
-    // Wait for response
-    printf("Waiting for response\n");
-    int resp_len = zmq_recvmsg(requester, &zmq_msg, 0);
-
-    void *resp_data = zmq_msg_data(&zmq_msg);
-    resp = response_message__unpack(NULL, resp_len, resp_data);
-    r.score = resp->score;
-    r.success = resp->success;
-    r.secret_code = resp->secret_code;
-    response_message__free_unpacked(resp, NULL);
+    rc = zmq_recv(requester, &r, sizeof(r), 0);
+    assert(rc != -1);
 
     if (r.success == 0)
     {

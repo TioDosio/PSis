@@ -181,15 +181,8 @@ int main(int argc, char *argv[])
             rc = zmq_send(requester, msg_buf, msg_len, 0);
             assert(rc != -1);
 
-            int resp_len = zmq_recvmsg(requester, &zmq_msg, 0);
-
-            void *resp_data = zmq_msg_data(&zmq_msg);
-            resp = response_message__unpack(NULL, resp_len, resp_data);
-            r.score = resp->score;
-            r.success = resp->success;
-            r.secret_code = resp->secret_code;
-            response_message__free_unpacked(resp, NULL);
-            printf("Secret code: %d\n", r.secret_code);
+            rc = zmq_recv(requester, &r, sizeof(r), 0);
+            assert(rc != -1);
         }
     }
     zmq_close(requester);
