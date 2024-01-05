@@ -15,8 +15,8 @@
         o- All threads have the same code 
             o- Read msg, execute, reply and send update
 
-    - 1 thread for roaches + wasps
-    - protocol buffer
+    o- 1 thread for roaches + wasps
+    o- protocol buffer
     - all threads finish by updating display and sending update msg
     - roaches can share cells (but can't move to heads)
     - Wasps can't share cells
@@ -34,7 +34,7 @@ All clients:
     - address + port is cmd line argument
     - 1 min of no msgs = disconnect
     - If trying to move something that was removed, receive "invalid msg"
-    - NPCs must use protocol buffers
+    o- NPCs must use protocol buffers
 
 -Roaches-client
     - controls 10
