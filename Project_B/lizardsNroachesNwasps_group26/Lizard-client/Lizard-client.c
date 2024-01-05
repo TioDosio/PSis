@@ -9,15 +9,9 @@
 #include <zmq.h>
 #include <time.h>
 #include <assert.h>
-#include "../common-files/messages.pb-c.h"
 
 int main(int argc, char *argv[])
 {
-    ClientMessage msg = CLIENT_MESSAGE__INIT;
-    ResponseMessage *resp;
-    zmq_msg_t zmq_msg;
-    zmq_msg_init(&zmq_msg);
-
     char server_address[256];
     char *server_ip;
     char *server_port;
