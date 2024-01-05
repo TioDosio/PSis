@@ -54,7 +54,6 @@ void *npc_thread(void *npc_args)
             generate_r_npc(responder, 0, -1, 0);
             continue;
         }
-        printf("Sending response %d\n", success);
         switch (m.msg_type)
         {
         case CONNECT:
@@ -76,7 +75,6 @@ void *npc_thread(void *npc_args)
             pthread_mutex_unlock(&mutex_npc);
 
             // Send response [HERE] MUST SEND DISPLAY_CONNECT?
-            printf("Sending response %d\n", success);
             generate_r_npc(responder, success, code, 0);
 
             break;
