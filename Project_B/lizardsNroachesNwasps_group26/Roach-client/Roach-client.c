@@ -107,11 +107,11 @@ int main(int argc, char *argv[])
     requester = zmq_socket(context, ZMQ_REQ);
     snprintf(server_address, sizeof(server_address), "tcp://%s:%s", server_ip, server_port);
     rc = zmq_connect(requester, server_address);
-    assert(rc != -1);
+    printf("Server: %s\n", server_address);
+    assert(rc == 0);
 
     // Send n_roaches connection messages
     connect_roaches(n_roaches, roach_codes);
-
     while (1)
     {
         m.entity_type = ROACH;

@@ -5,7 +5,7 @@
 #include <ncurses.h>
 
 #define ADDRESS_REQ_LIZ "tcp://127.0.0.1:6666"
-#define ADDRESS_REQ_NPC "tcp://127.0.0.1:6667"
+#define ADDRESS_REQ_NPC "tcp://127.0.0.1:6665"
 #define ADDRESS_PUB "tcp://127.0.0.1:6669"
 #define BACK_END_ADDRESS "inproc://back-end"
 
@@ -58,14 +58,14 @@ typedef struct client_msg // client msg (connections, movements or disconnection
     entity_type_t entity_type;       /* type of entity */
     msg_type_t msg_type;             /* type of message */
     short int content;               /* value to send (points, char, movement direction, etc) */
-    short int secret_code;           /* secret id for entity */
+    int secret_code;                  /* secret id for entity */
 } client_msg;
 
 typedef struct response_msg
 {
     unsigned short int success; /* 0 - fail, 1 - success, 2 - success in disconnection*/
     short int score;            /* score of the player */
-    short int secret_code;      /* secret id of entity */
+    int secret_code;             /* secret id of entity */
 } response_msg;
 
 typedef struct display_update

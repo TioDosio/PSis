@@ -7,8 +7,9 @@
  *
  * @param game The game structure containing the necessary information.
  * @param entity_type The type of entity to be spawned.
+ * @return An integer indicating the unique code of the spawned entity, or -1 if the entity could not be spawned.
  */
-void spawn_entity(thread_args *game, entity_type_t entity_type);
+int spawn_entity(thread_args *game, entity_type_t entity_type);
 
 /**
  * @brief Function to move lizard with given code in given direction

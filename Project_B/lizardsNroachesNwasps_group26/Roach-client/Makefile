@@ -1,7 +1,7 @@
-all: client clean
+all: clean client
 
 client: 
-	gcc Roach-client.c -o Roach-client -lzmq -lncurses -lpthread
+	gcc -g Roach-client.c -o Roach-client -lzmq -lncurses -lpthread
 
 clean:
 	rm -f Roach-client

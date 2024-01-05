@@ -44,9 +44,6 @@ void *lizard_thread(void *lizard_args)
         switch (m.msg_type)
         {
         case CONNECT:
-            // Generate Secrete code
-            code = generate_code();
-
             // CRITICAL SECTION
             pthread_mutex_lock(&mutex_lizard);
 
@@ -54,7 +51,7 @@ void *lizard_thread(void *lizard_args)
             if (shared->n_lizards < MAX_LIZARDS)
             {
                 // Add lizard to array
-                spawn_entity(shared,LIZARD);
+                code = spawn_entity(shared,LIZARD);
 
                 // success
                 success = 1;
@@ -103,7 +100,7 @@ void *lizard_thread(void *lizard_args)
             generate_r(responder, success, m.secret_code, 0);
             break;
         }
-        update.entity = shared->lizard_array[m.secret_code];
+        //update.entity = shared->lizard_array[m.secret_code];
         // Update display
         disp_update(shared);
         // Send display update to lizard-clients

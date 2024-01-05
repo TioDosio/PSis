@@ -74,7 +74,7 @@ int main()
     }
 
     pthread_t npc;
-    //pthread_create(&npc, NULL, npc_thread, (void *)&shared);
+    pthread_create(&npc, NULL, npc_thread, (void *)&shared);
  
     //  Start the proxy
     zmq_proxy (frontend, backend, NULL);

@@ -2,11 +2,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "Debug Main Server",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Project_B/lizardsNroachesNwasps_group26/lizardsNroachesNwasps-server/lizardsNroachesNwasps",
             "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build"
+        },
+        {
+            "name": "Debug Roach Client",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Project_B/lizardsNroachesNwasps_group26/Roach-client/Roach-client",
+            "args": ["127.0.0.1", "6665"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

@@ -1,0 +1,69 @@
+syntax = "proto2";
+
+enum EntityType {
+  LIZARD = 0;
+  ROACH = 1;
+  WASP = 2;
+}
+
+enum Direction {
+  UP = 0;
+  DOWN = 1;
+  LEFT = 2;
+  RIGHT = 3;
+}
+
+enum MessageType {
+  CONNECT = 0;
+  MOVE = 1;
+  DISCONNECT = 2;
+}
+
+message Entity {
+  required EntityType entity_type = 1;
+  required string ch = 2;
+  required uint32 points = 3;
+  required uint32 pos_x = 4;
+  required uint32 pos_y = 5;
+  required Direction direction = 6;
+  required int32 secret_code = 7;
+}
+
+message ClientMessage {
+  required EntityType entity_type = 1;
+  required MessageType msg_type = 2;
+  required sint32 content = 3;
+  required sint32 secret_code = 4;
+}
+
+message ResponseMessage {
+  required uint32 success = 1;  // 0 - fail, 1 - success, 2 - success in disconnection
+  required sint32 score = 2;    // score of the player
+  required sint32 secret_code = 3;  // secret id of entity
+}
+
+message DisplayUpdate {
+  required Entity entity = 1;
+  required uint32 disconnect = 2;  // 0 - no disconnect, 1 - disconnect
+  required sint32 id_l_bumped = 3;  // id of lizard bumped
+}
+
+message ConnectDisplayResponse {
+  repeated Entity lizard = 1;
+  repeated Entity npc = 2;
+  required int32 n_lizards = 3;
+  required int32 n_npc = 4;
+  required string address_port = 5;
+}
+
+// Struct for arguments for threads
+message ThreadArgs {
+  repeated Entity lizard_array = 1;
+  repeated Entity npc_array = 2;
+  required int32 n_lizards = 3;
+  required int32 n_npc = 4;
+  required sint64 roach_death_time = 5;
+  // Assuming WINDOW is some custom type; you may need to adjust this field accordingly
+  // required ??? game_win = ?;
+  // required ??? lines_win = ?;
+}

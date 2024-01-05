@@ -15,8 +15,14 @@ void generate_r(void *responder, int success, int secret_code, int score)
 
 int generate_code()
 {
-    // Unique code will be current time of execution
-    int code = time(NULL);
+    // Get current timestamp
+    time_t currentTime = time(NULL);
 
-    return code;
+    // Generate a random number
+    int randomNum = rand();
+
+    // Combine timestamp and random number to create a unique code
+    int uniqueCode = (int)currentTime ^ randomNum;
+
+    return uniqueCode;
 }

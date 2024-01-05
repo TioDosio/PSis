@@ -3,19 +3,20 @@
     o-lizard eats roach = + points
     o-lizard stung (colide) by wasp = - 10 points
     o-win at 50
-    -lose at <0
+    o-lose at <0
 
 
 -lizardNroachesNwasps-server
     -Every change => send update display
-    -Max players =26
-    -Roaches + wasps < 1/3 of field
-    -Receiving connect => add to array
+    o-Max players =26
+    o-Roaches + wasps < 1/3 of field
+    o-Receiving connect => add to array
     -4 threads for lizards
         o- All threads have the same code 
             o- Read msg, execute, reply and send update
 
-    -1 thread for roaches + wasps (use protocal buffer)
+    - 1 thread for roaches + wasps
+    - protocol buffer
     - all threads finish by updating display and sending update msg
     - roaches can share cells (but can't move to heads)
     - Wasps can't share cells
@@ -26,10 +27,10 @@
     - if animal was removed (through timeout), reply with "invalid msg"
 
 All clients:
-    - Connect msg
-    - Send moves
+    o- Connect msg
+    o- Send moves
     - Disconnect msgs
-    - Always gets replies
+    o- Always gets replies
     - address + port is cmd line argument
     - 1 min of no msgs = disconnect
     - If trying to move something that was removed, receive "invalid msg"
@@ -61,3 +62,5 @@ All clients:
 
 - Notas extra:
     -Extra thread em server para gerir display updates msgs
+
+- lizard display, receber updates: pensa guilherme .|.

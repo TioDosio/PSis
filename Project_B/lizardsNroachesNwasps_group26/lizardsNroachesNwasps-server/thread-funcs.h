@@ -6,6 +6,7 @@
 #include <zmq.h>
 #include <assert.h>
 #include "entity_behaviour.h"
+#include <stdlib.h>
 
 
 // Mutex for protecting the shared content

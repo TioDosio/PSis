@@ -241,12 +241,13 @@ void new_position(int *x, int *y, direction_t direction)
     }
 }
 
-void spawn_entity(thread_args *game, entity_type_t entity_type)
+int spawn_entity(thread_args *game, entity_type_t entity_type)
 {
     entity_t new_entity;
     int pos_x, pos_y;
     int collision_index;            //not used, but needed for valid_pos
     entity_type_t collision_type;   //not used, but needed for valid_pos
+    int code;                       // secret code to return
 
     // Generate random position
     pos_x = rand() % (WINDOW_SIZE - 2) + 1;
@@ -256,12 +257,13 @@ void spawn_entity(thread_args *game, entity_type_t entity_type)
     if (valid_pos(game, pos_x, pos_y, &collision_index, &collision_type))
     {
         // Set entity values
+        code = generate_code();
         new_entity.entity_type = entity_type;
         new_entity.points = 0;
         new_entity.pos_x = pos_x;
         new_entity.pos_y = pos_y;
         new_entity.direction = UP;
-        new_entity.secret_code = generate_code();
+        new_entity.secret_code = code;
 
         // Add entity to array
         if (entity_type == LIZARD)
@@ -281,6 +283,8 @@ void spawn_entity(thread_args *game, entity_type_t entity_type)
         }
     } else {
         // If position is not valid, try again
-        spawn_entity(game, entity_type);
+        code = spawn_entity(game, entity_type);
     }
+
+    return new_entity.secret_code;
 }

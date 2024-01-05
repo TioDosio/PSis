@@ -7,11 +7,11 @@ void *npc_thread(void *npc_args){
     // Initialize ZMQ
     // Socket to reply to clients
     void *responder = zmq_socket(context, ZMQ_REP);    // Create socket por REQ-REP
-    int rc = zmq_connect(responder, ADDRESS_REQ_NPC); // Bind to address
+    int rc = zmq_bind(responder, ADDRESS_REQ_NPC);     // Bind to address
     assert(rc == 0);
 
     // Socket to send display updates
-    void *publisher = zmq_socket(context, ZMQ_PUB); // Create socket for PUB-SUB
+    void *publisher = zmq_socket(context, ZMQ_PUB);   // Create socket for PUB-SUB
     //rc = zmq_bind(publisher, ADDRESS_PUB);          // Bind to address
     assert(rc == 0);
 
@@ -43,8 +43,6 @@ void *npc_thread(void *npc_args){
         switch (m.msg_type)
         {
         case CONNECT:
-            // Generate Secrete code
-            code = generate_code();
 
             // CRITICAL SECTION
             pthread_mutex_lock(&mutex_npc);
@@ -53,7 +51,7 @@ void *npc_thread(void *npc_args){
             if (shared->n_npc < MAX_NPCS)
             {
                 // Add the npc to array
-                spawn_entity(shared,m.entity_type);
+                code = spawn_entity(shared,m.entity_type);
 
                 // success
                 success = 1;
@@ -97,9 +95,12 @@ void *npc_thread(void *npc_args){
 
         case MOVE:
             move_npc(m.secret_code, m.content, shared);
+
+            // Send response
+            generate_r(responder, success, m.secret_code, 0);
             break;
         }
-        update.entity = shared->npc_array[m.secret_code];
+        //update.entity = shared->npc_array[];
         // Update display
         disp_update(shared);
         // Send display update to lizard-clients
