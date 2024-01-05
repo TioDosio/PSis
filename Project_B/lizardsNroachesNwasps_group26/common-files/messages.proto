@@ -52,18 +52,7 @@ message ConnectDisplayResponse {
   repeated Entity lizard = 1;
   repeated Entity npc = 2;
   required int32 n_lizards = 3;
-  required int32 n_npc = 4;
+  required int32 n__npc = 4;
   required string address_port = 5;
 }
 
-// Struct for arguments for threads
-message ThreadArgs {
-  repeated Entity lizard_array = 1;
-  repeated Entity npc_array = 2;
-  required int32 n_lizards = 3;
-  required int32 n_npc = 4;
-  required sint64 roach_death_time = 5;
-  // Assuming WINDOW is some custom type; you may need to adjust this field accordingly
-  // required ??? game_win = ?;
-  // required ??? lines_win = ?;
-}

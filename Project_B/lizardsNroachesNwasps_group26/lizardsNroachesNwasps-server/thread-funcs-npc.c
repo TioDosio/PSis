@@ -1,18 +1,22 @@
 #include "thread-funcs.h"
+#include "../common-files/messages.pb-c.h"
+#include "../common-files/lizardsNroachesNwasps.h"
+#include <string.h>
 
-void *npc_thread(void *npc_args){
+void *npc_thread(void *npc_args)
+{
     // Load shared variables
     thread_args *shared = (thread_args *)npc_args;
-    
+
     // Initialize ZMQ
     // Socket to reply to clients
-    void *responder = zmq_socket(context, ZMQ_REP);    // Create socket por REQ-REP
-    int rc = zmq_bind(responder, ADDRESS_REQ_NPC);     // Bind to address
+    void *responder = zmq_socket(context, ZMQ_REP); // Create socket por REQ-REP
+    int rc = zmq_bind(responder, ADDRESS_REQ_NPC);  // Bind to address
     assert(rc == 0);
 
     // Socket to send display updates
-    void *publisher = zmq_socket(context, ZMQ_PUB);   // Create socket for PUB-SUB
-    //rc = zmq_bind(publisher, ADDRESS_PUB);          // Bind to address
+    void *publisher = zmq_socket(context, ZMQ_PUB); // Create socket for PUB-SUB
+    // rc = zmq_bind(publisher, ADDRESS_PUB);          // Bind to address
     assert(rc == 0);
 
     // Initialize variables
@@ -21,25 +25,41 @@ void *npc_thread(void *npc_args){
     display_update update;
     int success;
 
+    zmq_msg_t zmq_msg;
+    zmq_msg_init(&zmq_msg);
+    ClientMessage *msg;
+
     // loop for handling messages
     while (1)
     {
         update.disconnect = 0;
         update.id_l_bumped = -1;
-        // Set success to 0
         success = 0;
+        // Set success to 0
 
         // Receive message
+        /*
         zmq_recv(responder, &m, sizeof(m), 0);
+        */
+        printf("Bananaaaaa");
+        int msg_len = zmq_recvmsg(responder, &zmq_msg, 0);
+        printf("Received %d bytes\n", msg_len);
 
-        // Check if message is from a lizard
+        void *msg_data = zmq_msg_data(&zmq_msg);
+        msg = client_message__unpack(NULL, msg_len, msg_data);
+        m.content = msg->content;
+        m.entity_type = msg->entity_type;
+        m.msg_type = msg->msg_type;
+        m.secret_code = msg->secret_code;
+        printf("Received message of length %d\n", m.content);
+        client_message__free_unpacked(msg, NULL);
         if (m.entity_type == LIZARD)
         {
             // Send error message
             generate_r(responder, 0, -1, 0);
             continue;
         }
-
+        printf("Sending response %d\n", success);
         switch (m.msg_type)
         {
         case CONNECT:
@@ -51,7 +71,7 @@ void *npc_thread(void *npc_args){
             if (shared->n_npc < MAX_NPCS)
             {
                 // Add the npc to array
-                code = spawn_entity(shared,m.entity_type);
+                code = spawn_entity(shared, m.entity_type);
 
                 // success
                 success = 1;
@@ -61,6 +81,7 @@ void *npc_thread(void *npc_args){
             pthread_mutex_unlock(&mutex_npc);
 
             // Send response [HERE] MUST SEND DISPLAY_CONNECT?
+            printf("Sending response %d\n", success);
             generate_r(responder, success, code, 0);
 
             break;
@@ -100,10 +121,10 @@ void *npc_thread(void *npc_args){
             generate_r(responder, success, m.secret_code, 0);
             break;
         }
-        //update.entity = shared->npc_array[];
-        // Update display
+        // update.entity = shared->npc_array[];
+        //  Update display
         disp_update(shared);
         // Send display update to lizard-clients
-        //zmq_send(publisher, &update, sizeof(update), 0);
+        // zmq_send(publisher, &update, sizeof(update), 0);
     }
 }

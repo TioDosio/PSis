@@ -232,51 +232,6 @@ void   connect_display_response__free_unpacked
   assert(message->base.descriptor == &connect_display_response__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
-void   thread_args__init
-                     (ThreadArgs         *message)
-{
-  static const ThreadArgs init_value = THREAD_ARGS__INIT;
-  *message = init_value;
-}
-size_t thread_args__get_packed_size
-                     (const ThreadArgs *message)
-{
-  assert(message->base.descriptor == &thread_args__descriptor);
-  return protobuf_c_message_get_packed_size ((const ProtobufCMessage*)(message));
-}
-size_t thread_args__pack
-                     (const ThreadArgs *message,
-                      uint8_t       *out)
-{
-  assert(message->base.descriptor == &thread_args__descriptor);
-  return protobuf_c_message_pack ((const ProtobufCMessage*)message, out);
-}
-size_t thread_args__pack_to_buffer
-                     (const ThreadArgs *message,
-                      ProtobufCBuffer *buffer)
-{
-  assert(message->base.descriptor == &thread_args__descriptor);
-  return protobuf_c_message_pack_to_buffer ((const ProtobufCMessage*)message, buffer);
-}
-ThreadArgs *
-       thread_args__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data)
-{
-  return (ThreadArgs *)
-     protobuf_c_message_unpack (&thread_args__descriptor,
-                                allocator, len, data);
-}
-void   thread_args__free_unpacked
-                     (ThreadArgs *message,
-                      ProtobufCAllocator *allocator)
-{
-  if(!message)
-    return;
-  assert(message->base.descriptor == &thread_args__descriptor);
-  protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
-}
 static const ProtobufCFieldDescriptor entity__field_descriptors[7] =
 {
   {
@@ -637,12 +592,12 @@ static const ProtobufCFieldDescriptor connect_display_response__field_descriptor
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
   {
-    "n_npc",
+    "n__npc",
     4,
     PROTOBUF_C_LABEL_REQUIRED,
     PROTOBUF_C_TYPE_INT32,
     0,   /* quantifier_offset */
-    offsetof(ConnectDisplayResponse, n_npc),
+    offsetof(ConnectDisplayResponse, n__npc),
     NULL,
     NULL,
     0,             /* flags */
@@ -664,8 +619,8 @@ static const ProtobufCFieldDescriptor connect_display_response__field_descriptor
 static const unsigned connect_display_response__field_indices_by_name[] = {
   4,   /* field[4] = address_port */
   0,   /* field[0] = lizard */
+  3,   /* field[3] = n__npc */
   2,   /* field[2] = n_lizards */
-  3,   /* field[3] = n_npc */
   1,   /* field[1] = npc */
 };
 static const ProtobufCIntRange connect_display_response__number_ranges[1 + 1] =
@@ -686,96 +641,6 @@ const ProtobufCMessageDescriptor connect_display_response__descriptor =
   connect_display_response__field_indices_by_name,
   1,  connect_display_response__number_ranges,
   (ProtobufCMessageInit) connect_display_response__init,
-  NULL,NULL,NULL    /* reserved[123] */
-};
-static const ProtobufCFieldDescriptor thread_args__field_descriptors[5] =
-{
-  {
-    "lizard_array",
-    1,
-    PROTOBUF_C_LABEL_REPEATED,
-    PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(ThreadArgs, n_lizard_array),
-    offsetof(ThreadArgs, lizard_array),
-    &entity__descriptor,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "npc_array",
-    2,
-    PROTOBUF_C_LABEL_REPEATED,
-    PROTOBUF_C_TYPE_MESSAGE,
-    offsetof(ThreadArgs, n_npc_array),
-    offsetof(ThreadArgs, npc_array),
-    &entity__descriptor,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "n_lizards",
-    3,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_INT32,
-    0,   /* quantifier_offset */
-    offsetof(ThreadArgs, n_lizards),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "n_npc",
-    4,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_INT32,
-    0,   /* quantifier_offset */
-    offsetof(ThreadArgs, n_npc),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-  {
-    "roach_death_time",
-    5,
-    PROTOBUF_C_LABEL_REQUIRED,
-    PROTOBUF_C_TYPE_SINT64,
-    0,   /* quantifier_offset */
-    offsetof(ThreadArgs, roach_death_time),
-    NULL,
-    NULL,
-    0,             /* flags */
-    0,NULL,NULL    /* reserved1,reserved2, etc */
-  },
-};
-static const unsigned thread_args__field_indices_by_name[] = {
-  0,   /* field[0] = lizard_array */
-  2,   /* field[2] = n_lizards */
-  3,   /* field[3] = n_npc */
-  1,   /* field[1] = npc_array */
-  4,   /* field[4] = roach_death_time */
-};
-static const ProtobufCIntRange thread_args__number_ranges[1 + 1] =
-{
-  { 1, 0 },
-  { 0, 5 }
-};
-const ProtobufCMessageDescriptor thread_args__descriptor =
-{
-  PROTOBUF_C__MESSAGE_DESCRIPTOR_MAGIC,
-  "ThreadArgs",
-  "ThreadArgs",
-  "ThreadArgs",
-  "",
-  sizeof(ThreadArgs),
-  5,
-  thread_args__field_descriptors,
-  thread_args__field_indices_by_name,
-  1,  thread_args__number_ranges,
-  (ProtobufCMessageInit) thread_args__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
 static const ProtobufCEnumValue entity_type__enum_values_by_number[3] =

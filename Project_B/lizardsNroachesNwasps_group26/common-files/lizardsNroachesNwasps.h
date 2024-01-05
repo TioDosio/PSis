@@ -55,17 +55,17 @@ typedef struct entity_t
 
 typedef struct client_msg // client msg (connections, movements or disconnections)
 {
-    entity_type_t entity_type;       /* type of entity */
-    msg_type_t msg_type;             /* type of message */
-    short int content;               /* value to send (points, char, movement direction, etc) */
-    int secret_code;                  /* secret id for entity */
+    entity_type_t entity_type; /* type of entity */
+    msg_type_t msg_type;       /* type of message */
+    short int content;         /* value to send (points, char, movement direction, etc) */
+    int secret_code;           /* secret id for entity */
 } client_msg;
 
 typedef struct response_msg
 {
     unsigned short int success; /* 0 - fail, 1 - success, 2 - success in disconnection*/
     short int score;            /* score of the player */
-    int secret_code;             /* secret id of entity */
+    int secret_code;            /* secret id of entity */
 } response_msg;
 
 typedef struct display_update

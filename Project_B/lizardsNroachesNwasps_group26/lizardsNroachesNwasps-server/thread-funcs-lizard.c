@@ -1,5 +1,5 @@
 #include "thread-funcs.h"
-
+#include "../common-files/lizardsNroachesNwasps.h"
 void *lizard_thread(void *lizard_args)
 {
     // Load shared variables

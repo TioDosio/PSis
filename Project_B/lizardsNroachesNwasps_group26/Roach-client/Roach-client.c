@@ -10,7 +10,10 @@
 #include <zmq.h>
 #include <time.h>
 #include <assert.h>
+#include "../common-files/messages.pb-c.h"
 
+ClientMessage msg = CLIENT_MESSAGE__INIT;
+ResponseMessage resp = RESPONSE_MESSAGE__INIT;
 client_msg m;
 response_msg r;
 
@@ -33,23 +36,33 @@ void connect_roaches(int n, int *roach_codes)
         int points_roach = (rand() % 5) + 1;
 
         // Set and send message
-        m.msg_type = 0;
-        m.entity_type = ROACH;
-        m.content = points_roach + '0';
+        msg.msg_type = 0;
+        msg.entity_type = ROACH;
+        msg.content = points_roach + '0';
+        printf("points_roach: %d\n", points_roach);
 
-        rc = zmq_send(requester, &m, sizeof(m), 0);
+        int msg_len = client_message__get_packed_size(&msg);
+        char *msg_buf = malloc(msg_len);
+        client_message__pack(&msg, msg_buf);
+
+        printf("Sending message of length %d\n", msg_len);
+        rc = zmq_send(requester, msg_buf, msg_len, 0);
         assert(rc != -1);
-
         // Wait for response
+        printf("Waiting for response\n");
         rc = zmq_recv(requester, &r, sizeof(r), 0);
         assert(rc != -1);
 
+        printf("Secret code: %d\n", r.secret_code);
+        printf("success: %d\n", r.success);
+        printf("score: %d\n", r.score);
         if (r.success == 0)
         {
             printf("Server Full, try again later\n");
             break;
         }
         roach_codes[i] = r.secret_code;
+        free(msg_buf);
     }
 }
 
@@ -143,7 +156,17 @@ int main(int argc, char *argv[])
             // Set and send message
             m.content = direction;
             m.secret_code = roach_codes[i];
-            rc = zmq_send(requester, &m, sizeof(m), 0);
+
+            msg.msg_type = m.msg_type;
+            msg.entity_type = m.entity_type;
+            msg.content = m.content;
+            msg.secret_code = m.secret_code;
+            int msg_len = client_message__get_packed_size(&msg);
+            char *msg_buf = malloc(msg_len);
+            client_message__pack(&msg, msg_buf);
+
+            printf("Sending message of length %d\n", msg_len);
+            rc = zmq_send(requester, msg_buf, msg_len, 0);
             assert(rc != -1);
 
             rc = zmq_recv(requester, &r, sizeof(r), 0);

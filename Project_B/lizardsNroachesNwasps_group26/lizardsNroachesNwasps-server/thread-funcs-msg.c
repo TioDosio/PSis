@@ -2,6 +2,7 @@
 #include "../common-files/lizardsNroachesNwasps.h"
 #include <pthread.h>
 #include <zmq.h>
+#include "../common-files/messages.pb-c.h"
 
 void generate_r(void *responder, int success, int secret_code, int score)
 {

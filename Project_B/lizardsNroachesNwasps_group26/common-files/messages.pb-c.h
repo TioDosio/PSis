@@ -20,7 +20,6 @@ typedef struct _ClientMessage ClientMessage;
 typedef struct _ResponseMessage ResponseMessage;
 typedef struct _DisplayUpdate DisplayUpdate;
 typedef struct _ConnectDisplayResponse ConnectDisplayResponse;
-typedef struct _ThreadArgs ThreadArgs;
 
 
 /* --- enums --- */
@@ -123,36 +122,12 @@ struct  _ConnectDisplayResponse
   size_t n_npc;
   Entity **npc;
   int32_t n_lizards;
-  int32_t n_npc;
+  int32_t n__npc;
   char *address_port;
 };
 #define CONNECT_DISPLAY_RESPONSE__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&connect_display_response__descriptor) \
     , 0,NULL, 0,NULL, 0, 0, NULL }
-
-
-/*
- * Struct for arguments for threads
- */
-struct  _ThreadArgs
-{
-  ProtobufCMessage base;
-  size_t n_lizard_array;
-  Entity **lizard_array;
-  size_t n_npc_array;
-  Entity **npc_array;
-  int32_t n_lizards;
-  int32_t n_npc;
-  /*
-   * Assuming WINDOW is some custom type; you may need to adjust this field accordingly
-   * required ??? game_win = ?;
-   * required ??? lines_win = ?;
-   */
-  int64_t roach_death_time;
-};
-#define THREAD_ARGS__INIT \
- { PROTOBUF_C_MESSAGE_INIT (&thread_args__descriptor) \
-    , 0,NULL, 0,NULL, 0, 0, 0 }
 
 
 /* Entity methods */
@@ -250,25 +225,6 @@ ConnectDisplayResponse *
 void   connect_display_response__free_unpacked
                      (ConnectDisplayResponse *message,
                       ProtobufCAllocator *allocator);
-/* ThreadArgs methods */
-void   thread_args__init
-                     (ThreadArgs         *message);
-size_t thread_args__get_packed_size
-                     (const ThreadArgs   *message);
-size_t thread_args__pack
-                     (const ThreadArgs   *message,
-                      uint8_t             *out);
-size_t thread_args__pack_to_buffer
-                     (const ThreadArgs   *message,
-                      ProtobufCBuffer     *buffer);
-ThreadArgs *
-       thread_args__unpack
-                     (ProtobufCAllocator  *allocator,
-                      size_t               len,
-                      const uint8_t       *data);
-void   thread_args__free_unpacked
-                     (ThreadArgs *message,
-                      ProtobufCAllocator *allocator);
 /* --- per-message closures --- */
 
 typedef void (*Entity_Closure)
@@ -286,9 +242,6 @@ typedef void (*DisplayUpdate_Closure)
 typedef void (*ConnectDisplayResponse_Closure)
                  (const ConnectDisplayResponse *message,
                   void *closure_data);
-typedef void (*ThreadArgs_Closure)
-                 (const ThreadArgs *message,
-                  void *closure_data);
 
 /* --- services --- */
 
@@ -303,7 +256,6 @@ extern const ProtobufCMessageDescriptor client_message__descriptor;
 extern const ProtobufCMessageDescriptor response_message__descriptor;
 extern const ProtobufCMessageDescriptor display_update__descriptor;
 extern const ProtobufCMessageDescriptor connect_display_response__descriptor;
-extern const ProtobufCMessageDescriptor thread_args__descriptor;
 
 PROTOBUF_C__END_DECLS
 
