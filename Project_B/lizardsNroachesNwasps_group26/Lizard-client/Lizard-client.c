@@ -21,8 +21,6 @@ void read_update(thread_args *game, void *subscriber){
     display_update update;
 
     // Store in local variables
-    int n_lizards = game->n_lizards;
-    int n_npc = game->n_npc;
     entity_t *array_lizards = game->lizard_array;
     entity_t *array_npc = game->npc_array;
     WINDOW *my_win = game->game_win;
@@ -47,34 +45,35 @@ void read_update(thread_args *game, void *subscriber){
         switch (update.entity.entity_type)
         {
         case LIZARD:
-            id = find_entity_id(array_lizards, n_lizards, update.entity.secret_code);
+            id = find_entity_id(array_lizards, game->n_lizards, update.entity.secret_code);
             if (id == -1) // If it's a new lizard, add it to the array
             {
-                array_lizards[n_lizards] = update.entity;
-                n_lizards++;
+                array_lizards[game->n_lizards] = update.entity;
+                game->n_lizards++;
             }
             else
             {
                 array_lizards[id] = update.entity;
                 if (update.disconnect == 1)
                 {
-                    remove_entity(array_lizards, &n_lizards, id);
+                    remove_entity(array_lizards, &game->n_lizards, id);
                 }
             }
             break;
-        case 1:
-            id = find_entity_id(array_npc, n_npc, update.entity.secret_code);
-            if (id == -1) // If it's a new roach, add it to the array
+        case ROACH:
+        case WASP:
+            id = find_entity_id(array_npc, game->n_npc, update.entity.secret_code);
+            if (id == -1) // If it's a new npc, add it to the array
             {
-                array_npc[n_npc] = update.entity;
-                n_npc++;
+                array_npc[game->n_npc] = update.entity;
+                game->n_npc++;
             }
             else
             {
                 array_npc[id] = update.entity;
                 if (update.disconnect == 1)
                 {
-                    remove_entity(array_npc, &n_npc, id);
+                    remove_entity(array_npc, &game->n_npc, id);
                 }
             }
             break;
@@ -86,9 +85,9 @@ void read_update(thread_args *game, void *subscriber){
         }
 
         // Check if roaches got eaten
-        for (int i = 0; i < n_npc; i++)
+        for (int i = 0; i < game->n_npc; i++)
         {
-            for (int j = 0; j < n_lizards; j++)
+            for (int j = 0; j < game->n_lizards; j++)
             {
                 if (array_lizards[j].pos_x == array_npc[i].pos_x && array_lizards[j].pos_y == array_npc[i].pos_y)
                 {

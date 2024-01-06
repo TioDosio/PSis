@@ -72,6 +72,8 @@ void *npc_thread(void *npc_args)
 
                 // success
                 success = 1;
+                //Save npc id
+                id_npc = shared->n_npc - 1;
             }
 
             // END CRITICAL SECTION

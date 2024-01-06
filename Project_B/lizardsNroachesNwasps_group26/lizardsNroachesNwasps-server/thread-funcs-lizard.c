@@ -60,6 +60,8 @@ void *lizard_thread(void *lizard_args)
 
                 // success
                 success = 1;
+                //Save lizard id
+                l_id = shared->n_lizards - 1;
             }
 
             // END CRITICAL SECTION
