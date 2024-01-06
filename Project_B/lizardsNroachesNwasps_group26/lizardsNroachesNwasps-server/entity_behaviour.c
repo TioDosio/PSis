@@ -185,10 +185,10 @@ int eat_roaches(thread_args *game, int pos_x, int pos_y)
         if (game->npc_array[i].pos_x == pos_x && game->npc_array[i].pos_y == pos_y && game->npc_array->entity_type == ROACH)
         {
             //If not dead
-            if(game->npc_array->ch != ' ')
+            if(game->npc_array[i].ch != ' ')
             {
                 //Add points
-                points += game->npc_array->ch - '0';
+                points += game->npc_array[i].ch - '0';
                 //Kill Roach
                 game->npc_array[i].ch = ' ';
                 game->roach_death_time[i] = time(NULL);

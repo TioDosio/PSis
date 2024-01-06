@@ -267,7 +267,7 @@ void disp_update(thread_args *game)
 
     // Clear window
     disp_clear_window(game->game_win);
-    disp_clear_window(game->lines_win);
+    wclear(game->lines_win);
 
     // Draw all lizards
     for (i = 0; i < game->n_lizards; i++)
@@ -295,3 +295,34 @@ void disp_update(thread_args *game)
     wrefresh(game->game_win);
     wrefresh(game->lines_win);
 }
+
+
+/*void *display_thread(void *args)
+{   
+    void *context = zmq_ctx_new();
+    void *publisher = zmq_socket(context, ZMQ_PUB);
+    rc = zmq_bind(publisher, ADDRESS_PUB);
+    assert(rc == 0);
+
+    //  Socket facing subscribers
+    void *sock_recv = zmq_socket (context, ZMQ_PULL);
+    int rc = zmq_bind (sock_recv, "inproc://xxxx");
+    assert (rc == 0);
+
+    display_update update;
+    char *string = "dis";
+    
+    while (1) {
+        zmq_recv(sock_recv, &update, sizeof(update), 0);
+
+        if (zmq_send(publisher, string, strlen(string), ZMQ_SNDMORE) == -1)
+        {
+            continue;
+        }
+        if (zmq_send(publisher, &update, sizeof(update), 0) == -1)
+        {
+            continue;
+        }
+    }
+    
+}*/

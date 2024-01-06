@@ -64,3 +64,12 @@ All clients:
     -Extra thread em server para gerir display updates msgs
 
 - lizard display, receber updates: pensa guilherme .|.
+
+- display:
+    thread que recebe dos roaches-thread e lizard-thread.
+-thread-timer 5s para renascer
+-thread-timeout disconnect
+-disconnect messages roach
+-disconnect messages wasps
+-ver codigo wasps 
+-connect display 

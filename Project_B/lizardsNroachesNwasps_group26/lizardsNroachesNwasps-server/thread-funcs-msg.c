@@ -26,7 +26,6 @@ void generate_r_npc(void *responder, int success, int secret_code, int score)
     char *resp_buf = malloc(resp_len);
     response_message__pack(&resp, resp_buf);
 
-    printf("Sending message of length %d\n", resp_len);
     int rc = zmq_send(responder, resp_buf, resp_len, 0);
     assert(rc != -1);
 }
