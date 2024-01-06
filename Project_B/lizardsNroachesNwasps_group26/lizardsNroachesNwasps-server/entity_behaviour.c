@@ -293,7 +293,7 @@ int spawn_entity(thread_args *game, entity_type_t entity_type)
         else 
         {
             if(entity_type == ROACH)
-                new_entity.ch = '0' + rand() % 5;
+                new_entity.ch = '0' + (rand() % 5) + 1;
             else
                 new_entity.ch = '#';
             game->npc_array[game->n_npc] = new_entity;
