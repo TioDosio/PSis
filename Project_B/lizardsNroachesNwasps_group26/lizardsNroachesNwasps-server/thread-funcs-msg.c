@@ -86,3 +86,46 @@ void send_display_connect(void *responder, thread_args *shared, int success, int
     // Send message
     zmq_send(responder, &m, sizeof(m), 0);
 }
+
+clients_t *add_client(entity_type_t entity_type, int secret_code[10]){
+    
+    clients_t *new_client = malloc(sizeof(clients_t));
+    pthread_mutex_lock(&mutex_clients);
+    new_client->entity_type = entity_type;
+    new_client->last_received_time = time(NULL);
+    for (int i = 0; i < 10; i++) {
+        new_client->secret_code[i] = secret_code[i];
+    }
+    client_array[n_clients] = new_client;
+    n_clients++;
+    pthread_mutex_unlock(&mutex_clients);
+    return new_client;
+}
+
+void remove_client(int client_id){
+    pthread_mutex_lock(&mutex_clients);
+    clients_t *client = client_array[client_id];
+    if (client == NULL)
+        return;
+
+    for (int i = client_id; i < n_clients - 1; i++)
+    {
+        client_array[i] = client_array[i + 1];
+    }
+    n_clients--;
+    free(client);
+    pthread_mutex_unlock(&mutex_clients);
+    return;
+}
+
+time_t update_time(clients_t *client)
+{
+    time_t current_time = time(NULL);
+    time_t dif;
+
+    pthread_mutex_lock(&mutex_clients);
+    dif = current_time - client->last_received_time;
+    client->last_received_time = current_time;
+    pthread_mutex_unlock(&mutex_clients);
+    return dif;
+}

@@ -10,7 +10,7 @@
 void   entity__init
                      (Entity         *message)
 {
-  static const Entity init_value = ENTITY__INIT;
+  static Entity init_value = ENTITY__INIT;
   *message = init_value;
 }
 size_t entity__get_packed_size
@@ -47,15 +47,13 @@ void   entity__free_unpacked
                      (Entity *message,
                       ProtobufCAllocator *allocator)
 {
-  if(!message)
-    return;
   assert(message->base.descriptor == &entity__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   client_message__init
                      (ClientMessage         *message)
 {
-  static const ClientMessage init_value = CLIENT_MESSAGE__INIT;
+  static ClientMessage init_value = CLIENT_MESSAGE__INIT;
   *message = init_value;
 }
 size_t client_message__get_packed_size
@@ -92,15 +90,13 @@ void   client_message__free_unpacked
                      (ClientMessage *message,
                       ProtobufCAllocator *allocator)
 {
-  if(!message)
-    return;
   assert(message->base.descriptor == &client_message__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   response_message__init
                      (ResponseMessage         *message)
 {
-  static const ResponseMessage init_value = RESPONSE_MESSAGE__INIT;
+  static ResponseMessage init_value = RESPONSE_MESSAGE__INIT;
   *message = init_value;
 }
 size_t response_message__get_packed_size
@@ -137,15 +133,13 @@ void   response_message__free_unpacked
                      (ResponseMessage *message,
                       ProtobufCAllocator *allocator)
 {
-  if(!message)
-    return;
   assert(message->base.descriptor == &response_message__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   display_update__init
                      (DisplayUpdate         *message)
 {
-  static const DisplayUpdate init_value = DISPLAY_UPDATE__INIT;
+  static DisplayUpdate init_value = DISPLAY_UPDATE__INIT;
   *message = init_value;
 }
 size_t display_update__get_packed_size
@@ -182,15 +176,13 @@ void   display_update__free_unpacked
                      (DisplayUpdate *message,
                       ProtobufCAllocator *allocator)
 {
-  if(!message)
-    return;
   assert(message->base.descriptor == &display_update__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }
 void   connect_display_response__init
                      (ConnectDisplayResponse         *message)
 {
-  static const ConnectDisplayResponse init_value = CONNECT_DISPLAY_RESPONSE__INIT;
+  static ConnectDisplayResponse init_value = CONNECT_DISPLAY_RESPONSE__INIT;
   *message = init_value;
 }
 size_t connect_display_response__get_packed_size
@@ -227,8 +219,6 @@ void   connect_display_response__free_unpacked
                      (ConnectDisplayResponse *message,
                       ProtobufCAllocator *allocator)
 {
-  if(!message)
-    return;
   assert(message->base.descriptor == &connect_display_response__descriptor);
   protobuf_c_message_free_unpacked ((ProtobufCMessage*)message, allocator);
 }

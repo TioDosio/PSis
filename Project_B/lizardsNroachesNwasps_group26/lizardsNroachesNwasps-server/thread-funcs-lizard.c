@@ -34,6 +34,7 @@ void *lizard_thread(void *lizard_args)
         disc = 0;
         id_l_bumped = -1;
         success = 0;
+        int code_saved[10] = {0};
 
         // Receive message
         zmq_recv(responder, &m, sizeof(m), 0);
@@ -51,6 +52,7 @@ void *lizard_thread(void *lizard_args)
         case CONNECT:
             // CRITICAL SECTION
             pthread_mutex_lock(&mutex_lizard);
+            pthread_mutex_lock(&mutex_clients);
 
             // Check if there is room for more lizards
             if (shared->n_lizards < MAX_LIZARDS)
@@ -62,10 +64,14 @@ void *lizard_thread(void *lizard_args)
                 success = 1;
                 //Save lizard id
                 l_id = shared->n_lizards - 1;
+                // Create client
+                code_saved[0] = code;
+                add_client(LIZARD, code_saved[0]);
             }
 
             // END CRITICAL SECTION
             pthread_mutex_unlock(&mutex_lizard);
+            pthread_mutex_unlock(&mutex_clients);
 
             // Send response (in this case, its display connect, not r)
             send_display_connect(responder, shared, success, code);
@@ -75,6 +81,7 @@ void *lizard_thread(void *lizard_args)
         case DISCONNECT:
             // CRITICAL SECTION
             pthread_mutex_lock(&mutex_lizard);
+            pthread_mutex_lock(&mutex_clients);
 
             // Check if lizard exists
             for (int i = 0; i < shared->n_lizards; i++)
@@ -83,16 +90,20 @@ void *lizard_thread(void *lizard_args)
                 {
                     // Remove lizard from array
                     remove_entity(shared->lizard_array, &shared->n_lizards, i);
-    void *context = zmq_ctx_new();
+
                     // success
                     success = 1;
                     disc = 1;
+
+                    // Remove client
+                    remove_client();
                     break;
                 }
             }
 
             // END CRITICAL SECTION
             pthread_mutex_unlock(&mutex_lizard);
+            pthread_mutex_unlock(&mutex_clients);
 
             // Send response
             generate_r(responder, success, m.secret_code, 0);

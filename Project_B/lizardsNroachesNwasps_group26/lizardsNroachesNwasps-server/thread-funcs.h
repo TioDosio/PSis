@@ -11,6 +11,42 @@
 // Mutex for protecting the shared content
 pthread_mutex_t mutex_lizard;
 pthread_mutex_t mutex_npc;
+pthread_mutex_t mutex_clients;
+
+typedef struct clients_t
+{
+    entity_type_t entity_type;
+    int secret_code[10];
+    time_t last_received_time;
+} clients_t;
+
+typedef struct timeout_args {
+    clients_t *client;
+    thread_args *shared;
+} timeout_args;
+
+
+clients_t *client_array[MAX_CLIENTS] = {NULL};
+int n_clients;
+
+/**
+ * @brief Create a new client and add it to the array
+ *
+ * @param entity_type type of client
+ * @param secret_code array of secret codes of client
+ * 
+ * @return pointer to the new client
+ *
+ */
+client_t * add_client(entity_type_t entity_type, int secret_code[10]);
+
+/**
+ * @brief Remove a client from the array
+ *
+ * @param client_id id of client to remove
+ *
+ */
+void remove_client(int client_id);
 
 /**
  * @brief Thread function for handeling lizard messages and execute actions
@@ -100,8 +136,18 @@ void *display_thread(void *args);
 /**
  * @brief The function checks if clients have not transmitted any data in the past minute. If not disconnects
  *
- * @param ?????????????????????'
+ * @param args pointer to struct with arguments for the thread (shared and client)
  *
  */
-//void *timeout_thread(void *???);
+void *timeout_thread(void *args);
+
+/**
+ * @brief Update last used time of client and return time difference
+ * @param client pointer to client
+ *
+ * @return time difference
+ *
+ */
+time_t update_time(clients_t *client);
+
 #endif

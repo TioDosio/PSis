@@ -52,7 +52,7 @@ void read_update(thread_args *game, void *subscriber){
                 game->n_lizards++;
             }
             else
-            {
+            {   
                 array_lizards[id] = update.entity;
                 if (update.disconnect == 1)
                 {
