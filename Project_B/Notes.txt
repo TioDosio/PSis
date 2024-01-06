@@ -73,3 +73,11 @@ All clients:
 -disconnect messages wasps
 -ver codigo wasps 
 -connect display 
+
+testar:
+-display liszzar
+
+-lizard com wasps
+
+-roach respawn
+

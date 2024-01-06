@@ -1,6 +1,9 @@
 import zmq
 import sys
-from messages_pb2 import ClientMessage, ResponseMessage
+import argparse
+import random
+import time
+import messages_pb2
 
 class EntityType:
     LIZARD = 0
@@ -18,88 +21,85 @@ class MessageType:
     MOVE = 1
     DISCONNECT = 2
 
-class Entity:
-    def __init__(self):
-        self.entity_type = None  # type of entity
-        self.ch = None  # ch of entity
-        self.points = None  # amount of points
-        self.pos_x = None  # position of entity
-        self.pos_y = None  # position of entity
-        self.direction = None  # direction of last movement
-        self.secret_code = None  # secret code to send
-
 class ClientMessage:
     def __init__(self):
-        self.entity_type = None  # type of entity
-        self.msg_type = None  # type of message
-        self.content = None  # value to send (points, char, movement direction, etc)
-        self.secret_code = None  # secret id for entity
+        self.message = messages_pb2.ClientMessage()
 
 class ResponseMessage:
     def __init__(self):
-        self.success = None  # 0 - fail, 1 - success, 2 - success in disconnection
-        self.score = None  # score of the player
-        self.secret_code = None  # secret id of entity
+        self.success = None
+        self.score = None
+        self.secret_code = None
 
-def send_and_receive_message(entity_type, msg_type, content, secret_code):
-    # Create a ClientMessage
-    client_msg = ClientMessage()
-    client_msg.entity_type = entity_type
-    client_msg.msg_type = msg_type
-    client_msg.content = content
-    client_msg.secret_code = secret_code
+def main(server_ip, server_port, n_wasps=None):
+    if n_wasps < 1 or n_wasps > 10:
+        print("Invalid number of Wasps (1-10).")
+        exit(0)
 
-    # Serialize the message
-    msg_bytes = client_msg.SerializeToString()
-
-    # Send the message
-    socket.send(msg_bytes)
-
-    print(f"Sent {msg_type} message to the server")
-
-    # Receive the response
-    resp_bytes = socket.recv()
-
-    # Parse the response
-    response_msg = ResponseMessage()
-    response_msg.ParseFromString(resp_bytes)
-
-    print("Received response from the server:")
-    print(f"Success: {response_msg.success}")
-    print(f"Score: {response_msg.score}")
-    print(f"Secret code: {response_msg.secret_code}")
-    
-
-def main(server_ip, server_port):
     # Connect to the server
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
     socket.connect(f"tcp://{server_ip}:{server_port}")
 
+    wasps_codes = [0] * n_wasps
+    for i in range(n_wasps):
+        client_message = ClientMessage()
+        client_message.message.entity_type = EntityType.WASP
+        client_message.message.msg_type = MessageType.CONNECT
+        client_message.message.secret_code = 0
+        client_message.message.content = 0
 
+        msg = client_message.message.SerializeToString()
+        socket.send(msg)
+        serialized_message = socket.recv()
 
+        response_message = messages_pb2.ResponseMessage()
+        response_message.ParseFromString(serialized_message)
+        if response_message.success == 0:
+            exit(0)
+        wasps_codes[i] = response_message.secret_code
 
+    while True:
+        for i in range(n_wasps):
+            time.sleep(random.uniform(0, 0.6))
+            client_message = ClientMessage()
+            client_message.message.entity_type = EntityType.WASP
+            client_message.message.msg_type = MessageType.MOVE  # Assuming you want to send a MOVE message
+            client_message.message.content = random.choice([Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT])
+            client_message.message.secret_code = wasps_codes[i]
 
+            if client_message.message.content == Direction.LEFT:
+                print(" Going Left")
+            elif client_message.message.content == Direction.RIGHT:
+                print(" Going Right")
+            elif client_message.message.content == Direction.DOWN:
+                print(" Going Down")
+            elif client_message.message.content == Direction.UP:
+                print(" Going Up")
 
+            msg = client_message.message.SerializeToString()
+            socket.send(msg)
+            serialized_message = socket.recv()
 
+            response_message = messages_pb2.ResponseMessage()
+            response_message.ParseFromString(serialized_message)
 
+            #id (response_message.success == 0) :
+            print("success",response_message.success)
 
-    entity_type = 1  # Update with the desired entity type
-    msg_type = 0  # Update with the desired message type
-    content = "Some content"
-    secret_code = 123
-    send_and_receive_message(entity_type, msg_type, content, secret_code)
 
     socket.close()
 
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python client.py <server_ip> <server_port>")
-        sys.exit(1)
-
-    server_ip = sys.argv[1]
-    server_port = sys.argv[2]
-    main(server_ip, server_port)
-    
+    parser = argparse.ArgumentParser(description="Your script description here")
+    parser.add_argument("server_ip", type=str, help="Server IP")
+    parser.add_argument("server_port", type=str, help="Server Port")
+    parser.add_argument(
+        "n_wasps",
+        nargs="?",
+        type=int,
+        help="Number of Wasps (1-10) default=random(1,10) ",
+        default=random.randint(1, 10),
+    )
+    args = parser.parse_args()
+    main(args.server_ip, args.server_port, args.n_wasps)

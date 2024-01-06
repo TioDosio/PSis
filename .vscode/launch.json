@@ -40,6 +40,26 @@
                 }
             ],
             "preLaunchTask": "build"
+        },
+        {
+            "name": "Debug Lizard Client",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Project_B/lizardsNroachesNwasps_group26/Lizard-client/Lizard-client",
+            "args": ["127.0.0.1", "6666"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build"
         }
     ]
 }

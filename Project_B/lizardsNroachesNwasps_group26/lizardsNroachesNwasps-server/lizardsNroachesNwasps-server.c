@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "display-funcs.h"
+#include "../common-files/display-funcs.h"
 #include <string.h>
 #include <pthread.h>
 #include "thread-funcs.h"
@@ -68,13 +68,17 @@ int main()
     shared.lines_win = lines_win;
     
     // Call thread functions
+    pthread_t display;
+    pthread_create(&display, NULL, display_thread, NULL);
+
+    
     for(int i = 0; i < LIZARD_THREADS; i++)
     {   pthread_t lizard;
         pthread_create(&lizard, NULL, lizard_thread, (void *)&shared);
     }
 
     pthread_t npc;
-    pthread_create(&npc, NULL, npc_thread, (void *)&shared);
+    pthread_create(&npc, NULL, npc_thread, (void *)&shared); 
  
     //  Start the proxy
     zmq_proxy (frontend, backend, NULL);

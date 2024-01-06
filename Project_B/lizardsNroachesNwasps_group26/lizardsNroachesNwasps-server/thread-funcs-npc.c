@@ -1,6 +1,7 @@
 #include "thread-funcs.h"
 #include "../common-files/messages.pb-c.h"
 #include "../common-files/lizardsNroachesNwasps.h"
+#include "../common-files/display-funcs.h"
 #include <string.h>
 
 void *npc_thread(void *npc_args)
@@ -15,8 +16,8 @@ void *npc_thread(void *npc_args)
     assert(rc == 0);
 
     // Socket to send display updates
-    void *publisher = zmq_socket(context, ZMQ_PUB); // Create socket for PUB-SUB
-    // rc = zmq_bind(publisher, ADDRESS_PUB);          // Bind to address
+    void *pusher = zmq_socket(context, ZMQ_PUSH); // Create socket for PUB-SUB
+    rc = zmq_connect(pusher, ADDRESS_PULL);       // Connect to address
     assert(rc == 0);
 
     // Initialize variables
@@ -24,6 +25,9 @@ void *npc_thread(void *npc_args)
     int code;
     display_update update;
     int success;
+    int points;
+    int disc;
+    int id_npc;
 
     zmq_msg_t zmq_msg;
     zmq_msg_init(&zmq_msg);
@@ -32,10 +36,9 @@ void *npc_thread(void *npc_args)
     // loop for handling messages
     while (1)
     {
-        update.disconnect = 0;
-        update.id_l_bumped = -1;
+        // Set returns to default value
+        disc = 0;
         success = 0;
-        // Set success to 0
 
         // Receive message
 
@@ -89,12 +92,11 @@ void *npc_thread(void *npc_args)
                 if (shared->npc_array[i].secret_code == m.secret_code)
                 {
                     // Remove npc from array
-                    shared->npc_array[i].secret_code = -1;
-                    shared->n_npc--;
+                    remove_entity(shared->npc_array, &shared->n_npc, i);
 
                     // success
                     success = 1;
-                    update.disconnect = 1;
+                    disc = 1;
                     break;
                 }
             }
@@ -108,16 +110,29 @@ void *npc_thread(void *npc_args)
             break;
 
         case MOVE:
-            move_npc(m.secret_code, m.content, shared);
+            success = move_npc(m.secret_code, m.content, shared, &id_npc);
 
             // Send response
             generate_r_npc(responder, success, m.secret_code, 0);
             break;
         }
-        // update.entity = shared->npc_array[];
-        //  Update display
+        // Create update struct (used to send display updates)
+        pthread_mutex_lock(&mutex_lizard);
+        pthread_mutex_lock(&mutex_npc);
+        update.entity = shared->npc_array[id_npc];
+        pthread_mutex_unlock(&mutex_lizard);
+        pthread_mutex_unlock(&mutex_npc);
+        update.id_l_bumped = -1;
+        update.disconnect = disc;
+
+        //  Update display (critical section)
+        pthread_mutex_lock(&mutex_lizard);
+        pthread_mutex_lock(&mutex_npc);
         disp_update(shared);
-        // Send display update to lizard-clients
-        // zmq_send(publisher, &update, sizeof(update), 0);
+        pthread_mutex_unlock(&mutex_lizard);
+        pthread_mutex_unlock(&mutex_npc);
+
+        // Send display update to display-thread
+        zmq_send(pusher, &update, sizeof(update), 0);
     }
 }

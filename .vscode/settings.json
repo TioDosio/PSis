@@ -3,7 +3,8 @@
     "files.associations": {
       "*.rmd": "markdown",
       "zmq.h": "c",
-      "lizardsnroachesnwasps.h": "c"
+      "lizardsnroachesnwasps.h": "c",
+      "stat.h": "c"
    },
     "makefile.launchConfigurations": [
         {

@@ -69,4 +69,39 @@ void disp_update(thread_args *shared);
  */
 int generate_code();
 
+/**
+ * @brief Function to send display connect message
+ *
+ * @param responder socket to send message
+ * @param shared pointer to struct with shared data
+ * @param success success of operation so far
+ * @param code secret code of entity
+ *
+ */
+void send_display_connect(void *responder, thread_args *shared, int success, int code);
+
+
+/**
+ * @brief Function to respawn the eaten roaches
+ *
+ * @param roach roach to respawn after 5 seconds
+ *
+ */
+void *respawn_thread(void *roach);
+
+/**
+ * @brief Function to receive updates from lizards threads and npc's thread and send to lizard client 
+ *
+ * @param roach roach to respawn after 5 seconds
+ *
+ */
+void *display_thread(void *args);
+
+/**
+ * @brief The function checks if clients have not transmitted any data in the past minute. If not disconnects
+ *
+ * @param ?????????????????????'
+ *
+ */
+//void *timeout_thread(void *???);
 #endif

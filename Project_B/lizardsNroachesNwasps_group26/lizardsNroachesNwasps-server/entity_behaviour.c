@@ -2,7 +2,7 @@
 #include "thread-funcs.h"
 #include <stdlib.h>
 
-int move_lizard(int code, direction_t dir , thread_args *game)
+int move_lizard(int code, direction_t dir , thread_args *game, int* points_to_return, int *id_l_bumped, int *l_id)
 {
     entity_t lizard_after_move;
     int lizard_index;
@@ -51,6 +51,7 @@ int move_lizard(int code, direction_t dir , thread_args *game)
                     points = (lizard_after_move.points + game->lizard_array[collision_index].points) / 2;
                     lizard_after_move.points = points;
                     game->lizard_array[collision_index].points = points;
+
                     break;
                 case WASP:
                     // If wasp, reduce 10 points
@@ -62,7 +63,18 @@ int move_lizard(int code, direction_t dir , thread_args *game)
         // Update lizard array
         game->lizard_array[lizard_index] = lizard_after_move;
 
-    }
+        // If possible, update points
+        if(points_to_return != NULL)
+            *points_to_return = lizard_after_move.points;
+
+        //Save lizard bumped, if necessary
+        if(id_l_bumped != NULL)
+            *id_l_bumped = collision_index;
+
+        //Save lizard id, if necessary
+        if(l_id != NULL)
+            *l_id = lizard_index;
+    } 
     
     pthread_mutex_unlock(&mutex_lizard);
     pthread_mutex_unlock(&mutex_npc);
@@ -70,7 +82,7 @@ int move_lizard(int code, direction_t dir , thread_args *game)
     return success;
 }
 
-int move_npc(int code, direction_t dir , thread_args *game){
+int move_npc(int code, direction_t dir , thread_args *game, int *id_npc){
 
     entity_t npc_after_move;
     int npc_index;
@@ -125,6 +137,10 @@ int move_npc(int code, direction_t dir , thread_args *game){
 
         // Update NPC array
         game->npc_array[npc_index] = npc_after_move;
+
+        //Save npc id, if necessary
+        if(id_npc != NULL)
+            *id_npc = npc_index;
     }
     
     pthread_mutex_unlock(&mutex_lizard);
@@ -191,7 +207,9 @@ int eat_roaches(thread_args *game, int pos_x, int pos_y)
                 points += game->npc_array[i].ch - '0';
                 //Kill Roach
                 game->npc_array[i].ch = ' ';
-                game->roach_death_time[i] = time(NULL);
+                
+                pthread_t roach;
+                pthread_create(&roach, NULL, respawn_thread, (void *)&game->npc_array[i]);
             }
             
         }

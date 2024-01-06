@@ -17,11 +17,14 @@ int spawn_entity(thread_args *game, entity_type_t entity_type);
  * @param code code of entity
  * @param dir direction to move entity
  * @param game struct containing all game data
+ * @param points pointer to store points gained by lizard. Ignored if NULL
+ * @param id_l_bumped pointer to store id of lizard bumped. Ignored if NULL 
+ * @param id_l pointer to store id of lizard moved. Ignored if NULL
  * 
  * @return 0 if failed
  * 
  */
-int move_lizard (int code, direction_t dir , thread_args *game);
+int move_lizard (int code, direction_t dir , thread_args *game, int *points, int *id_l_bumped, int *id_l);
 
 
 /**
@@ -36,7 +39,7 @@ int move_lizard (int code, direction_t dir , thread_args *game);
  * @param game The thread arguments containing the game context.
  * @return An integer indicating the success or failure of the NPC's movement.
  */
-int move_npc(int code, direction_t dir , thread_args *game);
+int move_npc(int code, direction_t dir , thread_args *game, int* id_npc);
 
 /**
  * @note FUNCTION MUST BE CALLED WITH LOCKED MUTEXES.

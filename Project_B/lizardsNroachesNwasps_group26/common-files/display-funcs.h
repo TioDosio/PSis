@@ -44,7 +44,7 @@ void clear_body(WINDOW *win, int pos_x, int pos_y, direction_t direction);
 void draw_body(WINDOW *win, entity_t lizard);
 
 /*
-* @brief clear window
+* @brief clear game window
 *
 * @param win window to be cleared
 *
@@ -78,6 +78,6 @@ void remove_entity(entity_t entity[], int *n_entities, int id);
 * @param game thread arguments
     
 */
-void update_display(thread_args *game);
+void disp_update(thread_args *game);
 
 #endif // display_funcs_H

@@ -1,4 +1,5 @@
 #include "thread-funcs.h"
+#include "../common-files/display-funcs.h"
 
 void *lizard_thread(void *lizard_args)
 {
@@ -12,8 +13,8 @@ void *lizard_thread(void *lizard_args)
     assert(rc == 0);
 
     // Socket to send display updates
-    void *publisher = zmq_socket(context, ZMQ_PUB); // Create socket for PUB-SUB
-    // rc = zmq_bind(publisher, ADDRESS_PUB);          // Bind to address
+    void *pusher = zmq_socket(context, ZMQ_PUSH); // Create socket for PUB-SUB
+    rc = zmq_connect(pusher, ADDRESS_PULL);       // Connect to address
     assert(rc == 0);
 
     // Initialize variables
@@ -21,13 +22,17 @@ void *lizard_thread(void *lizard_args)
     int code;
     display_update update;
     int success;
+    int points;
+    int disc;
+    int id_l_bumped;
+    int l_id;
 
     // loop for handling messages
     while (1)
     {
-        update.disconnect = 0;
-        update.id_l_bumped = -1;
-        // Set success to 0
+        // Set returns to default value
+        disc = 0;
+        id_l_bumped = -1;
         success = 0;
 
         // Receive message
@@ -60,8 +65,8 @@ void *lizard_thread(void *lizard_args)
             // END CRITICAL SECTION
             pthread_mutex_unlock(&mutex_lizard);
 
-            // Send response [HERE] MUST SEND DISPLAY_CONNECT?
-            generate_r(responder, success, code, 0);
+            // Send response (in this case, its display connect, not r)
+            send_display_connect(responder, shared, success, code);
 
             break;
 
@@ -75,12 +80,11 @@ void *lizard_thread(void *lizard_args)
                 if (shared->lizard_array[i].secret_code == m.secret_code)
                 {
                     // Remove lizard from array
-                    shared->lizard_array[i].secret_code = -1;
-                    shared->n_lizards--;
-
+                    remove_entity(shared->lizard_array, &shared->n_lizards, i);
+    void *context = zmq_ctx_new();
                     // success
                     success = 1;
-                    update.disconnect = 1;
+                    disc = 1;
                     break;
                 }
             }
@@ -94,16 +98,28 @@ void *lizard_thread(void *lizard_args)
             break;
 
         case MOVE:
-            move_lizard(m.secret_code, m.content, shared);
+            success = move_lizard(m.secret_code, m.content, shared, &points, &id_l_bumped, &l_id);
 
-            // Send response
-            generate_r(responder, success, m.secret_code, 0);
+            generate_r(responder, success, m.secret_code, points);
             break;
         }
-        // update.entity = shared->lizard_array[m.secret_code];
-        //  Update display
+        // Create update struct (used to send display updates)
+        pthread_mutex_lock(&mutex_lizard);
+        pthread_mutex_lock(&mutex_npc);
+        update.entity = shared->lizard_array[l_id];
+        pthread_mutex_unlock(&mutex_lizard);
+        pthread_mutex_unlock(&mutex_npc);
+        update.id_l_bumped = id_l_bumped;
+        update.disconnect = disc;
+
+        //  Update display (critical section)
+        pthread_mutex_lock(&mutex_lizard);
+        pthread_mutex_lock(&mutex_npc);
         disp_update(shared);
-        // Send display update to lizard-clients
-        // zmq_send(publisher, &update, sizeof(update), 0);
+        pthread_mutex_unlock(&mutex_lizard);
+        pthread_mutex_unlock(&mutex_npc);
+
+        // Send display update to display thread
+        zmq_send(pusher, &update, sizeof(update), 0);
     }
 }

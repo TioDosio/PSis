@@ -284,6 +284,7 @@ int find_entity_id(entity_t entity[], int n_entities, int code)
     }
     return -1;
 }
+
 /*
 * @brief remove entity from array
 

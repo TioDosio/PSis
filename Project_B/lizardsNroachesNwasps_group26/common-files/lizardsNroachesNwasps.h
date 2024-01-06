@@ -8,12 +8,13 @@
 #define ADDRESS_REQ_NPC "tcp://127.0.0.1:6665"
 #define ADDRESS_PUB "tcp://127.0.0.1:6669"
 #define BACK_END_ADDRESS "inproc://back-end"
+#define ADDRESS_PULL "inproc://display"
 
 #define WINDOW_SIZE 30
 #define MAX_NPCS (WINDOW_SIZE * WINDOW_SIZE / 3) // one third of possible spaces
 #define MAX_LIZARDS 26
 #define MAX_ROACH_PER_CLIENT 10
-#define ROACH_RESPAWN_TIME 5
+#define ROACH_RESPAWN_TIME 5 // apagar
 #define BUFFER_SIZE 70
 #define LIZARD_THREADS 4
 
@@ -77,6 +78,8 @@ typedef struct display_update
 
 typedef struct connect_display_resp
 {
+    unsigned short int success;     /* 0 - fail, 1 - success */
+    int secret_code;                /* secret id of entity */
     entity_t lizard[MAX_LIZARDS];   /* array of lizards */
     entity_t npc[MAX_NPCS];         /* array of npcs */
     int n_lizards;                  /* number of lizards */
@@ -87,14 +90,14 @@ typedef struct connect_display_resp
 // Struct for arguments for threads
 typedef struct thread_args
 {
-    entity_t *lizard_array;
-    entity_t *npc_array;
-    int n_lizards;
-    int n_npc;
-    time_t *roach_death_time;
-    WINDOW *game_win;
-    WINDOW *lines_win;
-
+    entity_t *lizard_array;         /* array of lizards */
+    entity_t *npc_array;            /* array of npcs */
+    int n_lizards;                  /* number of lizards */
+    int n_npc;                      /* number of npcs */
+    time_t *roach_death_time;       /* array of roach death times */
+    WINDOW *game_win;               /* game window */
+    WINDOW *lines_win;              /* lines window */
+    char broadcast_address[BUFFER_SIZE]; /* address and port of publisher */
 } thread_args;
 
 #endif

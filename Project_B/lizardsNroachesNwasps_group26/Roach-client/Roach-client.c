@@ -177,7 +177,6 @@ int main(int argc, char *argv[])
             char *msg_buf = malloc(msg_len);
             client_message__pack(&msg, msg_buf);
 
-            printf("Sending message of length %d\n", msg_len);
             rc = zmq_send(requester, msg_buf, msg_len, 0);
             assert(rc != -1);
 
@@ -189,7 +188,6 @@ int main(int argc, char *argv[])
             r.success = resp->success;
             r.secret_code = resp->secret_code;
             response_message__free_unpacked(resp, NULL);
-            printf("Secret code: %d\n", r.secret_code);
         }
     }
     zmq_close(requester);
