@@ -289,8 +289,22 @@ int spawn_entity(thread_args *game, entity_type_t entity_type)
         if (entity_type == LIZARD)
         {
             new_entity.ch = 'a'+game->n_lizards;
+            // Check if ch is already in use
+            for (int i = 0; i < game->n_lizards; i++)
+            {
+                if (new_entity.ch == game->lizard_array[i].ch)
+                {
+                    new_entity.ch++;
+                    i = -1; // Restart the loop to check again
+                    if (new_entity.ch > 'z')
+                    {
+                        new_entity.ch = 'a';
+                    }
+                }
+            }
             game->lizard_array[game->n_lizards] = new_entity;
             game->n_lizards++;
+
         }
         else 
         {
