@@ -137,7 +137,7 @@ void draw_body(WINDOW *win, entity_t lizard)
     }
 
     // If points less than 0, don't draw body
-    if (lizard.points <= 0)
+    if (lizard.points < 0)
     {
         return;
     }

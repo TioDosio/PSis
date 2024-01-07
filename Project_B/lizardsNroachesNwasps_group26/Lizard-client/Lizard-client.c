@@ -15,6 +15,10 @@
 
 void *context;
 
+pthread_mutex_t pause_display_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+int pause_display = 0;
+
 //Read update function
 void read_update(thread_args *game, void *subscriber){
     // Local variable for incoming update message
@@ -37,7 +41,6 @@ void read_update(thread_args *game, void *subscriber){
         // Clear the screen
         wclear(my_win);
         box(my_win, 0, 0);
-        wrefresh(my_win);
 
         rc = zmq_recv(subscriber, &update, sizeof(update), 0);
         assert(rc != -1);
@@ -101,7 +104,15 @@ void read_update(thread_args *game, void *subscriber){
             array_lizards[update.id_l_bumped].points = update.entity.points;
         }
 
-        disp_update(game);
+        pthread_mutex_lock(&pause_display_mutex);
+        int value = pause_display;
+        pthread_mutex_unlock(&pause_display_mutex);
+        if(value == 0)
+            disp_update(game);
+        
+        
+        
+        
     }
 }
 
@@ -254,15 +265,20 @@ int main(int argc, char *argv[])
             }
             
             if(r.success == 0){
-                //Clear the screen
+                //Clear the screen and pause display
+                pthread_mutex_lock(&pause_display_mutex);
+                pause_display = 1;
+                pthread_mutex_unlock(&pause_display_mutex);
                 wclear(game_win);
                 wclear(lines_win);
                 wrefresh(game_win);
                 wrefresh(lines_win);
-                endwin(); /* End curses mode		  */
-                sleep(1);
-                printf("Operation failed. Timed out?\n");
-                sleep(1);
+                wprintw(game_win, "Invalid operation. Timed out?\n");
+                wrefresh(game_win);
+                sleep(3);
+                pthread_mutex_lock(&pause_display_mutex);
+                pause_display = 0;
+                pthread_mutex_unlock(&pause_display_mutex);
                 continue;
             }
 

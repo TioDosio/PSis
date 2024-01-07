@@ -18,7 +18,7 @@
 #define BUFFER_SIZE 70
 #define LIZARD_THREADS 4
 #define MAX_CLIENTS MAX_LIZARDS + MAX_NPCS
-#define TIME_OUT 5
+#define TIME_OUT 15
 
 //ZMQ context
 void *context;
@@ -49,7 +49,7 @@ typedef struct entity_t
 {
     entity_type_t entity_type;       /* type of entity */
     char ch;                         /* ch of entity */
-    unsigned int points;             /* ammount of points */
+    int points;             /* ammount of points */
     unsigned short int pos_x, pos_y; /* position of entity */
     direction_t direction;           /* direction of last movement */
     int secret_code;                 /* secret code to send */

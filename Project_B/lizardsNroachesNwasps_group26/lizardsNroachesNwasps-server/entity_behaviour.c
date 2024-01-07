@@ -58,6 +58,8 @@ int move_lizard(int code, direction_t dir , thread_args *game, int* points_to_re
                     lizard_after_move.points -= 10;
                     break;
             }
+            // Even if no move, lets store the new direction (just to control feel more responsive)
+            lizard_after_move.direction = dir;
         }
 
         // Update lizard array

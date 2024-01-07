@@ -93,6 +93,7 @@ clients_t *add_client(entity_type_t entity_type, int secret_code){
     new_client->entity_type = entity_type;
     new_client->last_received_time = time(NULL);
     new_client->code = secret_code;
+    new_client->npc_list = NULL;
 
     pthread_mutex_lock(&mutex_clients);
     client_array[n_clients] = new_client;
