@@ -87,26 +87,46 @@ void send_display_connect(void *responder, thread_args *shared, int success, int
     zmq_send(responder, &m, sizeof(m), 0);
 }
 
-clients_t *add_client(entity_type_t entity_type, int secret_code[10]){
+clients_t *add_client(entity_type_t entity_type, int secret_code, thread_args *shared){
     
     clients_t *new_client = malloc(sizeof(clients_t));
-    pthread_mutex_lock(&mutex_clients);
     new_client->entity_type = entity_type;
     new_client->last_received_time = time(NULL);
-    for (int i = 0; i < 10; i++) {
-        new_client->secret_code[i] = secret_code[i];
-    }
+    new_client->code = secret_code;
+
+    pthread_mutex_lock(&mutex_clients);
     client_array[n_clients] = new_client;
     n_clients++;
+    pthread_mutex_unlock(&mutex_clients);
+    
+
+    // Create timeout_check thread
+    timeout_args *args = malloc(sizeof(timeout_args));
+    args->client = new_client;
+    args->shared = shared;
+    pthread_mutex_lock(&mutex_clients);
+    pthread_create(&new_client->timeout_thread, NULL, timeout_check_thread, (void*) args);
     pthread_mutex_unlock(&mutex_clients);
     return new_client;
 }
 
-void remove_client(int client_id){
+int remove_client(clients_t *client){
     pthread_mutex_lock(&mutex_clients);
-    clients_t *client = client_array[client_id];
-    if (client == NULL)
-        return;
+    int client_id = -1;
+    for (int i = 0; i < n_clients; i++)
+    {
+        if (client_array[i] == client)
+        {
+            client_id = i;
+            break;
+        }
+    }
+
+    if (client_id == -1)
+    {
+        pthread_mutex_unlock(&mutex_clients);
+        return 0;
+    }
 
     for (int i = client_id; i < n_clients - 1; i++)
     {
@@ -115,7 +135,7 @@ void remove_client(int client_id){
     n_clients--;
     free(client);
     pthread_mutex_unlock(&mutex_clients);
-    return;
+    return 1;
 }
 
 time_t update_time(clients_t *client)
@@ -124,8 +144,23 @@ time_t update_time(clients_t *client)
     time_t dif;
 
     pthread_mutex_lock(&mutex_clients);
-    dif = current_time - client->last_received_time;
+    dif = difftime(current_time, client->last_received_time);
     client->last_received_time = current_time;
     pthread_mutex_unlock(&mutex_clients);
     return dif;
+}
+
+clients_t* find_client(int secret_code)
+{
+    pthread_mutex_lock(&mutex_clients);
+    for (int i = 0; i < n_clients; i++)
+    {
+        if (client_array[i]->code == secret_code)
+        {
+            pthread_mutex_unlock(&mutex_clients);
+            return client_array[i];
+        }
+    }
+    pthread_mutex_unlock(&mutex_clients);
+    return NULL;
 }

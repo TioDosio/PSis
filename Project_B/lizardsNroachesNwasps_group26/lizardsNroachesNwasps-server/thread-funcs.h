@@ -15,9 +15,10 @@ pthread_mutex_t mutex_clients;
 
 typedef struct clients_t
 {
-    entity_type_t entity_type;
-    int secret_code[10];
-    time_t last_received_time;
+    entity_type_t entity_type;  // Type of entity
+    int code;                   // Secret code of client (same as first entity it represents)
+    time_t last_received_time;  // Time of last received message
+    pthread_t timeout_thread;   // Thread to check timeout
 } clients_t;
 
 typedef struct timeout_args {
@@ -26,27 +27,30 @@ typedef struct timeout_args {
 } timeout_args;
 
 
-clients_t *client_array[MAX_CLIENTS] = {NULL};
+clients_t *client_array[MAX_CLIENTS];
 int n_clients;
 
 /**
  * @brief Create a new client and add it to the array
  *
  * @param entity_type type of client
- * @param secret_code array of secret codes of client
+ * @param code code of client
+ * @param shared pointer to struct with shared data
  * 
  * @return pointer to the new client
  *
  */
-client_t * add_client(entity_type_t entity_type, int secret_code[10]);
+clients_t *add_client(entity_type_t entity_type, int code, thread_args *shared);
 
 /**
  * @brief Remove a client from the array
  *
- * @param client_id id of client to remove
+ * @param client pointer to client
+ * 
+ * @return 1 if success, 0 if not found
  *
  */
-void remove_client(int client_id);
+int remove_client(clients_t *client);
 
 /**
  * @brief Thread function for handeling lizard messages and execute actions
@@ -149,5 +153,25 @@ void *timeout_thread(void *args);
  *
  */
 time_t update_time(clients_t *client);
+
+/**
+ * @brief Finds a client pointer with the given secret code.
+ *
+ * This function searches for a client in the system with the specified secret code.
+ * The secret code of a client is the same as the secret code of the FIRST entity it represents.
+ *
+ * @param secret_code The secret code of the client to find.
+ * @return The client pointer if found, or NULL if not found.
+ */
+clients_t * find_client(int secret_code);
+
+/**
+ * @brief This function is responsible for checking the timeout of a thread.
+ *
+ * @param arg The argument passed to the thread function.
+ * @return void* The return value of the thread function.
+ */
+void* timeout_check_thread(void* arg);
+
 
 #endif

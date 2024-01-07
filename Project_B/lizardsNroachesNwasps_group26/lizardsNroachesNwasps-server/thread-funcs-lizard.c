@@ -34,7 +34,6 @@ void *lizard_thread(void *lizard_args)
         disc = 0;
         id_l_bumped = -1;
         success = 0;
-        int code_saved[10] = {0};
 
         // Receive message
         zmq_recv(responder, &m, sizeof(m), 0);
@@ -52,7 +51,6 @@ void *lizard_thread(void *lizard_args)
         case CONNECT:
             // CRITICAL SECTION
             pthread_mutex_lock(&mutex_lizard);
-            pthread_mutex_lock(&mutex_clients);
 
             // Check if there is room for more lizards
             if (shared->n_lizards < MAX_LIZARDS)
@@ -65,13 +63,11 @@ void *lizard_thread(void *lizard_args)
                 //Save lizard id
                 l_id = shared->n_lizards - 1;
                 // Create client
-                code_saved[0] = code;
-                add_client(LIZARD, code_saved[0]);
+                add_client(LIZARD, code, shared);
             }
 
             // END CRITICAL SECTION
             pthread_mutex_unlock(&mutex_lizard);
-            pthread_mutex_unlock(&mutex_clients);
 
             // Send response (in this case, its display connect, not r)
             send_display_connect(responder, shared, success, code);
@@ -96,7 +92,11 @@ void *lizard_thread(void *lizard_args)
                     disc = 1;
 
                     // Remove client
-                    remove_client();
+                    clients_t *client = find_client(m.secret_code);
+                    if (client != NULL)
+                        remove_client(client);
+                    else
+                        success = 0;
                     break;
                 }
             }
@@ -112,7 +112,12 @@ void *lizard_thread(void *lizard_args)
 
         case MOVE:
             success = move_lizard(m.secret_code, m.content, shared, &points, &id_l_bumped, &l_id);
+            // Find client and update time
+            clients_t *client = find_client(m.secret_code);
+            if (client != NULL)
+                update_time(client);
 
+            // Send response
             generate_r(responder, success, m.secret_code, points);
             break;
         }

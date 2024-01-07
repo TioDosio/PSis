@@ -18,6 +18,7 @@
 #define BUFFER_SIZE 70
 #define LIZARD_THREADS 4
 #define MAX_CLIENTS MAX_LIZARDS + MAX_NPCS
+#define TIME_OUT 5
 
 //ZMQ context
 void *context;
