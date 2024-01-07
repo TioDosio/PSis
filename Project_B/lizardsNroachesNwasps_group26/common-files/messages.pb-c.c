@@ -338,7 +338,7 @@ const ProtobufCMessageDescriptor entity__descriptor =
   (ProtobufCMessageInit) entity__init,
   NULL,NULL,NULL    /* reserved[123] */
 };
-static const ProtobufCFieldDescriptor client_message__field_descriptors[4] =
+static const ProtobufCFieldDescriptor client_message__field_descriptors[5] =
 {
   {
     "entity_type",
@@ -388,8 +388,21 @@ static const ProtobufCFieldDescriptor client_message__field_descriptors[4] =
     0,             /* flags */
     0,NULL,NULL    /* reserved1,reserved2, etc */
   },
+  {
+    "client_code",
+    5,
+    PROTOBUF_C_LABEL_REQUIRED,
+    PROTOBUF_C_TYPE_SINT32,
+    0,   /* quantifier_offset */
+    offsetof(ClientMessage, client_code),
+    NULL,
+    NULL,
+    0,             /* flags */
+    0,NULL,NULL    /* reserved1,reserved2, etc */
+  },
 };
 static const unsigned client_message__field_indices_by_name[] = {
+  4,   /* field[4] = client_code */
   2,   /* field[2] = content */
   0,   /* field[0] = entity_type */
   1,   /* field[1] = msg_type */
@@ -398,7 +411,7 @@ static const unsigned client_message__field_indices_by_name[] = {
 static const ProtobufCIntRange client_message__number_ranges[1 + 1] =
 {
   { 1, 0 },
-  { 0, 4 }
+  { 0, 5 }
 };
 const ProtobufCMessageDescriptor client_message__descriptor =
 {
@@ -408,7 +421,7 @@ const ProtobufCMessageDescriptor client_message__descriptor =
   "ClientMessage",
   "",
   sizeof(ClientMessage),
-  4,
+  5,
   client_message__field_descriptors,
   client_message__field_indices_by_name,
   1,  client_message__number_ranges,

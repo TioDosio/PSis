@@ -69,10 +69,11 @@ struct  _ClientMessage
   MessageType msg_type;
   int32_t content;
   int32_t secret_code;
+  int32_t client_code;
 };
 #define CLIENT_MESSAGE__INIT \
  { PROTOBUF_C_MESSAGE_INIT (&client_message__descriptor) \
-    , 0, 0, 0, 0 }
+    , 0, 0, 0, 0, 0 }
 
 
 struct  _ResponseMessage

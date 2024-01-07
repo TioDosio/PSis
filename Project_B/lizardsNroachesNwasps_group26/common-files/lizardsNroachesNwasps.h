@@ -66,7 +66,7 @@ typedef struct client_msg // client msg (connections, movements or disconnection
 
 typedef struct response_msg
 {
-    unsigned short int success; /* 0 - fail, 1 - success, 2 - success in disconnection*/
+    unsigned short int success; /* 0 - fail, 1 - success*/
     short int score;            /* score of the player */
     int secret_code;            /* secret id of entity */
 } response_msg;
@@ -74,7 +74,7 @@ typedef struct response_msg
 typedef struct display_update
 {
     entity_t entity;               /* entity to update */
-    unsigned short int disconnect; /* 0 - no disconnect, 1 - disconnect */
+    short int disconnect;           /* 0 - no disconnect, 1 - disconnect, -1 - connection */
     short int id_l_bumped;         /* id of lizard bumped */
 } display_update;
 

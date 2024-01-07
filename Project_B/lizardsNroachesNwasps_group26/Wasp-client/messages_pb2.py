@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='messages.proto',
   package='',
   syntax='proto2',
-  serialized_pb=_b('\n\x0emessages.proto\"\x98\x01\n\x06\x45ntity\x12 \n\x0b\x65ntity_type\x18\x01 \x02(\x0e\x32\x0b.EntityType\x12\n\n\x02\x63h\x18\x02 \x02(\t\x12\x0e\n\x06points\x18\x03 \x02(\r\x12\r\n\x05pos_x\x18\x04 \x02(\r\x12\r\n\x05pos_y\x18\x05 \x02(\r\x12\x1d\n\tdirection\x18\x06 \x02(\x0e\x32\n.Direction\x12\x13\n\x0bsecret_code\x18\x07 \x02(\x05\"w\n\rClientMessage\x12 \n\x0b\x65ntity_type\x18\x01 \x02(\x0e\x32\x0b.EntityType\x12\x1e\n\x08msg_type\x18\x02 \x02(\x0e\x32\x0c.MessageType\x12\x0f\n\x07\x63ontent\x18\x03 \x02(\x11\x12\x13\n\x0bsecret_code\x18\x04 \x02(\x11\"F\n\x0fResponseMessage\x12\x0f\n\x07success\x18\x01 \x02(\r\x12\r\n\x05score\x18\x02 \x02(\x11\x12\x13\n\x0bsecret_code\x18\x03 \x02(\x11\"Q\n\rDisplayUpdate\x12\x17\n\x06\x65ntity\x18\x01 \x02(\x0b\x32\x07.Entity\x12\x12\n\ndisconnect\x18\x02 \x02(\r\x12\x13\n\x0bid_l_bumped\x18\x03 \x02(\x11\"\x80\x01\n\x16\x43onnectDisplayResponse\x12\x17\n\x06lizard\x18\x01 \x03(\x0b\x32\x07.Entity\x12\x14\n\x03npc\x18\x02 \x03(\x0b\x32\x07.Entity\x12\x11\n\tn_lizards\x18\x03 \x02(\x05\x12\x0e\n\x06n__npc\x18\x04 \x02(\x05\x12\x14\n\x0c\x61\x64\x64ress_port\x18\x05 \x02(\t*-\n\nEntityType\x12\n\n\x06LIZARD\x10\x00\x12\t\n\x05ROACH\x10\x01\x12\x08\n\x04WASP\x10\x02*2\n\tDirection\x12\x06\n\x02UP\x10\x00\x12\x08\n\x04\x44OWN\x10\x01\x12\x08\n\x04LEFT\x10\x02\x12\t\n\x05RIGHT\x10\x03*4\n\x0bMessageType\x12\x0b\n\x07\x43ONNECT\x10\x00\x12\x08\n\x04MOVE\x10\x01\x12\x0e\n\nDISCONNECT\x10\x02')
+  serialized_pb=_b('\n\x0emessages.proto\"\x98\x01\n\x06\x45ntity\x12 \n\x0b\x65ntity_type\x18\x01 \x02(\x0e\x32\x0b.EntityType\x12\n\n\x02\x63h\x18\x02 \x02(\t\x12\x0e\n\x06points\x18\x03 \x02(\r\x12\r\n\x05pos_x\x18\x04 \x02(\r\x12\r\n\x05pos_y\x18\x05 \x02(\r\x12\x1d\n\tdirection\x18\x06 \x02(\x0e\x32\n.Direction\x12\x13\n\x0bsecret_code\x18\x07 \x02(\x05\"\x8c\x01\n\rClientMessage\x12 \n\x0b\x65ntity_type\x18\x01 \x02(\x0e\x32\x0b.EntityType\x12\x1e\n\x08msg_type\x18\x02 \x02(\x0e\x32\x0c.MessageType\x12\x0f\n\x07\x63ontent\x18\x03 \x02(\x11\x12\x13\n\x0bsecret_code\x18\x04 \x02(\x11\x12\x13\n\x0b\x63lient_code\x18\x05 \x02(\x11\"F\n\x0fResponseMessage\x12\x0f\n\x07success\x18\x01 \x02(\r\x12\r\n\x05score\x18\x02 \x02(\x11\x12\x13\n\x0bsecret_code\x18\x03 \x02(\x11\"Q\n\rDisplayUpdate\x12\x17\n\x06\x65ntity\x18\x01 \x02(\x0b\x32\x07.Entity\x12\x12\n\ndisconnect\x18\x02 \x02(\r\x12\x13\n\x0bid_l_bumped\x18\x03 \x02(\x11\"\x80\x01\n\x16\x43onnectDisplayResponse\x12\x17\n\x06lizard\x18\x01 \x03(\x0b\x32\x07.Entity\x12\x14\n\x03npc\x18\x02 \x03(\x0b\x32\x07.Entity\x12\x11\n\tn_lizards\x18\x03 \x02(\x05\x12\x0e\n\x06n__npc\x18\x04 \x02(\x05\x12\x14\n\x0c\x61\x64\x64ress_port\x18\x05 \x02(\t*-\n\nEntityType\x12\n\n\x06LIZARD\x10\x00\x12\t\n\x05ROACH\x10\x01\x12\x08\n\x04WASP\x10\x02*2\n\tDirection\x12\x06\n\x02UP\x10\x00\x12\x08\n\x04\x44OWN\x10\x01\x12\x08\n\x04LEFT\x10\x02\x12\t\n\x05RIGHT\x10\x03*4\n\x0bMessageType\x12\x0b\n\x07\x43ONNECT\x10\x00\x12\x08\n\x04MOVE\x10\x01\x12\x0e\n\nDISCONNECT\x10\x02')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -45,8 +45,8 @@ _ENTITYTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=580,
-  serialized_end=625,
+  serialized_start=602,
+  serialized_end=647,
 )
 _sym_db.RegisterEnumDescriptor(_ENTITYTYPE)
 
@@ -76,8 +76,8 @@ _DIRECTION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=627,
-  serialized_end=677,
+  serialized_start=649,
+  serialized_end=699,
 )
 _sym_db.RegisterEnumDescriptor(_DIRECTION)
 
@@ -103,8 +103,8 @@ _MESSAGETYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=679,
-  serialized_end=731,
+  serialized_start=701,
+  serialized_end=753,
 )
 _sym_db.RegisterEnumDescriptor(_MESSAGETYPE)
 
@@ -230,6 +230,13 @@ _CLIENTMESSAGE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
+    _descriptor.FieldDescriptor(
+      name='client_code', full_name='ClientMessage.client_code', index=4,
+      number=5, type=17, cpp_type=1, label=2,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
   ],
   extensions=[
   ],
@@ -242,8 +249,8 @@ _CLIENTMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=173,
-  serialized_end=292,
+  serialized_start=174,
+  serialized_end=314,
 )
 
 
@@ -287,8 +294,8 @@ _RESPONSEMESSAGE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=294,
-  serialized_end=364,
+  serialized_start=316,
+  serialized_end=386,
 )
 
 
@@ -332,8 +339,8 @@ _DISPLAYUPDATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=366,
-  serialized_end=447,
+  serialized_start=388,
+  serialized_end=469,
 )
 
 
@@ -391,8 +398,8 @@ _CONNECTDISPLAYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=450,
-  serialized_end=578,
+  serialized_start=472,
+  serialized_end=600,
 )
 
 _ENTITY.fields_by_name['entity_type'].enum_type = _ENTITYTYPE

@@ -60,10 +60,12 @@ void *lizard_thread(void *lizard_args)
 
                 // success
                 success = 1;
+                disc = -1; // -1 mean the display will add a new lizard
+
                 //Save lizard id
                 l_id = shared->n_lizards - 1;
                 // Create client
-                add_client(LIZARD, code, shared);
+                add_client(LIZARD, code);
             }
 
             // END CRITICAL SECTION
@@ -77,13 +79,15 @@ void *lizard_thread(void *lizard_args)
         case DISCONNECT:
             // CRITICAL SECTION
             pthread_mutex_lock(&mutex_lizard);
-            pthread_mutex_lock(&mutex_clients);
 
             // Check if lizard exists
             for (int i = 0; i < shared->n_lizards; i++)
             {
                 if (shared->lizard_array[i].secret_code == m.secret_code)
                 {
+                    // Need to save the entity to send display update BEFORE removing it
+                    update.entity = shared->lizard_array[i];
+
                     // Remove lizard from array
                     remove_entity(shared->lizard_array, &shared->n_lizards, i);
 
@@ -92,18 +96,19 @@ void *lizard_thread(void *lizard_args)
                     disc = 1;
 
                     // Remove client
+                    pthread_mutex_lock(&mutex_clients);
                     clients_t *client = find_client(m.secret_code);
                     if (client != NULL)
                         remove_client(client);
                     else
                         success = 0;
+                    pthread_mutex_unlock(&mutex_clients);
                     break;
                 }
             }
 
             // END CRITICAL SECTION
             pthread_mutex_unlock(&mutex_lizard);
-            pthread_mutex_unlock(&mutex_clients);
 
             // Send response
             generate_r(responder, success, m.secret_code, 0);
@@ -121,12 +126,21 @@ void *lizard_thread(void *lizard_args)
             generate_r(responder, success, m.secret_code, points);
             break;
         }
+
+        if (success == 0) // Don't execute display updates if operation failed
+            continue;
+        
         // Create update struct (used to send display updates)
-        pthread_mutex_lock(&mutex_lizard);
-        pthread_mutex_lock(&mutex_npc);
-        update.entity = shared->lizard_array[l_id];
-        pthread_mutex_unlock(&mutex_lizard);
-        pthread_mutex_unlock(&mutex_npc);
+        if(disc != 1)
+        {
+            // Save entity to send display update (no need to save if it disconnected)
+            pthread_mutex_lock(&mutex_lizard);
+            pthread_mutex_lock(&mutex_npc);
+            update.entity = shared->lizard_array[l_id];
+            pthread_mutex_unlock(&mutex_lizard);
+            pthread_mutex_unlock(&mutex_npc);
+        }
+        // Create rest of update struct (used to send display updates)
         update.id_l_bumped = id_l_bumped;
         update.disconnect = disc;
 

@@ -46,7 +46,7 @@ void read_update(thread_args *game, void *subscriber){
         {
         case LIZARD:
             id = find_entity_id(array_lizards, game->n_lizards, update.entity.secret_code);
-            if (id == -1) // If it's a new lizard, add it to the array
+            if (id == -1 && update.disconnect == -1) // If it's a new lizard and disconnect == -1, add it to the array
             {
                 array_lizards[game->n_lizards] = update.entity;
                 game->n_lizards++;
@@ -131,9 +131,9 @@ int main(int argc, char *argv[])
     char server_address[256];
     char *server_ip;
     char *server_port;
-
+    int client_id = -1;
     // para colocar o ip e a porta como argumentos
-    if (argc == 3)
+    if (argc == 3) 
     {
         server_ip = argv[1];
         server_port = argv[2];
@@ -166,7 +166,9 @@ int main(int argc, char *argv[])
 
     rc = zmq_recv(requester, &disp_start_msg, sizeof(disp_start_msg), 0);
     assert(rc != -1);
-
+    if (client_id == -1){
+        printf("banana");
+    }
     if (disp_start_msg.success == 0)
     {
         printf("Server Full, try again later\n");
@@ -198,10 +200,11 @@ int main(int argc, char *argv[])
     pthread_create(&display_thread, NULL, display_thread_func, &game);
 
     int n = 0;
+    int disconnect = 0;
 
     int key;
     do
-    {
+    {    
         //  prepare the movement message
         m.msg_type = 1;
         m.content = 0;
@@ -230,6 +233,7 @@ int main(int argc, char *argv[])
         case 'q':
         case 'Q':
             m.msg_type = DISCONNECT;
+            disconnect = 1;
             break;
         default:
             key = 'x';
@@ -247,8 +251,21 @@ int main(int argc, char *argv[])
             {
                 continue;
             }
+            
+            if(r.success == 0){
+                //Clear the screen
+                wclear(game_win);
+                wclear(lines_win);
+                wrefresh(game_win);
+                wrefresh(lines_win);
+                endwin(); /* End curses mode		  */
+                sleep(1);
+                printf("Operation failed. Timed out?\n");
+                sleep(1);
+                continue;
+            }
 
-            if (r.success == 2)
+            if (disconnect == 1 && r.success == 1)
             {
                 refresh();
                 key = 27;

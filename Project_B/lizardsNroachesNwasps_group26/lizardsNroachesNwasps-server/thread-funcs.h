@@ -21,11 +21,6 @@ typedef struct clients_t
     pthread_t timeout_thread;   // Thread to check timeout
 } clients_t;
 
-typedef struct timeout_args {
-    clients_t *client;
-    thread_args *shared;
-} timeout_args;
-
 
 clients_t *client_array[MAX_CLIENTS];
 int n_clients;
@@ -35,12 +30,11 @@ int n_clients;
  *
  * @param entity_type type of client
  * @param code code of client
- * @param shared pointer to struct with shared data
  * 
  * @return pointer to the new client
  *
  */
-clients_t *add_client(entity_type_t entity_type, int code, thread_args *shared);
+clients_t *add_client(entity_type_t entity_type, int code);
 
 /**
  * @brief Remove a client from the array
@@ -162,6 +156,7 @@ time_t update_time(clients_t *client);
  *
  * @param secret_code The secret code of the client to find.
  * @return The client pointer if found, or NULL if not found.
+ * @note Function must be called with mutex_clients locked.
  */
 clients_t * find_client(int secret_code);
 

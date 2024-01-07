@@ -87,7 +87,7 @@ void send_display_connect(void *responder, thread_args *shared, int success, int
     zmq_send(responder, &m, sizeof(m), 0);
 }
 
-clients_t *add_client(entity_type_t entity_type, int secret_code, thread_args *shared){
+clients_t *add_client(entity_type_t entity_type, int secret_code){
     
     clients_t *new_client = malloc(sizeof(clients_t));
     new_client->entity_type = entity_type;
@@ -101,11 +101,8 @@ clients_t *add_client(entity_type_t entity_type, int secret_code, thread_args *s
     
 
     // Create timeout_check thread
-    timeout_args *args = malloc(sizeof(timeout_args));
-    args->client = new_client;
-    args->shared = shared;
     pthread_mutex_lock(&mutex_clients);
-    pthread_create(&new_client->timeout_thread, NULL, timeout_check_thread, (void*) args);
+    pthread_create(&new_client->timeout_thread, NULL, timeout_check_thread, (void*) new_client);
     pthread_mutex_unlock(&mutex_clients);
     return new_client;
 }
@@ -152,7 +149,6 @@ time_t update_time(clients_t *client)
 
 clients_t* find_client(int secret_code)
 {
-    pthread_mutex_lock(&mutex_clients);
     for (int i = 0; i < n_clients; i++)
     {
         if (client_array[i]->code == secret_code)
@@ -161,6 +157,5 @@ clients_t* find_client(int secret_code)
             return client_array[i];
         }
     }
-    pthread_mutex_unlock(&mutex_clients);
     return NULL;
 }

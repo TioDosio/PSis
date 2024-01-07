@@ -3,18 +3,38 @@
 #include "../common-files/lizardsNroachesNwasps.h"
 #include "thread-funcs.h"
 #include "../common-files/display-funcs.h"
-#define DELTA 2
+#define DELTA 1
 
 // Function to check and disconnect if no messages received for a minute
 void* timeout_check_thread(void* arg) {
     
     //Load variables
-    timeout_args *args = (timeout_args *)arg;
-    thread_args *shared = args->shared;
-    clients_t *client = args->client;
+    clients_t *client = (clients_t *)arg;
 
-    //Free the memory allocated for the arguments
-    free(args);
+    // Initialize ZMQ
+    void *requester = zmq_socket(context, ZMQ_REQ);
+    int rc;
+    switch (client->entity_type){
+            
+                case LIZARD:
+                    rc = zmq_connect(requester, ADDRESS_REQ_LIZ);
+                    break;
+                case ROACH:
+                case WASP:
+                   rc = zmq_connect(requester, ADDRESS_REQ_NPC);
+                    break;                
+            }
+    assert(rc != -1);
+    
+    response_msg r;
+    client_msg m;
+    m.msg_type = DISCONNECT;
+    m.content = 0;
+
+    pthread_mutex_lock(&mutex_clients);
+    m.secret_code = client->code;
+    m.entity_type = client->entity_type;
+    pthread_mutex_unlock(&mutex_clients);
 
     while (1) {
         // Sleep for a short duration to avoid continuous checking
@@ -28,39 +48,14 @@ void* timeout_check_thread(void* arg) {
 
         // If no messages received for a minute, disconnect the client
         if (time_difference >= TIME_OUT) {
-            // Disconnect the client
-            switch (client->entity_type){
-            
-                case LIZARD:
-                    pthread_mutex_lock(&mutex_lizard);
-                    pthread_mutex_lock(&mutex_clients);
-                    for (int i=0; i < MAX_LIZARDS; i++) {
-                        if (client->code == shared->lizard_array[i].secret_code) {
-                            remove_entity(shared->lizard_array, &shared->n_lizards, i);
-                            break;
-                        }
-                    }
-                    pthread_mutex_unlock(&mutex_lizard);
-                    pthread_mutex_unlock(&mutex_clients);
-                    break;
-                case ROACH:
-                case WASP:
-                    pthread_mutex_lock(&mutex_npc);
-                    pthread_mutex_lock(&mutex_clients);
-                    for (int i=0; i < MAX_NPCS; i++) {
-                        if (client->code == shared->npc_array[i].secret_code) {
-                            remove_entity(shared->npc_array, &shared->n_npc, i);
-                            break;
-                        }
-                    }
-
-                    pthread_mutex_unlock(&mutex_npc);
-                    pthread_mutex_unlock(&mutex_clients);
-                    break;
-
-                remove_client(client);
-            }
-            pthread_exit(NULL);
+            // Send disconnect message to display
+            rc = zmq_send(requester, &m, sizeof(m), 0);
+            assert(rc != -1);
+            rc = zmq_recv(requester, &r, sizeof(r), 0);
+            assert(rc != -1);
+            if (r.success == 1)
+                zmq_close(requester);
+                pthread_exit(NULL);
         }
     }
 }

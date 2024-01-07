@@ -34,6 +34,7 @@ message ClientMessage {
   required MessageType msg_type = 2;
   required sint32 content = 3;
   required sint32 secret_code = 4;
+  required sint32 client_code = 5;
 }
 
 message ResponseMessage {
