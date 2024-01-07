@@ -18,9 +18,9 @@
 #define BUFFER_SIZE 70
 #define LIZARD_THREADS 4
 #define MAX_CLIENTS MAX_LIZARDS + MAX_NPCS
-#define TIME_OUT 15
+#define TIME_OUT 60
 
-//ZMQ context
+// ZMQ context
 void *context;
 
 typedef enum entity_type_t // entity type
@@ -49,7 +49,7 @@ typedef struct entity_t
 {
     entity_type_t entity_type;       /* type of entity */
     char ch;                         /* ch of entity */
-    int points;             /* ammount of points */
+    int points;                      /* ammount of points */
     unsigned short int pos_x, pos_y; /* position of entity */
     direction_t direction;           /* direction of last movement */
     int secret_code;                 /* secret code to send */
@@ -62,7 +62,7 @@ typedef struct client_msg // client msg (connections, movements or disconnection
     msg_type_t msg_type;       /* type of message */
     short int content;         /* value to send (points, char, movement direction, etc) */
     int secret_code;           /* secret id for entity */
-    int client_code;            /* client signature (same as its first entity) */
+    int client_code;           /* client signature (same as its first entity) */
 } client_msg;
 
 typedef struct response_msg
@@ -74,9 +74,9 @@ typedef struct response_msg
 
 typedef struct display_update
 {
-    entity_t entity;               /* entity to update */
-    short int disconnect;           /* 0 - no disconnect, 1 - disconnect, -1 - connection */
-    short int id_l_bumped;         /* id of lizard bumped */
+    entity_t entity;       /* entity to update */
+    short int disconnect;  /* 0 - no disconnect, 1 - disconnect, -1 - connection */
+    short int id_l_bumped; /* id of lizard bumped */
 } display_update;
 
 typedef struct connect_display_resp
@@ -93,13 +93,13 @@ typedef struct connect_display_resp
 // Struct for arguments for threads
 typedef struct thread_args
 {
-    entity_t *lizard_array;         /* array of lizards */
-    entity_t *npc_array;            /* array of npcs */
-    int n_lizards;                  /* number of lizards */
-    int n_npc;                      /* number of npcs */
-    time_t *roach_death_time;       /* array of roach death times */
-    WINDOW *game_win;               /* game window */
-    WINDOW *lines_win;              /* lines window */
+    entity_t *lizard_array;              /* array of lizards */
+    entity_t *npc_array;                 /* array of npcs */
+    int n_lizards;                       /* number of lizards */
+    int n_npc;                           /* number of npcs */
+    time_t *roach_death_time;            /* array of roach death times */
+    WINDOW *game_win;                    /* game window */
+    WINDOW *lines_win;                   /* lines window */
     char broadcast_address[BUFFER_SIZE]; /* address and port of publisher */
 } thread_args;
 
