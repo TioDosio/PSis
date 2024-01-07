@@ -18,6 +18,7 @@ void *context;
 pthread_mutex_t pause_display_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int pause_display = 0;
+int quit_display = 0;
 
 //Read update function
 void read_update(thread_args *game, void *subscriber){
@@ -34,86 +35,96 @@ void read_update(thread_args *game, void *subscriber){
     while (1)
     {
         char *cap[4];
-        int rc = zmq_recv(subscriber, cap, 3, 0);
-        assert(rc != -1);
-        int i;
+        int rc = zmq_recv(subscriber, cap, 3, ZMQ_NOBLOCK);
+        if(rc != -1){
+            int i;
 
-        // Clear the screen
-        wclear(my_win);
-        box(my_win, 0, 0);
+            // Clear the screen
+            wclear(my_win);
+            box(my_win, 0, 0);
 
-        rc = zmq_recv(subscriber, &update, sizeof(update), 0);
-        assert(rc != -1);
-        short id = -1;
-        switch (update.entity.entity_type)
-        {
-        case LIZARD:
-            id = find_entity_id(array_lizards, game->n_lizards, update.entity.secret_code);
-            if (id == -1 && update.disconnect == -1) // If it's a new lizard and disconnect == -1, add it to the array
+            rc = zmq_recv(subscriber, &update, sizeof(update), 0);
+            assert(rc != -1);
+            short id = -1;
+            switch (update.entity.entity_type)
             {
-                array_lizards[game->n_lizards] = update.entity;
-                game->n_lizards++;
-            }
-            else
-            {   
-                array_lizards[id] = update.entity;
-                if (update.disconnect == 1)
+            case LIZARD:
+                id = find_entity_id(array_lizards, game->n_lizards, update.entity.secret_code);
+                if (id == -1 && update.disconnect == -1) // If it's a new lizard and disconnect == -1, add it to the array
                 {
-                    remove_entity(array_lizards, &game->n_lizards, id);
+                    array_lizards[game->n_lizards] = update.entity;
+                    game->n_lizards++;
+                }
+                else
+                {   
+                    array_lizards[id] = update.entity;
+                    if (update.disconnect == 1)
+                    {
+                        remove_entity(array_lizards, &game->n_lizards, id);
+                    }
+                }
+                break;
+            case ROACH:
+            case WASP:
+                id = find_entity_id(array_npc, game->n_npc, update.entity.secret_code);
+                if (id == -1) // If it's a new npc, add it to the array
+                {
+                    array_npc[game->n_npc] = update.entity;
+                    game->n_npc++;
+                }
+                else
+                {
+                    array_npc[id] = update.entity;
+                    if (update.disconnect == 1)
+                    {
+                        remove_entity(array_npc, &game->n_npc, id);
+                    }
+                }
+                break;
+
+            default:
+                id = -1;
+                continue;
+                break;
+            }
+
+            // Check if roaches got eaten
+            for (int i = 0; i < game->n_npc; i++)
+            {
+                for (int j = 0; j < game->n_lizards; j++)
+                {
+                    if (array_lizards[j].pos_x == array_npc[i].pos_x && array_lizards[j].pos_y == array_npc[i].pos_y)
+                    {
+                        array_npc[i].ch = ' ';
+                    }
                 }
             }
-            break;
-        case ROACH:
-        case WASP:
-            id = find_entity_id(array_npc, game->n_npc, update.entity.secret_code);
-            if (id == -1) // If it's a new npc, add it to the array
-            {
-                array_npc[game->n_npc] = update.entity;
-                game->n_npc++;
-            }
-            else
-            {
-                array_npc[id] = update.entity;
-                if (update.disconnect == 1)
-                {
-                    remove_entity(array_npc, &game->n_npc, id);
-                }
-            }
-            break;
 
-        default:
-            id = -1;
-            continue;
-            break;
-        }
-
-        // Check if roaches got eaten
-        for (int i = 0; i < game->n_npc; i++)
-        {
-            for (int j = 0; j < game->n_lizards; j++)
+            // Check if lizards collided, and update points of collided lizard too
+            if (update.id_l_bumped != -1)
             {
-                if (array_lizards[j].pos_x == array_npc[i].pos_x && array_lizards[j].pos_y == array_npc[i].pos_y)
-                {
-                    array_npc[i].ch = ' ';
-                }
+                array_lizards[update.id_l_bumped].points = update.entity.points;
             }
+            pthread_mutex_lock(&pause_display_mutex);
+            int value = pause_display;
+            pthread_mutex_unlock(&pause_display_mutex);
+            if(value == 0)
+                disp_update(game);
+        } else if (errno == EAGAIN) {
+            pthread_mutex_lock(&pause_display_mutex);
+            int value = quit_display;
+            pthread_mutex_unlock(&pause_display_mutex);
+            if (value == 1)
+            {
+                break; // Exit the loop on quit
+            }
+        } else {
+            perror("zmq_recv");
+            break;  // Exit the loop on error
         }
-        // Check if lizards collided, and update points of collided lizard too
-        if (update.id_l_bumped != -1)
-        {
-            array_lizards[update.id_l_bumped].points = update.entity.points;
-        }
-
-        pthread_mutex_lock(&pause_display_mutex);
-        int value = pause_display;
-        pthread_mutex_unlock(&pause_display_mutex);
-        if(value == 0)
-            disp_update(game);
-        
-        
-        
         
     }
+    zmq_close(subscriber);
 }
 
 //Display thread function
@@ -290,6 +301,16 @@ int main(int argc, char *argv[])
             }
         }
     } while (key != 27);
+
+    pthread_mutex_lock(&pause_display_mutex);
+    quit_display = 1;
+    pthread_mutex_unlock(&pause_display_mutex);
+
+    // Wait for the thread to finish
+    if (pthread_join(display_thread, NULL) != 0) {
+        perror("Error joining thread");
+        return 1;
+    }
 
     zmq_close(requester);
     zmq_ctx_destroy(context);
