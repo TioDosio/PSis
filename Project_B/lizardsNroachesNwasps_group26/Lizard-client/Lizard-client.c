@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
     rc = zmq_recv(requester, &disp_start_msg, sizeof(disp_start_msg), 0);
     assert(rc != -1);
     if (client_id == -1){
-        printf("banana");
+        client_id = disp_start_msg.secret_code;
     }
     if (disp_start_msg.success == 0)
     {
@@ -243,6 +243,7 @@ int main(int argc, char *argv[])
         // send the movement message
         if (key != 'x')
         {
+            m.client_code = client_id;
             if (zmq_send(requester, &m, sizeof(m), 0) == -1)
             {
                 continue;

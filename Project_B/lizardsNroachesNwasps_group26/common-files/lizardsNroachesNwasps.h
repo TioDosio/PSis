@@ -62,6 +62,7 @@ typedef struct client_msg // client msg (connections, movements or disconnection
     msg_type_t msg_type;       /* type of message */
     short int content;         /* value to send (points, char, movement direction, etc) */
     int secret_code;           /* secret id for entity */
+    int client_code;            /* client signature (same as its first entity) */
 } client_msg;
 
 typedef struct response_msg

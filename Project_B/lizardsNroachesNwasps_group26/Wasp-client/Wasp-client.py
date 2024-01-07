@@ -40,7 +40,7 @@ def main(server_ip, server_port, n_wasps=None):
     context = zmq.Context()
     socket = context.socket(zmq.REQ)
     socket.connect(f"tcp://{server_ip}:{server_port}")
-
+    client_id = -1
     wasps_codes = [0] * n_wasps
     for i in range(n_wasps):
         client_message = ClientMessage()
@@ -48,6 +48,7 @@ def main(server_ip, server_port, n_wasps=None):
         client_message.message.msg_type = MessageType.CONNECT
         client_message.message.secret_code = 0
         client_message.message.content = 0
+        client_message.message.client_code = client_id
 
         msg = client_message.message.SerializeToString()
         socket.send(msg)
@@ -55,6 +56,8 @@ def main(server_ip, server_port, n_wasps=None):
 
         response_message = messages_pb2.ResponseMessage()
         response_message.ParseFromString(serialized_message)
+        if (client_id == -1):
+            client_id = response_message.secret_code
         if response_message.success == 0:
             exit(0)
         wasps_codes[i] = response_message.secret_code
@@ -67,7 +70,8 @@ def main(server_ip, server_port, n_wasps=None):
             client_message.message.msg_type = MessageType.MOVE  # Assuming you want to send a MOVE message
             client_message.message.content = random.choice([Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT])
             client_message.message.secret_code = wasps_codes[i]
-
+            client_message.message.client_code = client_id
+            
             if client_message.message.content == Direction.LEFT:
                 print(" Going Left")
             elif client_message.message.content == Direction.RIGHT:
@@ -84,9 +88,9 @@ def main(server_ip, server_port, n_wasps=None):
             response_message = messages_pb2.ResponseMessage()
             response_message.ParseFromString(serialized_message)
 
-            #id (response_message.success == 0) :
-            print("success",response_message.success)
-
+            if (response_message.success == 0):
+                    print("Timeout")
+                    exit(0)
 
     socket.close()
 

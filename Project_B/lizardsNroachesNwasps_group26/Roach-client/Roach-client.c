@@ -28,27 +28,30 @@ char server_address[256];
  * @param n number of roaches to spawn
  * @param roach_codes array to store the secret codes of the roaches
  *
+ * @return client_id that is used to send to the server do identify the client
+ *
  */
-void connect_roaches(int n, int *roach_codes)
+int connect_roaches(int n, int *roach_codes)
 {
     zmq_msg_t zmq_msg;
     zmq_msg_init(&zmq_msg);
     int rc;
+    int client_id = -1;
     for (int i = 0; i < n; i++)
     {
         int points_roach = (rand() % 5) + 1;
 
         // Set and send message
-        msg.msg_type = 0;
+        msg.msg_type = CONNECT;
         msg.entity_type = ROACH;
         msg.content = points_roach + '0';
+        msg.client_code = client_id; 
         printf("points_roach: %d\n", points_roach);
 
         int msg_len = client_message__get_packed_size(&msg);
         char *msg_buf = malloc(msg_len);
         client_message__pack(&msg, msg_buf);
 
-        printf("Sending message of length %d\n", msg_len);
         rc = zmq_send(requester, msg_buf, msg_len, 0);
         assert(rc != -1);
 
@@ -61,11 +64,12 @@ void connect_roaches(int n, int *roach_codes)
         r.score = resp->score;
         r.success = resp->success;
         r.secret_code = resp->secret_code;
+        
         response_message__free_unpacked(resp, NULL);
 
-        printf("Secret code: %d\n", r.secret_code);
-        printf("success: %d\n", r.success);
-        printf("score: %d\n", r.score);
+        if (client_id == -1){
+            client_id = r.secret_code;
+        }
         if (r.success == 0)
         {
             printf("Server Full, try again later\n");
@@ -74,6 +78,7 @@ void connect_roaches(int n, int *roach_codes)
         roach_codes[i] = r.secret_code;
         free(msg_buf);
     }
+    return client_id;
 }
 
 int main(int argc, char *argv[])
@@ -136,7 +141,8 @@ int main(int argc, char *argv[])
     assert(rc == 0);
 
     // Send n_roaches connection messages
-    connect_roaches(n_roaches, roach_codes);
+    msg.client_code = connect_roaches(n_roaches, roach_codes);
+
     while (1)
     {
         m.entity_type = ROACH;
@@ -188,6 +194,13 @@ int main(int argc, char *argv[])
             r.success = resp->success;
             r.secret_code = resp->secret_code;
             response_message__free_unpacked(resp, NULL);
+
+            if(r.success == 0){
+                sleep(1);
+                printf("Operation failed. Timed out?\n");
+                sleep(1);
+                continue;
+            }
         }
     }
     zmq_close(requester);

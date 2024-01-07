@@ -13,12 +13,19 @@ pthread_mutex_t mutex_lizard;
 pthread_mutex_t mutex_npc;
 pthread_mutex_t mutex_clients;
 
+typedef struct code_list_t
+{
+    int code;                   // Secret code of entity
+    struct code_list_t *next;   // Pointer to next code in list
+} code_list_t;
+
 typedef struct clients_t
 {
     entity_type_t entity_type;  // Type of entity
     int code;                   // Secret code of client (same as first entity it represents)
     time_t last_received_time;  // Time of last received message
     pthread_t timeout_thread;   // Thread to check timeout
+    code_list_t *npc_list;     // List of codes of entities represented by this client (NULL if lizard)
 } clients_t;
 
 

@@ -109,6 +109,7 @@ clients_t *add_client(entity_type_t entity_type, int secret_code){
 
 int remove_client(clients_t *client){
     pthread_mutex_lock(&mutex_clients);
+    // find id
     int client_id = -1;
     for (int i = 0; i < n_clients; i++)
     {
@@ -118,18 +119,29 @@ int remove_client(clients_t *client){
             break;
         }
     }
-
+    // If not found, return 0
     if (client_id == -1)
     {
         pthread_mutex_unlock(&mutex_clients);
         return 0;
     }
-
+    // Otherwise, remove client
     for (int i = client_id; i < n_clients - 1; i++)
     {
         client_array[i] = client_array[i + 1];
     }
     n_clients--;
+    // Free memory
+    // List of codes
+    code_list_t *current = client->npc_list;
+    code_list_t *next;
+    while (current != NULL)
+    {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+    // Client
     free(client);
     pthread_mutex_unlock(&mutex_clients);
     return 1;

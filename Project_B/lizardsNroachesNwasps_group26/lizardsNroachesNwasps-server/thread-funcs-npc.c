@@ -50,6 +50,7 @@ void *npc_thread(void *npc_args)
         m.entity_type = msg->entity_type;
         m.msg_type = msg->msg_type;
         m.secret_code = msg->secret_code;
+        m.client_code = msg->client_code;
         client_message__free_unpacked(msg, NULL);
         if (m.entity_type == LIZARD)
         {
@@ -72,14 +73,46 @@ void *npc_thread(void *npc_args)
 
                 // success
                 success = 1;
+                disc = -1; // -1 mean the display will add a new npc
+
                 //Save npc id
                 id_npc = shared->n_npc - 1;
-            }
 
+                // Check if client already exists
+                int client_exists = m.client_code != -1;
+
+                if(client_exists){
+                    // Update last received time and add code to list
+                    pthread_mutex_lock(&mutex_clients);
+                    clients_t *client = find_client(m.client_code);
+                    if (client != NULL)
+                    {
+                        client->last_received_time = time(NULL);
+                        // Add code to list
+                        code_list_t *new_code = malloc(sizeof(code_list_t));
+                        new_code->code = code;
+                        new_code->next = client->npc_list;
+                        client->npc_list = new_code;
+                    }
+                    else
+                        success = 0;
+                    pthread_mutex_unlock(&mutex_clients);
+                }
+                else
+                {
+                    
+                    clients_t *client = add_client(m.entity_type, code);
+                    client->npc_list = malloc(sizeof(code_list_t));
+                    client->npc_list->code = code;
+                    client->npc_list->next = NULL;
+                }
+                    
+
+            }
             // END CRITICAL SECTION
             pthread_mutex_unlock(&mutex_npc);
 
-            // Send response [HERE] MUST SEND DISPLAY_CONNECT?
+            // Send response
             generate_r_npc(responder, success, code, 0);
 
             break;
@@ -93,6 +126,9 @@ void *npc_thread(void *npc_args)
             {
                 if (shared->npc_array[i].secret_code == m.secret_code)
                 {
+                    // Need to save the entity to send display update BEFORE removing it
+                    update.entity = shared->npc_array[i];
+
                     // Remove npc from array
                     remove_entity(shared->npc_array, &shared->n_npc, i);
 
@@ -113,17 +149,30 @@ void *npc_thread(void *npc_args)
 
         case MOVE:
             success = move_npc(m.secret_code, m.content, shared, &id_npc);
+            // Find client and update time
+            clients_t *client = find_client(m.secret_code);
+            if (client != NULL)
+                update_time(client);
 
             // Send response
             generate_r_npc(responder, success, m.secret_code, 0);
             break;
-        }
+    }
+
+        if(success == 0) //Dont send display update if not success
+            continue;
+        
         // Create update struct (used to send display updates)
-        pthread_mutex_lock(&mutex_lizard);
-        pthread_mutex_lock(&mutex_npc);
-        update.entity = shared->npc_array[id_npc];
-        pthread_mutex_unlock(&mutex_lizard);
-        pthread_mutex_unlock(&mutex_npc);
+        if(disc != 1)
+        {
+            // Save entity to send display update (no need to save if it disconnected)
+            pthread_mutex_lock(&mutex_lizard);
+            pthread_mutex_lock(&mutex_npc);
+            update.entity = shared->npc_array[id_npc];
+            pthread_mutex_unlock(&mutex_lizard);
+            pthread_mutex_unlock(&mutex_npc);
+        }    
+        
         update.id_l_bumped = -1;
         update.disconnect = disc;
 
@@ -136,5 +185,6 @@ void *npc_thread(void *npc_args)
 
         // Send display update to display-thread
         zmq_send(pusher, &update, sizeof(update), 0);
+        
     }
 }
